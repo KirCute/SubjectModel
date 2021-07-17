@@ -4,12 +4,16 @@
 [Bb]uild/
 [Bb]uilds/
 [Ll]ogs/
+[Uu]ser[Ss]ettings/
 
 # Uncomment this line if you wish to ignore the asset store tools plugin
 # [Aa]ssets/AssetStoreTools*
 
 # Visual Studio cache directory
 .vs/
+
+# Rider cache directory
+.idea/
 
 # Gradle cache directory
 .gradle/
@@ -46,3 +50,12 @@ sysinfo.txt
 
 # Crashlytics generated file
 crashlytics-build.properties
+
+# Assets which is imported
+Assets/Ludiq/
+Assets/Ludiq.meta
+Assets/Plugins/
+Assets/Plugins.meta
+
+# Irrelevant configure file
+ignore.conf
