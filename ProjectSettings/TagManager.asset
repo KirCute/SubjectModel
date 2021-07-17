@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Cinemachine
+  - ScriptContainer
+  - DrugCollider
+  - FlyingDrug
+  - BossAssistance
+  - Enemy
+  - Boss
+  - GUI
+  - BossSpawner
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - Terrain
+  - Water
+  - UI
+  - Fighter
+  - ArmsEffect
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Background
+    uniqueID: 2858305893
+    locked: 0
+  - name: Item
+    uniqueID: 4293286141
+    locked: 0
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Mask
+    uniqueID: 1769639921
+    locked: 0
+  - name: GUI
+    uniqueID: 3127905729
+    locked: 0
