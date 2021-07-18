@@ -140,7 +140,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _data:
-    _json: '{"declarations":{"collection":{"$content":[{"name":"Speed","value":{"$content":15.0,"$type":"System.Single"},"$version":"A"},{"name":"Health","value":{"$content":20.0,"$type":"System.Single"},"$version":"A"},{"name":"MaxHealth","value":{"$content":20.0,"$type":"System.Single"},"$version":"A"},{"name":"Defence","value":{"$content":10.0,"$type":"System.Single"},"$version":"A"}],"$version":"A"},"$version":"A"}}'
+    _json: '{"declarations":{"collection":{"$content":[{"name":"Speed","value":{"$content":15.0,"$type":"System.Single"},"$version":"A"},{"name":"Health","value":{"$content":20.0,"$type":"System.Single"},"$version":"A"},{"name":"MaxHealth","value":{"$content":20.0,"$type":"System.Single"},"$version":"A"},{"name":"Defence","value":{"$content":10.0,"$type":"System.Single"},"$version":"A"},{"name":"Inventory","value":{"$content":[],"$type":"System.Collections.Generic.List`1[[SubjectModel.DrugStack,
+      Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]"},"$version":"A"}],"$version":"A"},"$version":"A"}}'
     _objectReferences: []
 --- !u!114 &8447671915212957988
 MonoBehaviour:
@@ -215,6 +216,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _data:
-    _json: '{"nest":{"source":"Macro","macro":0,"embed":null}}'
-    _objectReferences:
-    - {fileID: 11400000, guid: 1c5a1c613b929b549b78a995e1c6b53b, type: 2}
+    _json: '{"nest":{"source":"Embed","macro":null,"embed":{"title":null,"summary":null,"pan":{"x":0.0,"y":0.0},"zoom":1.0,"elements":[{"nest":{"source":"Embed","macro":null,"embed":{"variables":{"collection":{"$content":[],"$version":"A"},"$version":"A"},"controlInputDefinitions":[],"controlOutputDefinitions":[],"valueInputDefinitions":[],"valueOutputDefinitions":[],"title":"Start","summary":null,"pan":{"x":0.0,"y":0.0},"zoom":1.0,"elements":[{"coroutine":false,"defaultValues":{},"position":{"x":-205.0,"y":-215.0},"guid":"56eefd64-290b-4dde-8c99-b3a46a350e27","$version":"A","$type":"Bolt.OnEnterState"},{"coroutine":false,"defaultValues":{},"position":{"x":-161.0,"y":-38.0},"guid":"b79f9060-cbe7-43ae-84ea-5c7d68b53368","$version":"A","$type":"Bolt.Update"},{"coroutine":false,"defaultValues":{},"position":{"x":-205.0,"y":145.0},"guid":"b3afbb69-abe4-4453-9eaf-04c20b606ef1","$version":"A","$type":"Bolt.OnExitState"}],"$version":"A"}},"isStart":true,"position":{"x":-86.0,"y":-15.0},"width":170.0,"guid":"ec99fd7d-9dbb-4ca5-985d-b06cdea1e4ed","$version":"A","$type":"Bolt.FlowState"}],"$version":"A"}}}'
+    _objectReferences: []

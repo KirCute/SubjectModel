@@ -1,5 +1,6 @@
 using Bolt;
 using Cinemachine;
+using Ludiq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -15,6 +16,7 @@ namespace SubjectModel
         public float bossDefence;
         public float bossSpeed;
         public Vector2 bossSpawnPosition;
+        public StateMacro bossAI;
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (!other.gameObject.CompareTag("Player")) return;
@@ -36,6 +38,11 @@ namespace SubjectModel
             boss.GetComponent<Variables>().declarations.GetDeclaration("Health").value = bossHeart;
             boss.GetComponent<Variables>().declarations.GetDeclaration("Defence").value = bossDefence;
             boss.GetComponent<Variables>().declarations.GetDeclaration("Speed").value = bossSpeed;
+            if (bossAI != null)
+            {
+                boss.GetComponent<StateMachine>().nest.source = GraphSource.Macro;
+                boss.GetComponent<StateMachine>().nest.macro = bossAI;
+            }
             GameObject.FindWithTag("BossAssistance").GetComponent<BossAssistance>().StartBossFight(boss, Raf);
         }
     }
