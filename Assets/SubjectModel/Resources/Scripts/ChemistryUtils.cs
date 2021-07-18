@@ -71,10 +71,10 @@ namespace SubjectModel
         {
             return new List<DrugStack>
             {
-                DrugStackFactory(Buff.Slowness, new object[] {3.0f, 2.0f}),
+                DrugStackFactory(Buff.Slowness, new object[] {3.0f, 3.0f}),
                 DrugStackFactory(Buff.Poison, new object[] {2.0f, 12.5f}),
-                DrugStackFactory(Buff.Curing, new object[] {2.0f, 25f}),
-                DrugStackFactory(Buff.Ghost, new object[] {6.0f}),
+                DrugStackFactory(Buff.Curing, new object[] {1.0f, 12.5f}),
+                DrugStackFactory(Buff.Ghost, new object[] {6.0f, 2.0f}),
                 DrugStackFactory(Buff.Corrosion, new object[] {2.0f, 50f})
             };
         }

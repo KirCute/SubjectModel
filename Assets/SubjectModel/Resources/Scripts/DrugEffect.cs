@@ -142,7 +142,7 @@ namespace SubjectModel
         {
             private float reserveHealth;
 
-            public PIII(float remain) : base(remain, 1.0f)
+            public PIII(float remain, float level) : base(remain, level)
             {
                 reserveHealth = .0f;
             }
@@ -153,17 +153,17 @@ namespace SubjectModel
                 var variables = host.GetComponent<Variables>();
 
                 var health = (float) variables.declarations.GetDeclaration("Health").value;
-                var lost = 5f;
+                var lost = 5f * GetLevel();
                 if (reserveHealth >= health)
                 {
-                    lost += (reserveHealth - health) * 25.0f;
+                    lost += (reserveHealth - health) * 25.0f * GetLevel();
                     variables.declarations.GetDeclaration("Health").value = reserveHealth;
                 }
                 else reserveHealth = health;
 
-                if (!variables.declarations.IsDefined("MaxStrength")) return;
-                var origin = (float) variables.declarations.GetDeclaration("MaxStrength").value;
-                variables.declarations.GetDeclaration("MaxStrength").value = origin - lost * Time.deltaTime;
+                if (!variables.declarations.IsDefined("Energy")) return;
+                var origin = (float) variables.declarations.GetDeclaration("Energy").value;
+                variables.declarations.GetDeclaration("Energy").value = origin - lost * Time.deltaTime;
             }
         }
         public class H : PoisonLike

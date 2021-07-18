@@ -21,7 +21,7 @@ namespace SubjectModel
         {
             var variables = GetComponent<Variables>();
             var strength = (float) variables.declarations.GetDeclaration("Strength").value;
-            var max = (float) variables.declarations.GetDeclaration("MaxStrength").value;
+            var max = (float) variables.declarations.GetDeclaration("Energy").value;
             strength += RecoverSpeed * Time.deltaTime;
             if (strength > max) strength = max;
             var speed = strength >= (float) variables.declarations.GetDeclaration("RunnableStrength").value ? runSpeed : 1.0f;

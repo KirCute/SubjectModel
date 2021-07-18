@@ -85,5 +85,12 @@ namespace SubjectModel
 
             return x;
         }
+
+        public static Vector2 GetRotatedForce(Vector2 force, Vector2 reference, float magnitude, double radian = Math.PI / 2)
+        {
+            var origin = LengthenVector(reference - force, magnitude);
+            return new Vector2((float) (origin.x * Math.Cos(radian) - origin.y * Math.Sin(radian)), 
+                               (float) (origin.x * Math.Sin(radian) + origin.y * Math.Cos(radian))) + force;
+        }
     }
 }

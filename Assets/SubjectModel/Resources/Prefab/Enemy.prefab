@@ -140,7 +140,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _data:
-    _json: '{"declarations":{"collection":{"$content":[{"name":"Speed","value":{"$content":5.0,"$type":"System.Single"},"$version":"A"},{"name":"Health","value":{"$content":20.0,"$type":"System.Single"},"$version":"A"},{"name":"MaxHealth","value":{"$content":20.0,"$type":"System.Single"},"$version":"A"},{"name":"Defence","value":{"$content":10.0,"$type":"System.Single"},"$version":"A"}],"$version":"A"},"$version":"A"}}'
+    _json: '{"declarations":{"collection":{"$content":[{"name":"Speed","value":{"$content":15.0,"$type":"System.Single"},"$version":"A"},{"name":"Health","value":{"$content":20.0,"$type":"System.Single"},"$version":"A"},{"name":"MaxHealth","value":{"$content":20.0,"$type":"System.Single"},"$version":"A"},{"name":"Defence","value":{"$content":10.0,"$type":"System.Single"},"$version":"A"}],"$version":"A"},"$version":"A"}}'
     _objectReferences: []
 --- !u!114 &8447671915212957988
 MonoBehaviour:
