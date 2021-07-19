@@ -43,7 +43,7 @@ namespace SubjectModel
 
         private void Remove(IBuff buff)
         {
-            buff.Destroy(gameObject); 
+            buff.Destroy(gameObject);
             buffs.Remove(buff);
         }
 
@@ -55,14 +55,18 @@ namespace SubjectModel
                 {
                     return;
                 }
-                if (Math.Abs(b.GetLevel() - buff.GetLevel()) < .0001f && b.GetTotalTime() - b.GetRemainedTime() <= buff.GetTotalTime())
+
+                if (Math.Abs(b.GetLevel() - buff.GetLevel()) < .0001f &&
+                    b.GetTotalTime() - b.GetRemainedTime() <= buff.GetTotalTime())
                 {
                     b.Append(buff.GetTotalTime());
                     return;
                 }
+
                 b.LevelUp(gameObject, buff.GetLevel());
                 b.Append(buff.GetTotalTime());
             }
+
             Add(buff);
         }
     }

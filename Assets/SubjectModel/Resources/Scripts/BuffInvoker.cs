@@ -26,14 +26,15 @@ namespace SubjectModel
         {
             remainTime += Time.deltaTime;
             if (remainTime >= aliveTime) Destroy(gameObject);
-            else gameObject.GetComponent<SpriteRenderer>().color = Utils.Vector3To4(DrugDictionary.GetColor(stack), 
-                Utils.Map(.0f, aliveTime, StartColorAlpha, .0f, remainTime));
+            else
+                gameObject.GetComponent<SpriteRenderer>().color = Utils.Vector3To4(DrugDictionary.GetColor(stack),
+                    Utils.Map(.0f, aliveTime, StartColorAlpha, .0f, remainTime));
         }
 
         private void OnTriggerStay2D(Collider2D other)
         {
-            if (other.gameObject.layer == 6 && other.gameObject.TryGetComponent<BuffRenderer>(out var br)) 
-                br.Apply((IBuff)Activator.CreateInstance(DrugDictionary.GetTypeOfBuff(stack.Type), stack.Param));
+            if (other.gameObject.layer == 6 && other.gameObject.TryGetComponent<BuffRenderer>(out var br))
+                br.Apply((IBuff) Activator.CreateInstance(DrugDictionary.GetTypeOfBuff(stack.Type), stack.Param));
         }
 
         private void Initialize(DrugStack buff, Vector2 position, float keepTime = DefaultKeepTime)
@@ -46,22 +47,25 @@ namespace SubjectModel
             stack = buff;
         }
 
-        public static void InvokeByThrower(DrugStack buff, Vector2 position, Vector2 hostPosition, float keepTime = DefaultKeepTime)
+        public static void InvokeByThrower(DrugStack buff, Vector2 position, Vector2 hostPosition,
+            float keepTime = DefaultKeepTime)
         {
             if (Utils.GetMagnitudeSquare2D(position, hostPosition) <= SelfAttackRange * SelfAttackRange)
             {
                 Invoke(buff, position, keepTime);
                 return;
             }
+
             Physics2D.queriesStartInColliders = false;
             var origin = Utils.LengthenArrow(hostPosition, position, StartRange);
             var distanceSquare = Utils.GetMagnitudeSquare2D(position, hostPosition);
-            var distance = distanceSquare < MaxDistance * MaxDistance ?
-                ((float) Math.Sqrt(distanceSquare) - StartRange) : (MaxDistance - StartRange);
+            var distance = distanceSquare < MaxDistance * MaxDistance
+                ? ((float) Math.Sqrt(distanceSquare) - StartRange)
+                : (MaxDistance - StartRange);
             var hit = Physics2D.Raycast(origin, position - origin, distance, DrugMask);
             if (hit.collider != null) distance = hit.distance;
             position = Utils.LengthenArrow(origin, position, distance);
-            
+
             var flyingDrug = (GameObject) GameObject.Instantiate(Resources.Load("Prefab/FlyingDrug"));
             flyingDrug.GetComponent<FlyingDrug>().Initialize(buff, origin, position, keepTime);
         }

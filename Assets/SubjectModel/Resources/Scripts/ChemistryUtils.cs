@@ -9,6 +9,7 @@ namespace SubjectModel
         public Buff Type;
         public object[] Param;
     }
+
     public enum Buff
     {
         Slowness,
@@ -24,7 +25,7 @@ namespace SubjectModel
         private static readonly Dictionary<Buff, string> BuffName = new Dictionary<Buff, string>();
         private static readonly Dictionary<Buff, Vector3> BuffColor = new Dictionary<Buff, Vector3>();
         private static readonly List<DrugStack> DefaultInventory = new List<DrugStack>();
-        
+
         public static Type GetTypeOfBuff(Buff buff)
         {
             if (BuffDictionary.Count != 0) return BuffDictionary[buff];
@@ -67,14 +68,14 @@ namespace SubjectModel
         {
             return GetColor(stack.Type);
         }
-        
+
         public static IList<DrugStack> GetDefaultInventory()
         {
             if (DefaultInventory.Count != 0) return DefaultInventory;
             DefaultInventory.Add(DrugStackFactory(Buff.Slowness, new object[] {3.0f, 3.0f}));
             DefaultInventory.Add(DrugStackFactory(Buff.Poison, new object[] {2.0f, 12.5f}));
             DefaultInventory.Add(DrugStackFactory(Buff.Curing, new object[] {1.0f, 12.5f}));
-            DefaultInventory.Add(DrugStackFactory(Buff.Ghost, new object[] {6.0f, 2.0f}));
+            DefaultInventory.Add(DrugStackFactory(Buff.Ghost, new object[] {6.0f, 10.0f, 0.15f}));
             DefaultInventory.Add(DrugStackFactory(Buff.Corrosion, new object[] {2.0f, 50f}));
             return DefaultInventory;
         }

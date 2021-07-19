@@ -12,11 +12,12 @@ namespace SubjectModel
     {
         public string bossName;
         public string bossResource;
-        public float bossHeart;
+        public float bossHealth;
         public float bossDefence;
         public float bossSpeed;
         public Vector2 bossSpawnPosition;
-        public StateMacro bossAI;
+        public StateMacro bossAi;
+
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (!other.gameObject.CompareTag("Player")) return;
@@ -27,22 +28,24 @@ namespace SubjectModel
             void Raf()
             {
                 GetComponent<PolygonCollider2D>().enabled = false;
-                GameObject.FindWithTag("Cinemachine").GetComponent<CinemachineVirtualCamera>().Follow = other.gameObject.transform;
+                GameObject.FindWithTag("Cinemachine").GetComponent<CinemachineVirtualCamera>().Follow =
+                    other.gameObject.transform;
             }
 
             var boss = (GameObject) GameObject.Instantiate(Resources.Load(bossResource));
             boss.name = bossName;
             boss.tag = "Boss";
             boss.GetComponent<Rigidbody2D>().position = bossSpawnPosition;
-            boss.GetComponent<Variables>().declarations.GetDeclaration("MaxHealth").value = bossHeart;
-            boss.GetComponent<Variables>().declarations.GetDeclaration("Health").value = bossHeart;
+            boss.GetComponent<Variables>().declarations.GetDeclaration("MaxHealth").value = bossHealth;
+            boss.GetComponent<Variables>().declarations.GetDeclaration("Health").value = bossHealth;
             boss.GetComponent<Variables>().declarations.GetDeclaration("Defence").value = bossDefence;
             boss.GetComponent<Variables>().declarations.GetDeclaration("Speed").value = bossSpeed;
-            if (bossAI != null)
+            if (bossAi != null)
             {
                 boss.GetComponent<StateMachine>().nest.source = GraphSource.Macro;
-                boss.GetComponent<StateMachine>().nest.macro = bossAI;
+                boss.GetComponent<StateMachine>().nest.macro = bossAi;
             }
+
             GameObject.FindWithTag("BossAssistance").GetComponent<BossAssistance>().StartBossFight(boss, Raf);
         }
     }

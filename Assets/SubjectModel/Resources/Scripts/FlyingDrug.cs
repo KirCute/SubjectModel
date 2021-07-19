@@ -18,7 +18,7 @@ namespace SubjectModel
             this.buff = buff;
             this.origin = origin;
             GetComponent<Rigidbody2D>().position = origin;
-            GetComponent<Rigidbody2D>().velocity = 
+            GetComponent<Rigidbody2D>().velocity =
                 Utils.LengthenArrow(origin, target, FlyingVelocity);
             this.target = target;
             this.distanceSquare = Utils.GetMagnitudeSquare2D(origin, target);

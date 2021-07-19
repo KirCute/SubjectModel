@@ -4,6 +4,7 @@ using UnityEngine;
 namespace SubjectModel
 {
     public delegate void RecoverAfterFight();
+
     [RequireComponent(typeof(RectTransform))]
     public class BossAssistance : MonoBehaviour
     {
@@ -36,8 +37,12 @@ namespace SubjectModel
         {
             boss = null;
             maxHealth = .0f;
-            raf();
-            raf = null;
+            if (raf != null)
+            {
+                raf();
+                raf = null;
+            }
+
             GetComponent<RectTransform>().sizeDelta = new Vector2(0f, 7.5f);
             fighting = false;
         }

@@ -70,6 +70,7 @@ namespace SubjectModel
                 level = newLevel;
             }
         }
+
         public class PoisonLike : RemainingBuff
         {
             private string variable;
@@ -88,9 +89,11 @@ namespace SubjectModel
             private static void Invoke(string variable, GameObject host, float v)
             {
                 var origin = (float) host.GetComponent<Variables>().declarations.GetDeclaration(variable).value;
-                host.GetComponent<Variables>().declarations.GetDeclaration(variable).value = origin - v * Time.deltaTime;
+                host.GetComponent<Variables>().declarations.GetDeclaration(variable).value =
+                    origin - v * Time.deltaTime;
             }
         }
+
         public class IIIFe : RemainingBuff
         {
             private bool firstUpdate;
@@ -126,25 +129,30 @@ namespace SubjectModel
                 host.GetComponent<Variables>().declarations.GetDeclaration("Speed").value = origin * speed;
             }
         }
+
         public class IICu : PoisonLike
         {
             public IICu(float remain, float level) : base("Health", remain, level)
             {
             }
         }
+
         public class IICo : IICu
         {
             public IICo(float remain, float level) : base(remain, -level)
             {
             }
         }
+
         public class PIII : RemainingBuff
         {
             private float reserveHealth;
+            private float healthLost;
 
-            public PIII(float remain, float level) : base(remain, level)
+            public PIII(float remain, float lostPerSec, float lostPerHealth) : base(remain, lostPerSec)
             {
                 reserveHealth = .0f;
+                healthLost = lostPerHealth;
             }
 
             public override void UpdateAfterDelay(GameObject host)
@@ -153,19 +161,20 @@ namespace SubjectModel
                 var variables = host.GetComponent<Variables>();
 
                 var health = (float) variables.declarations.GetDeclaration("Health").value;
-                var lost = 5f * GetLevel();
+                var lost = GetLevel() * Time.deltaTime;
                 if (reserveHealth >= health)
                 {
-                    lost += (reserveHealth - health) * 25.0f * GetLevel();
+                    lost += (reserveHealth - health) * healthLost;
                     variables.declarations.GetDeclaration("Health").value = reserveHealth;
                 }
                 else reserveHealth = health;
 
                 if (!variables.declarations.IsDefined("Energy")) return;
                 var origin = (float) variables.declarations.GetDeclaration("Energy").value;
-                variables.declarations.GetDeclaration("Energy").value = origin - lost * Time.deltaTime;
+                variables.declarations.GetDeclaration("Energy").value = origin - lost;
             }
         }
+
         public class H : PoisonLike
         {
             public H(float remain, float level) : base("Defence", remain, level)

@@ -10,6 +10,7 @@ namespace SubjectModel
         {
             return (targetEnd - targetBegin) * (source - sourceBegin) / (sourceEnd - sourceBegin) + targetBegin;
         }
+
         public static Vector3 Vector2To3(Vector2 vec, float z = .0f)
         {
             return new Vector3(vec.x, vec.y, z);
@@ -24,7 +25,7 @@ namespace SubjectModel
         {
             return new Vector4(vec.x, vec.y, vec.z, w);
         }
-        
+
         public static float GetMagnitudeSquare2D(Vector3 a, Vector3 b)
         {
             return GetMagnitudeSquare2D(Vector3To2(a), Vector3To2(b));
@@ -60,18 +61,24 @@ namespace SubjectModel
         {
             return LengthenVector(to - from, magnitude) + from;
         }
-        public static float GenerateGaussian() {
+
+        public static float GenerateGaussian()
+        {
             float v1;
             float s;
-            do {
+            do
+            {
                 v1 = 2.0f * Random.Range(0f, 1f) - 1.0f;
                 var v2 = 2.0f * Random.Range(0f, 1f) - 1.0f;
                 s = v1 * v1 + v2 * v2;
             } while (s >= 1.0f || Math.Abs(s) < .0000001f);
+
             s = Mathf.Sqrt((-2.0f * Mathf.Log(s)) / s);
             return v1 * s;
         }
-        public static float GenerateGaussian(float mean, float standardDeviation) {
+
+        public static float GenerateGaussian(float mean, float standardDeviation)
+        {
             return mean + GenerateGaussian() * standardDeviation;
         }
 
@@ -86,11 +93,12 @@ namespace SubjectModel
             return x;
         }
 
-        public static Vector2 GetRotatedForce(Vector2 force, Vector2 reference, float magnitude, double radian = Math.PI / 2)
+        public static Vector2 GetRotatedForce(Vector2 force, Vector2 reference, float magnitude,
+            double radian = Math.PI / 2)
         {
             var origin = LengthenVector(reference - force, magnitude);
-            return new Vector2((float) (origin.x * Math.Cos(radian) - origin.y * Math.Sin(radian)), 
-                               (float) (origin.x * Math.Sin(radian) + origin.y * Math.Cos(radian))) + force;
+            return new Vector2((float) (origin.x * Math.Cos(radian) - origin.y * Math.Sin(radian)),
+                (float) (origin.x * Math.Sin(radian) + origin.y * Math.Cos(radian))) + force;
         }
     }
 }

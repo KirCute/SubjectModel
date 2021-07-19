@@ -39,13 +39,13 @@ namespace SubjectModel
             aim.y = Utils.GenerateGaussian(aim.y, deviation * distance, maxRange);
             var shooterPosition = GetComponent<Rigidbody2D>().position;
             if (shooterPosition == aim) return;
-            
+
             bulletRemain--;
             GetComponent<Variables>().declarations.GetDeclaration("Loading").value = loadingTime;
             Physics2D.queriesStartInColliders = false;
             var origin = Utils.LengthenArrow(shooterPosition, aim, StartRange);
             var hit = Physics2D.Raycast(origin, aim - origin, this.distance, ShootMask);
-            
+
             var dist = hit.collider == null ? distance : hit.distance;
             aim = Utils.LengthenArrow(origin, aim, dist);
             var track = GetComponent<LineRenderer>();
@@ -55,11 +55,12 @@ namespace SubjectModel
 
             if (hit.collider == null || hit.collider.gameObject.layer != 6) return;
             var variables = hit.collider.GetComponent<Variables>();
-            var defence = variables.declarations.IsDefined("Defence") ?
-                (float) variables.declarations.GetDeclaration("Defence").value : .0f;
+            var defence = variables.declarations.IsDefined("Defence")
+                ? (float) variables.declarations.GetDeclaration("Defence").value
+                : .0f;
             var health = (float) variables.declarations.GetDeclaration("Health").value;
-            variables.declarations.GetDeclaration("Health").value = health - (defence > depth ? 
-                Utils.Map(.0f, defence, .0f, damage, depth) : damage);
+            variables.declarations.GetDeclaration("Health").value =
+                health - (defence > depth ? Utils.Map(.0f, defence, .0f, damage, depth) : damage);
         }
     }
 }
