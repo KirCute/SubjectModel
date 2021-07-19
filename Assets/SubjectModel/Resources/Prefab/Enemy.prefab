@@ -10,12 +10,14 @@ GameObject:
   m_Component:
   - component: {fileID: 4546479427986897494}
   - component: {fileID: 113682655656182581}
+  - component: {fileID: 6180226607758788873}
   - component: {fileID: -100802708464695792}
   - component: {fileID: 414931163832227253}
   - component: {fileID: 510462755288934979}
   - component: {fileID: 8447671915212957988}
   - component: {fileID: -3625144484042481032}
   - component: {fileID: 2645565174689144944}
+  - component: {fileID: 3783856003099380856}
   - component: {fileID: 7834381494281578483}
   - component: {fileID: 8476038742562072724}
   m_Layer: 6
@@ -90,6 +92,25 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!95 &6180226607758788873
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9204706058163521875}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: f789a3f54efb4194fbc7d82bffa52657, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!50 &-100802708464695792
 Rigidbody2D:
   serializedVersion: 4
@@ -191,6 +212,22 @@ MonoBehaviour:
     _json: '{"nest":{"source":"Macro","macro":0,"embed":null}}'
     _objectReferences:
     - {fileID: 11400000, guid: 30afacfbf8c02af44a88c748449d95d0, type: 2}
+--- !u!114 &3783856003099380856
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9204706058163521875}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -57143145, guid: a040fb66244a7f54289914d98ea4ef7d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _data:
+    _json: '{"nest":{"source":"Macro","macro":0,"embed":null}}'
+    _objectReferences:
+    - {fileID: 11400000, guid: 2124022eea8816145af093a70885169d, type: 2}
 --- !u!114 &7834381494281578483
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -2,7 +2,6 @@ using Bolt;
 using Cinemachine;
 using Ludiq;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace SubjectModel
 {

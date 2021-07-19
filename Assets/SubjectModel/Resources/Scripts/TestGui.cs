@@ -6,6 +6,12 @@ using UnityEngine;
 
 namespace SubjectModel
 {
+    internal struct Pair<T>
+    {
+        public T First;
+        public T Second;
+    }
+
     public class TestGui : MonoBehaviour
     {
         private int selected;
@@ -97,7 +103,7 @@ namespace SubjectModel
 
         private void OnGUI()
         {
-            GUILayout.Window(0, new Rect(20, 20, 400, 50), id =>
+            GUILayout.Window(0, new Rect(20, 20, 300, 50), id =>
             {
                 selected = GUILayout.Toolbar(selected, new[] {"玩家", "敌人", "枪械", "炼金术", "收起"});
                 switch (selected)
@@ -108,9 +114,9 @@ namespace SubjectModel
                         ManualAdjustString("血量上限", ref maxHealth, "MaxHealth", playerVariables);
                         ManualAdjustSlider("血量", ref health, ref healthUpdate, "MaxHealth", "Health", playerVariables);
                         ManualAdjustString("精神上限", ref maxStrength, "MaxStrength", playerVariables);
-                        ManualAdjustSlider("能量", ref energy, ref energyUpdate, "MaxStrength", "Energy",
+                        ManualAdjustSlider("精神", ref energy, ref energyUpdate, "MaxStrength", "Energy",
                             playerVariables);
-                        ManualAdjustSlider("精神", ref strength, ref strengthUpdate, "Energy", "Strength",
+                        ManualAdjustSlider("体力", ref strength, ref strengthUpdate, "Energy", "Strength",
                             playerVariables);
                         ManualAdjustFloatUpdating("移动速度", ref speed, ref speedUpdate, "Speed", playerVariables);
                         ManualAdjustFloatUpdating("防御", ref defence, ref defenceUpdate, "Defence", playerVariables);
@@ -140,6 +146,7 @@ namespace SubjectModel
                         ManualAdjustFloatUpdating("剩余装填时间(s)", ref loading, ref loadingUpdate, "Loading",
                             playerVariables);
                         AutoAdjustString("射程(m)", ref distance);
+                        playerGun.telescope = GUILayout.Toggle(playerGun.telescope, "使用瞄具");
                         break;
                     case 3:
                         for (var i = 0; i < inventory.Count; i++)
@@ -157,8 +164,8 @@ namespace SubjectModel
         private static void AutoAdjustString(string text, ref string value)
         {
             GUILayout.BeginHorizontal("Box");
-            GUILayout.Label(text);
-            value = GUILayout.TextField(value);
+            GUILayout.Label(text, GUILayout.ExpandWidth(false));
+            value = GUILayout.TextField(value, GUILayout.ExpandWidth(true));
             GUILayout.EndHorizontal();
         }
 
@@ -172,9 +179,9 @@ namespace SubjectModel
         private static void ManualAdjustString(string text, ref string value, ref float target)
         {
             GUILayout.BeginHorizontal("Box");
-            GUILayout.Label(text);
-            value = GUILayout.TextField(value);
-            if (GUILayout.Button("生效")) target = float.Parse(value);
+            GUILayout.Label(text, GUILayout.ExpandWidth(false));
+            value = GUILayout.TextField(value, GUILayout.ExpandWidth(true));
+            if (GUILayout.Button("生效", GUILayout.ExpandWidth(false))) target = float.Parse(value);
             GUILayout.EndHorizontal();
         }
 
@@ -189,10 +196,10 @@ namespace SubjectModel
         private static void ManualAdjustIntUpdating(string text, ref string value, ref bool update, ref int target)
         {
             GUILayout.BeginHorizontal("Box");
-            GUILayout.Label(text);
-            value = GUILayout.TextField(value);
-            if (GUILayout.Button("生效")) target = int.Parse(value);
-            update = GUILayout.Toggle(update, "实时更新");
+            GUILayout.Label(text, GUILayout.ExpandWidth(false));
+            value = GUILayout.TextField(value, GUILayout.ExpandWidth(true));
+            if (GUILayout.Button("生效", GUILayout.ExpandWidth(false))) target = int.Parse(value);
+            update = GUILayout.Toggle(update, "实时更新", GUILayout.ExpandWidth(false));
             if (update) value = target.ToString();
             GUILayout.EndHorizontal();
         }
@@ -208,10 +215,10 @@ namespace SubjectModel
         private static void ManualAdjustFloatUpdating(string text, ref string value, ref bool update, ref float target)
         {
             GUILayout.BeginHorizontal("Box");
-            GUILayout.Label(text);
-            value = GUILayout.TextField(value);
-            if (GUILayout.Button("生效")) target = float.Parse(value);
-            update = GUILayout.Toggle(update, "实时更新");
+            GUILayout.Label(text, GUILayout.ExpandWidth(false));
+            value = GUILayout.TextField(value, GUILayout.ExpandWidth(true));
+            if (GUILayout.Button("生效", GUILayout.ExpandWidth(false))) target = float.Parse(value);
+            update = GUILayout.Toggle(update, "实时更新", GUILayout.ExpandWidth(false));
             if (update) value = target.ToString();
             GUILayout.EndHorizontal();
         }
@@ -229,11 +236,11 @@ namespace SubjectModel
             ref float target)
         {
             GUILayout.BeginHorizontal("Box");
-            GUILayout.Label(text);
-            value = GUILayout.HorizontalSlider(value, .0f, max);
+            GUILayout.Label(text, GUILayout.ExpandWidth(false));
+            value = GUILayout.HorizontalSlider(value, .0f, max, GUILayout.MinWidth(100));
             GUILayout.Label(Math.Round(value).ToString());
-            if (GUILayout.Button("生效")) target = value;
-            update = GUILayout.Toggle(update, "实时更新");
+            if (GUILayout.Button("生效", GUILayout.ExpandWidth(false))) target = value;
+            update = GUILayout.Toggle(update, "实时更新", GUILayout.ExpandWidth(false));
             if (update) value = target;
             GUILayout.EndHorizontal();
         }
@@ -241,8 +248,9 @@ namespace SubjectModel
         private static void DrugStackAdjuster(Buff type, ref string[] stack)
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label(DrugDictionary.GetName(type));
-            for (var i = 0; i < stack.Length; i++) stack[i] = GUILayout.TextField(stack[i]);
+            GUILayout.Label(DrugDictionary.GetName(type), GUILayout.ExpandWidth(false));
+            for (var i = 0; i < stack.Length; i++)
+                stack[i] = GUILayout.TextField(stack[i], GUILayout.ExpandWidth(true));
             GUILayout.EndHorizontal();
         }
     }
