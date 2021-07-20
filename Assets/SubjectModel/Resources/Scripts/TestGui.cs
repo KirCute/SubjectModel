@@ -146,7 +146,9 @@ namespace SubjectModel
                         ManualAdjustFloatUpdating("剩余装填时间(s)", ref loading, ref loadingUpdate, "Loading",
                             playerVariables);
                         AutoAdjustString("射程(m)", ref distance);
+                        GUILayout.BeginHorizontal("Box");
                         playerGun.telescope = GUILayout.Toggle(playerGun.telescope, "使用瞄具");
+                        GUILayout.EndHorizontal();
                         break;
                     case 3:
                         for (var i = 0; i < inventory.Count; i++)
@@ -158,7 +160,7 @@ namespace SubjectModel
 
                         break;
                 }
-            }, "Test");
+            }, "测试窗口");
         }
 
         private static void AutoAdjustString(string text, ref string value)
@@ -247,7 +249,7 @@ namespace SubjectModel
 
         private static void DrugStackAdjuster(Buff type, ref string[] stack)
         {
-            GUILayout.BeginHorizontal();
+            GUILayout.BeginHorizontal("Box");
             GUILayout.Label(DrugDictionary.GetName(type), GUILayout.ExpandWidth(false));
             for (var i = 0; i < stack.Length; i++)
                 stack[i] = GUILayout.TextField(stack[i], GUILayout.ExpandWidth(true));

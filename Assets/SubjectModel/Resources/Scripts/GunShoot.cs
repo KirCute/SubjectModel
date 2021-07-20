@@ -5,6 +5,7 @@ namespace SubjectModel
 {
     [RequireComponent(typeof(Variables))]
     [RequireComponent(typeof(Rigidbody2D))]
+    [RequireComponent(typeof(LineRenderer))]
     public class GunShoot : MonoBehaviour
     {
         private const float StartRange = 0.18f;
