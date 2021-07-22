@@ -181,5 +181,12 @@ namespace SubjectModel
             {
             }
         }
+
+        public class IIFe : IIIFe
+        {
+            public IIFe(float remain, float level) : base(remain, 1f / level)
+            {
+            }
+        }
     }
 }

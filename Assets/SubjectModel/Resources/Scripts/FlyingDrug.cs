@@ -6,16 +6,16 @@ namespace SubjectModel
     public class FlyingDrug : MonoBehaviour
     {
         private const float FlyingVelocity = 40.0f;
-        private DrugStack buff;
+        private DrugStack drug;
         private Vector2 origin;
         private Vector2 target;
         private float distanceSquare;
         private float keepTime;
 
-        public void Initialize(DrugStack buff, Vector2 origin, Vector2 target, float keepTime)
+        public void Initialize(DrugStack drug, Vector2 origin, Vector2 target, float keepTime)
         {
-            gameObject.name = "FlyingDrug_" + buff.Type;
-            this.buff = buff;
+            gameObject.name = "FlyingDrug_" + drug.Tag;
+            this.drug = drug;
             this.origin = origin;
             GetComponent<Rigidbody2D>().position = origin;
             GetComponent<Rigidbody2D>().velocity =
@@ -33,7 +33,7 @@ namespace SubjectModel
 
         private void Invoke()
         {
-            BuffInvoker.Invoke(buff, target, keepTime);
+            BuffInvoker.Invoke(drug, target, keepTime);
             Destroy(gameObject);
         }
     }

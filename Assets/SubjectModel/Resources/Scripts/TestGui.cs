@@ -42,9 +42,12 @@ namespace SubjectModel
         private string loadingTime;
         private string loading;
         private bool loadingUpdate;
+
         private string distance;
+        /*
         private IList<DrugStack> inventory;
         private IList<string[]> chemistryMenu;
+        */
 
         private void Start()
         {
@@ -78,10 +81,12 @@ namespace SubjectModel
             loading = playerVariables.declarations.GetDeclaration("Loading").value.ToString();
             loadingUpdate = false;
             distance = playerGun.distance.ToString();
+            /*
             inventory = DrugDictionary.GetDefaultInventory();
             chemistryMenu = new List<string[]>();
             foreach (var stack in inventory)
-                chemistryMenu.Add((from param in stack.Param select param.ToString()).ToArray());
+                chemistryMenu.Add((from param in stack.param select param.ToString()).ToArray());
+            */
         }
 
         private void Update()
@@ -95,10 +100,12 @@ namespace SubjectModel
             if (float.TryParse(maxRange, out value)) playerGun.maxRange = value;
             if (float.TryParse(loadingTime, out value)) playerGun.loadingTime = value;
             if (float.TryParse(distance, out value)) playerGun.distance = value;
+            /*
             for (var i = 0; i < inventory.Count; i++)
-            for (var j = 0; j < inventory[i].Param.Length; j++)
+            for (var j = 0; j < inventory[i].param.Length; j++)
                 if (float.TryParse(chemistryMenu[i][j], out value))
-                    inventory[i].Param[j] = value;
+                    inventory[i].param[j] = value;
+            */
         }
 
         private void OnGUI()
@@ -151,12 +158,14 @@ namespace SubjectModel
                         GUILayout.EndHorizontal();
                         break;
                     case 3:
+                        /*
                         for (var i = 0; i < inventory.Count; i++)
                         {
                             var strings = chemistryMenu[i];
-                            DrugStackAdjuster(inventory[i].Type, ref strings);
+                            DrugStackAdjuster(inventory[i].type, ref strings);
                             chemistryMenu[i] = strings;
                         }
+                        */
 
                         break;
                 }

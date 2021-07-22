@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SubjectModel
@@ -16,10 +17,12 @@ namespace SubjectModel
         private float aliveTime;
         private DrugStack stack;
         private float remainTime;
+        private IList<Collider2D> stained;
 
         private void Start()
         {
             remainTime = .0f;
+            stained = new List<Collider2D>();
         }
 
         private void Update()
@@ -27,32 +30,35 @@ namespace SubjectModel
             remainTime += Time.deltaTime;
             if (remainTime >= aliveTime) Destroy(gameObject);
             else
-                gameObject.GetComponent<SpriteRenderer>().color = Utils.Vector3To4(DrugDictionary.GetColor(stack),
+                gameObject.GetComponent<SpriteRenderer>().color = Utils.Vector3To4(
+                    DrugDictionary.GetColor(stack.Ions[0]),
                     Utils.Map(.0f, aliveTime, StartColorAlpha, .0f, remainTime));
         }
 
         private void OnTriggerStay2D(Collider2D other)
         {
-            if (other.gameObject.layer == 6 && other.gameObject.TryGetComponent<BuffRenderer>(out var br))
-                br.Apply((IBuff) Activator.CreateInstance(DrugDictionary.GetTypeOfBuff(stack.Type), stack.Param));
+            if (other.gameObject.layer != 6 || !other.gameObject.TryGetComponent<BuffRenderer>(out var br) ||
+                stained.Contains(other)) return;
+            br.React(stack);
+            stained.Add(other);
         }
 
-        private void Initialize(DrugStack buff, Vector2 position, float keepTime = DefaultKeepTime)
+        private void Initialize(DrugStack drug, Vector2 position, float keepTime = DefaultKeepTime)
         {
-            gameObject.name = "DrugCollider_" + buff.Type + "_" + position;
+            gameObject.name = "DrugCollider_" + drug.Tag + "_" + position;
             transform.position = Utils.Vector2To3(position);
             GetComponent<SpriteRenderer>().color =
-                Utils.Vector3To4(DrugDictionary.GetColor(buff), StartColorAlpha);
+                Utils.Vector3To4(DrugDictionary.GetColor(drug.Ions[0]), StartColorAlpha);
             aliveTime = keepTime;
-            stack = buff;
+            stack = drug;
         }
 
-        public static void InvokeByThrower(DrugStack buff, Vector2 position, Vector2 hostPosition,
+        public static void InvokeByThrower(DrugStack drug, Vector2 position, Vector2 hostPosition,
             float keepTime = DefaultKeepTime)
         {
             if (Utils.GetMagnitudeSquare2D(position, hostPosition) <= SelfAttackRange * SelfAttackRange)
             {
-                Invoke(buff, position, keepTime);
+                Invoke(drug.Clone(), position, keepTime);
                 return;
             }
 
@@ -67,13 +73,13 @@ namespace SubjectModel
             position = Utils.LengthenArrow(origin, position, distance);
 
             var flyingDrug = (GameObject) GameObject.Instantiate(Resources.Load("Prefab/FlyingDrug"));
-            flyingDrug.GetComponent<FlyingDrug>().Initialize(buff, origin, position, keepTime);
+            flyingDrug.GetComponent<FlyingDrug>().Initialize(drug.Clone(), origin, position, keepTime);
         }
 
-        public static void Invoke(DrugStack buff, Vector2 position, float keepTime = DefaultKeepTime)
+        public static void Invoke(DrugStack drug, Vector2 position, float keepTime = DefaultKeepTime)
         {
             var drugCollider = (GameObject) GameObject.Instantiate(Resources.Load("Prefab/DrugCollider"));
-            drugCollider.GetComponent<BuffInvoker>().Initialize(buff, position, keepTime);
+            drugCollider.GetComponent<BuffInvoker>().Initialize(drug, position, keepTime);
         }
     }
 }

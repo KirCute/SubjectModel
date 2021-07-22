@@ -6,18 +6,17 @@ using UnityEngine;
 
 namespace SubjectModel
 {
-    
     public static class GunDictionary
     {
         private static List<Gun> defaultInventory;
-        
+
         public static List<Gun> GetDefaultInventory()
         {
             if (defaultInventory != null) return defaultInventory;
             defaultInventory = JsonUtility.FromJson<GunData>(Resources.Load<TextAsset>("Firearms").text).guns;
             return defaultInventory;
         }
-        
+
         [MenuItem("Data/Generate Firearms Data")]
         private static void GenerateFirearmsData()
         {
@@ -39,7 +38,7 @@ namespace SubjectModel
     {
         public List<Gun> guns;
     }
-    
+
     [Serializable]
     public class Gun
     {
