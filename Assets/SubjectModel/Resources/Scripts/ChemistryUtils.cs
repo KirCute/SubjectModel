@@ -19,7 +19,29 @@ namespace SubjectModel
     public static class Elements
     {
         private static readonly float[] DefaultParam = {1f, 1f};
-
+        
+        public static readonly Element H = new Element("H")
+        {
+            valences = new[] {0, 1},
+            oxygenCount = new[]
+            {
+                new[] {.0f, .0f},
+                new[] {.0f, .5f}
+            },
+            potential = new[]
+            {
+                new[] {.0f},
+                new[] {.0f}
+            },
+            buffType = new[] {Buff.Empty, Buff.Corrosion},
+            buffParam = new[] {DefaultParam, new[] {2.0f, 50f}},
+            state = new[]
+            {
+                new[] {Element.Gas, Element.Aqua},
+                new[] {Element.Gas, Element.Aqua},
+            }
+        };
+        
         public static readonly Element O = new Element("O")
         {
             valences = new[] {-2, -1, 0},
@@ -39,6 +61,49 @@ namespace SubjectModel
             {
                 new[] {Element.Aqua, Element.Aqua, Element.Gas},
                 new[] {Element.Aqua, Element.Aqua, Element.Gas},
+            }
+        };
+
+        public static readonly Element Cl = new Element("Cl")
+        {
+            valences = new[] {-1, 0},
+            oxygenCount = new[]
+            {
+                new[] {.0f, .0f},
+                new[] {.0f, .0f}
+            },
+            potential = new[]
+            {
+                new[] {1.358f},
+                new[] {1.358f}
+            },
+            buffType = new[] {Buff.Empty, Buff.Poison},
+            buffParam = new[] {DefaultParam, new[] {10f, 1f}},
+            state = new[]
+            {
+                new[] {Element.Aqua, Element.Gas},
+                new[] {Element.Aqua, Element.Gas},
+            }
+        };
+        
+        public static readonly Element K = new Element("K")
+        {
+            valences = new[] {1},
+            oxygenCount = new[]
+            {
+                new[] {.0f, .0f}
+            },
+            potential = new[]
+            {
+                new float[] {},
+                new float[] {}
+            },
+            buffType = new[] {Buff.Empty},
+            buffParam = new[] {DefaultParam},
+            state = new[]
+            {
+                new[] {Element.Aqua},
+                new[] {Element.Aqua},
             }
         };
 
@@ -119,7 +184,10 @@ namespace SubjectModel
             potential = new[]
             {
                 new[] {1.8f},
-                new[] {/* Offstandard */ 0.65f}
+                new[]
+                {
+                    /* Offstandard */ 0.65f
+                }
             },
             buffType = new[] {Buff.Poison, Buff.Empty},
             buffParam = new[] {new[] {2f, 12.5f}, DefaultParam},
@@ -191,20 +259,25 @@ namespace SubjectModel
             if (DefaultInventory.Count != 0) return DefaultInventory;
             DefaultInventory.Add(new DrugStack
             {
-                Tag = "FeCl3(H+)",
+                Tag = "FeCl3",
                 Ions = new List<IonStack>
                 {
                     new IonStack
                     {
                         Element = Elements.Fe, Index = Elements.Fe.GetIndex(3),
                         Amount = 1f, Concentration = 1f
+                    },
+                    new IonStack
+                    {
+                        Element = Elements.Cl, Index = Elements.Cl.GetIndex(-1),
+                        Amount = 3f, Concentration = 3f
                     }
                 },
                 Properties = Element.Acid
             });
             DefaultInventory.Add(new DrugStack
             {
-                Tag = "CuSO4(H+)",
+                Tag = "CuSO4",
                 Ions = new List<IonStack>
                 {
                     new IonStack
@@ -217,7 +290,7 @@ namespace SubjectModel
             });
             DefaultInventory.Add(new DrugStack
             {
-                Tag = "CoSO4(H+)",
+                Tag = "CoSO4",
                 Ions = new List<IonStack>
                 {
                     new IonStack
@@ -230,7 +303,25 @@ namespace SubjectModel
             });
             DefaultInventory.Add(new DrugStack
             {
-                Tag = "FeSO4(H+)",
+                Tag = "HCl",
+                Ions = new List<IonStack>
+                {
+                    new IonStack
+                    {
+                        Element = Elements.H, Index = Elements.H.GetIndex(1),
+                        Amount = 1f, Concentration = 1f
+                    },
+                    new IonStack
+                    {
+                        Element = Elements.Cl, Index = Elements.Cl.GetIndex(-1),
+                        Amount = 1f, Concentration = 1f
+                    }
+                },
+                Properties = Element.Acid
+            });
+            DefaultInventory.Add(new DrugStack
+            {
+                Tag = "FeSO4",
                 Ions = new List<IonStack>
                 {
                     new IonStack
@@ -243,7 +334,7 @@ namespace SubjectModel
             });
             DefaultInventory.Add(new DrugStack
             {
-                Tag = "H2O2(H+)",
+                Tag = "H2O2",
                 Ions = new List<IonStack>
                 {
                     new IonStack
@@ -256,9 +347,14 @@ namespace SubjectModel
             });
             DefaultInventory.Add(new DrugStack
             {
-                Tag = "KMnO4(H+)",
+                Tag = "KMnO4",
                 Ions = new List<IonStack>
                 {
+                    new IonStack
+                    {
+                        Element = Elements.K, Index = Elements.K.GetIndex(1),
+                        Amount = 1f, Concentration = 1f
+                    },
                     new IonStack
                     {
                         Element = Elements.Mn, Index = Elements.Mn.GetIndex(7),
@@ -267,13 +363,7 @@ namespace SubjectModel
                 },
                 Properties = Element.Acid
             });
-            /*
-            DefaultInventory.Add(DrugStackFactory(Buff.Slowness, new object[] {3.0f, 3.0f}));
-            DefaultInventory.Add(DrugStackFactory(Buff.Poison, new object[] {2.0f, 12.5f}));
-            DefaultInventory.Add(DrugStackFactory(Buff.Curing, new object[] {1.0f, 12.5f}));
-            DefaultInventory.Add(DrugStackFactory(Buff.Ghost, new object[] {6.0f, 10.0f, 0.15f}));
-            DefaultInventory.Add(DrugStackFactory(Buff.Corrosion, new object[] {2.0f, 50f}));
-            */
+            //DefaultInventory.Add(DrugStackFactory(Buff.Ghost, new object[] {6.0f, 10.0f, 0.15f}));
             return DefaultInventory;
         }
     }
@@ -285,6 +375,19 @@ namespace SubjectModel
         public float Amount;
         public float Concentration;
         public float DropTime;
+
+        public string GetSymbol(int properties)
+        {
+            var charge = Element.GetCharge(Index, properties);
+            var chargeStr = charge == 0
+                ? ""
+                : Math.Abs(charge) == 1
+                    ? $"{(charge >= 0 ? "+" : "-")}"
+                    : $"{Math.Abs(charge).ToString()}{(charge >= 0 ? "+" : "-")}";
+            return Element.oxygenCount[properties][Index] < .5f
+                ? $"{Element.symbol}{chargeStr}"
+                : $"{Element.symbol}O{Element.oxygenCount[properties][Index]} {chargeStr}";
+        }
     }
 
     public class DrugStack

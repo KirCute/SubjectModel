@@ -42,12 +42,14 @@ namespace SubjectModel
         private string loadingTime;
         private string loading;
         private bool loadingUpdate;
-
         private string distance;
-        /*
+        private string mdc;
+        private string tdc;
+        private string mdp;
         private IList<DrugStack> inventory;
-        private IList<string[]> chemistryMenu;
-        */
+        private IList<IList<IList<string>>> chemistryMenu;
+        private IList<string> drugProperties;
+        private Vector2 chemistryScrollPos;
 
         private void Start()
         {
@@ -81,12 +83,23 @@ namespace SubjectModel
             loading = playerVariables.declarations.Get("Loading").ToString();
             loadingUpdate = false;
             distance = playerGun.distance.ToString();
-            /*
             inventory = DrugDictionary.GetDefaultInventory();
-            chemistryMenu = new List<string[]>();
-            foreach (var stack in inventory)
-                chemistryMenu.Add((from param in stack.param select param.ToString()).ToArray());
-            */
+            drugProperties = new List<string>();
+            mdc = BuffRenderer.MotiveDamageCoefficient.ToString();
+            tdc = BuffRenderer.ThermalDamageCoefficient.ToString();
+            mdp = BuffRenderer.MinimumDamagePotential.ToString();
+            chemistryMenu = new List<IList<IList<string>>>();
+            foreach (var drug in inventory)
+            {
+                drugProperties.Add(drug.Properties.ToString());
+                var drugList = drug.Ions.Select(ion => new List<string>
+                {
+                    ion.GetSymbol(drug.Properties), ion.Index.ToString(),
+                    ion.Amount.ToString(), ion.Concentration.ToString()
+                }).Cast<IList<string>>().ToList();
+                chemistryMenu.Add(drugList);
+            }
+            chemistryScrollPos = Vector2.zero;
         }
 
         private void Update()
@@ -100,17 +113,25 @@ namespace SubjectModel
             if (float.TryParse(maxRange, out value)) playerGun.maxRange = value;
             if (float.TryParse(loadingTime, out value)) playerGun.loadingTime = value;
             if (float.TryParse(distance, out value)) playerGun.distance = value;
-            /*
+            if (float.TryParse(mdc, out value)) BuffRenderer.MotiveDamageCoefficient = value;
+            if (float.TryParse(tdc, out value)) BuffRenderer.ThermalDamageCoefficient = value;
+            if (float.TryParse(mdp, out value)) BuffRenderer.MinimumDamagePotential = value;
             for (var i = 0; i < inventory.Count; i++)
-            for (var j = 0; j < inventory[i].param.Length; j++)
-                if (float.TryParse(chemistryMenu[i][j], out value))
-                    inventory[i].param[j] = value;
-            */
+            {
+                if (int.TryParse(drugProperties[i], out var intValue)) inventory[i].Properties = intValue;
+                for (var j = 0; j < chemistryMenu[i].Count; j++)
+                {
+                    chemistryMenu[i][j][0] = inventory[i].Ions[j].GetSymbol(inventory[i].Properties);
+                    if (int.TryParse(chemistryMenu[i][j][1], out intValue)) inventory[i].Ions[j].Index = intValue;
+                    if (float.TryParse(chemistryMenu[i][j][2], out value)) inventory[i].Ions[j].Amount = value;
+                    if (float.TryParse(chemistryMenu[i][j][3], out value)) inventory[i].Ions[j].Concentration = value;
+                }
+            }
         }
 
         private void OnGUI()
         {
-            GUILayout.Window(0, new Rect(20, 20, 300, 50), id =>
+            GUILayout.Window(0, new Rect(30, 40, 300, 20), id =>
             {
                 selected = GUILayout.Toolbar(selected, new[] {"玩家", "敌人", "枪械", "炼金术", "收起"});
                 switch (selected)
@@ -158,14 +179,20 @@ namespace SubjectModel
                         GUILayout.EndHorizontal();
                         break;
                     case 3:
-                        /*
-                        for (var i = 0; i < inventory.Count; i++)
+                        GUILayout.BeginVertical("Box");
+                        AutoAdjustString("动力伤害系数", ref mdc);
+                        AutoAdjustString("热力伤害系数", ref tdc);
+                        AutoAdjustString("最小热力伤害电势差", ref mdp);
+                        GUILayout.EndVertical();
+                        chemistryScrollPos = GUILayout.BeginScrollView(chemistryScrollPos,
+                            true, false, GUILayout.Height(200));
+                        for (var i = 0; i < chemistryMenu.Count; i++)
                         {
-                            var strings = chemistryMenu[i];
-                            DrugStackAdjuster(inventory[i].type, ref strings);
-                            chemistryMenu[i] = strings;
+                            var drugProperty = drugProperties[i];
+                            DrugStackAdjuster(inventory[i].Tag, ref drugProperty, chemistryMenu[i]);
+                            drugProperties[i] = drugProperty;
                         }
-                        */
+                        GUILayout.EndScrollView();
 
                         break;
                 }
@@ -256,11 +283,22 @@ namespace SubjectModel
             GUILayout.EndHorizontal();
         }
 
-        private static void DrugStackAdjuster(Buff type, ref string[] stack)
+        private static void DrugStackAdjuster(string tag, ref string properties, IList<IList<string>> stack)
         {
-            GUILayout.BeginHorizontal("Box");
-            GUILayout.Label(DrugDictionary.GetName(type), GUILayout.ExpandWidth(false));
-            for (var i = 0; i < stack.Length; i++)
+            GUILayout.BeginVertical("Box");
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(tag);
+            properties = GUILayout.TextField(properties, GUILayout.ExpandWidth(true));
+            GUILayout.EndHorizontal();
+            foreach (var t in stack) IonStackAdjuster(t);
+            GUILayout.EndVertical();
+        }
+
+        private static void IonStackAdjuster(IList<string> stack)
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(stack[0]);
+            for (var i = 1; i < stack.Count; i++)
                 stack[i] = GUILayout.TextField(stack[i], GUILayout.ExpandWidth(true));
             GUILayout.EndHorizontal();
         }
