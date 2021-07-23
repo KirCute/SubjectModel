@@ -9,7 +9,9 @@ namespace SubjectModel
     [RequireComponent(typeof(Variables))]
     public class BuffRenderer : MonoBehaviour
     {
-        private static readonly List<IonStack> Empty = new List<IonStack>();
+        public static float MotiveDamageCoefficient = 30.0f;
+        public static float ThermalDamageCoefficient = 50.0f;
+        public static float MinimumDamagePotential = .4f;
 
         private List<IBuff> buffs;
         private IList<IonStack> stain;
@@ -31,12 +33,21 @@ namespace SubjectModel
                 Remove(buff);
                 i--;
             }
+
+            for (var i = 0; i < stain.Count; i++)
+            {
+                stain[i].DropTime -= Time.deltaTime;
+                if (!(stain[i].DropTime <= .0f)) continue;
+                Remove(stain[i]);
+                i--;
+            }
         }
 
         public void Clear()
         {
             foreach (var buff in buffs) buff.Destroy(gameObject);
             buffs.Clear();
+            stain.Clear();
         }
 
         private void Add(IBuff buff)
@@ -51,14 +62,17 @@ namespace SubjectModel
             buffs.Remove(buff);
         }
 
+        private void Remove(IonStack ion)
+        {
+            Debug.LogFormat("Remove: {0}({1})", ion.Element.symbol, ion.Element.valences[ion.Index]);
+            stain.Remove(ion);
+        }
+
         private void Apply(IBuff buff)
         {
             foreach (var b in buffs.Where(b => b.GetType() == buff.GetType()))
             {
-                if (b.GetLevel() > buff.GetLevel())
-                {
-                    return;
-                }
+                if (b.GetLevel() > buff.GetLevel()) return;
 
                 if (Math.Abs(b.GetLevel() - buff.GetLevel()) < .0001f &&
                     b.GetTotalTime() - b.GetRemainedTime() <= buff.GetTotalTime())
@@ -74,26 +88,32 @@ namespace SubjectModel
             Add(buff);
         }
 
-        public void Cleanup()
+        private void Cleanup()
         {
             for (var i = 0; i < stain.Count; i++)
-                if (stain[i].Amount < .1f)
+                if (stain[i].Amount < .1f ||
+                    (stain[i].Element == Elements.O && stain[i].Index == 0))
                 {
-                    Debug.LogFormat("Remove: {0}({1})",
-                        stain[i].Element.symbol, stain[i].Element.valences[stain[i].Index]);
-                    stain.RemoveAt(i);
+                    Remove(stain[i]);
                     i--;
                 }
         }
 
         private void Insert(IonStack stack, int properties)
         {
-            switch (stack.Element.state[stack.Index][properties])
+            switch (stack.Element.state[properties][stack.Index])
             {
                 case Element.Solid:
                     return;
                 case Element.Gas:
-                    // TODO Damage
+                    var origin = (float) GetComponent<Variables>().declarations.Get("Health");
+                    GetComponent<Variables>().declarations
+                        .Set("Health", origin - stack.Amount * MotiveDamageCoefficient);
+                    if (stack.Element.buffType[stack.Index] != Buff.Empty)
+                        Apply((IBuff) Activator.CreateInstance(
+                            DrugDictionary.GetTypeOfBuff(stack.Element.buffType[stack.Index]),
+                            stack.Amount * stack.Element.buffParam[stack.Index][0],
+                            stack.Concentration * stack.Element.buffParam[stack.Index][1]));
                     return;
                 case Element.Aqua:
                     Debug.LogFormat("Insert: {0}({1}) {2}mol {3}mol/L", stack.Element.symbol,
@@ -106,20 +126,22 @@ namespace SubjectModel
                     foreach (var ion in stain.Where(ion => ion.Element == stack.Element && ion.Index == stack.Index))
                     {
                         ion.Amount += stack.Amount;
+                        ion.DropTime = 10.0f;
                         return;
                     }
 
+                    stack.DropTime = 10.0f;
                     stain.Add(stack);
                     return;
             }
         }
 
-        public void React(int properties)
+        private void React(int properties)
         {
             React(properties, new List<IonStack>());
         }
 
-        public void React(int properties, IList<IonStack> ignore)
+        private void React(int properties, ICollection<IonStack> ignore)
         {
             var maxPotential = float.NegativeInfinity;
             IonStack oxidizer = null;
@@ -155,14 +177,16 @@ namespace SubjectModel
             //Debug.Log("Reducer: " + reducer.Element.symbol + " " + reducer.Element.valences[reducer.Index] +
             //          " " + reducer.Amount);
 
-            Debug.LogFormat("Reaction happens: {0}({1} -> {2}) ↓    {3}({4} -> {5}) ↑",
+            Debug.LogFormat("Reaction happens: {0}({1} -> {2}) ↓   {3}({4} -> {5}) ↑",
                 oxidizer.Element.symbol,
                 oxidizer.Element.valences[oxidizer.Index], oxidizer.Element.valences[oxidizer.Index - 1],
                 reducer.Element.symbol,
                 reducer.Element.valences[reducer.Index], reducer.Element.valences[reducer.Index + 1]
             );
+
             var m = oxidizer.Element.GetReducedCoefficient(oxidizer.Index);
             var n = reducer.Element.GetOxidizedCoefficient(reducer.Index);
+            float reactionAmount;
             if (oxidizer.Amount * m >= reducer.Amount * n)
             {
                 Insert(new IonStack
@@ -175,8 +199,9 @@ namespace SubjectModel
                     Element = oxidizer.Element, Amount = reducer.Amount / m * n,
                     Index = oxidizer.Index - 1, Concentration = 1f
                 }, properties);
+                reactionAmount = (maxPotential - minPotential) * (reducer.Amount + reducer.Amount / m * n) / 2f;
                 oxidizer.Amount -= reducer.Amount / m * n;
-                reducer.Amount = 0;
+                reducer.Amount = .0f;
             }
             else
             {
@@ -190,14 +215,23 @@ namespace SubjectModel
                     Element = oxidizer.Element, Amount = oxidizer.Amount,
                     Index = oxidizer.Index - 1, Concentration = 1f
                 }, properties);
+                reactionAmount = (maxPotential - minPotential) * (oxidizer.Amount + oxidizer.Amount / n * m) / 2f;
                 reducer.Amount -= oxidizer.Amount / n * m;
-                oxidizer.Amount = 0;
+                oxidizer.Amount = .0f;
+            }
+
+            reactionAmount -= MinimumDamagePotential;
+            if (reactionAmount >= 0)
+            {
+                var origin = (float) GetComponent<Variables>().declarations.Get("Health");
+                GetComponent<Variables>().declarations
+                    .Set("Health", origin - reactionAmount * ThermalDamageCoefficient);
             }
 
             Cleanup();
         }
 
-        public void React(DrugStack drug)
+        public void Register(DrugStack drug)
         {
             foreach (var ion in drug.Ions)
             {
