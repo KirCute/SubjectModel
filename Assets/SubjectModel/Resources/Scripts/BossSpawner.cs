@@ -35,10 +35,10 @@ namespace SubjectModel
             boss.name = bossName;
             boss.tag = "Boss";
             boss.GetComponent<Rigidbody2D>().position = bossSpawnPosition;
-            boss.GetComponent<Variables>().declarations.GetDeclaration("MaxHealth").value = bossHealth;
-            boss.GetComponent<Variables>().declarations.GetDeclaration("Health").value = bossHealth;
-            boss.GetComponent<Variables>().declarations.GetDeclaration("Defence").value = bossDefence;
-            boss.GetComponent<Variables>().declarations.GetDeclaration("Speed").value = bossSpeed;
+            boss.GetComponent<Variables>().declarations.Set("MaxHealth", bossHealth);
+            boss.GetComponent<Variables>().declarations.Set("Health", bossHealth);
+            boss.GetComponent<Variables>().declarations.Set("Defence", bossDefence);
+            boss.GetComponent<Variables>().declarations.Set("Speed", bossSpeed);
             if (bossAi != null)
             {
                 boss.GetComponent<StateMachine>().nest.source = GraphSource.Macro;

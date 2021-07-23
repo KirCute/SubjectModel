@@ -39,7 +39,7 @@ namespace SubjectModel
         {
             if (other.gameObject.layer != 6 || !other.gameObject.TryGetComponent<BuffRenderer>(out var br) ||
                 stained.Contains(other)) return;
-            br.React(stack);
+            br.Register(stack);
             stained.Add(other);
         }
 

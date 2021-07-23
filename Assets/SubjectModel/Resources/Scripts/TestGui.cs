@@ -54,17 +54,17 @@ namespace SubjectModel
             selected = 4;
             var player = GameObject.FindWithTag("Player");
             playerVariables = player.GetComponent<Variables>();
-            maxHealth = playerVariables.declarations.GetDeclaration("MaxHealth").value.ToString();
-            health = (float) playerVariables.declarations.GetDeclaration("Health").value;
+            maxHealth = playerVariables.declarations.Get("MaxHealth").ToString();
+            health = (float) playerVariables.declarations.Get("Health");
             healthUpdate = false;
-            maxStrength = playerVariables.declarations.GetDeclaration("MaxStrength").value.ToString();
-            energy = (float) playerVariables.declarations.GetDeclaration("Energy").value;
+            maxStrength = playerVariables.declarations.Get("MaxStrength").ToString();
+            energy = (float) playerVariables.declarations.Get("Energy");
             energyUpdate = false;
-            strength = (float) playerVariables.declarations.GetDeclaration("Strength").value;
+            strength = (float) playerVariables.declarations.Get("Strength");
             strengthUpdate = false;
-            speed = playerVariables.declarations.GetDeclaration("Speed").value.ToString();
+            speed = playerVariables.declarations.Get("Speed").ToString();
             speedUpdate = false;
-            defence = playerVariables.declarations.GetDeclaration("Defence").value.ToString();
+            defence = playerVariables.declarations.Get("Defence").ToString();
             defenceUpdate = false;
             bossSpawner = GameObject.FindWithTag("BossSpawner").GetComponent<BossSpawner>();
             bossHealth = bossSpawner.bossHealth.ToString();
@@ -78,7 +78,7 @@ namespace SubjectModel
             deviation = playerGun.deviation.ToString();
             maxRange = playerGun.maxRange.ToString();
             loadingTime = playerGun.loadingTime.ToString();
-            loading = playerVariables.declarations.GetDeclaration("Loading").value.ToString();
+            loading = playerVariables.declarations.Get("Loading").ToString();
             loadingUpdate = false;
             distance = playerGun.distance.ToString();
             /*
@@ -117,7 +117,7 @@ namespace SubjectModel
                 {
                     case 0:
                         if (GUILayout.Button("回到重生点"))
-                            playerVariables.declarations.GetDeclaration("Health").value = .0f;
+                            playerVariables.declarations.Set("Health", .0f);
                         ManualAdjustString("血量上限", ref maxHealth, "MaxHealth", playerVariables);
                         ManualAdjustSlider("血量", ref health, ref healthUpdate, "MaxHealth", "Health", playerVariables);
                         ManualAdjustString("精神上限", ref maxStrength, "MaxStrength", playerVariables);
@@ -136,7 +136,7 @@ namespace SubjectModel
                         {
                             GameObject boss;
                             if ((boss = GameObject.FindWithTag("Boss")) != null)
-                                boss.GetComponent<Variables>().declarations.GetDeclaration("Health").value = .0f;
+                                boss.GetComponent<Variables>().declarations.Set("Health", .0f);
                             GameObject.FindWithTag("BossAssistance").GetComponent<BossAssistance>().BossDead();
                             bossSpawner.GetComponent<BoxCollider2D>().enabled = true;
                         }
@@ -182,9 +182,9 @@ namespace SubjectModel
 
         private static void ManualAdjustString(string text, ref string value, string targetName, Variables target)
         {
-            var v = (float) target.declarations.GetDeclaration(targetName).value;
+            var v = (float) target.declarations.Get(targetName);
             ManualAdjustString(text, ref value, ref v);
-            target.declarations.GetDeclaration(targetName).value = v;
+            target.declarations.Set(targetName, v);
         }
 
         private static void ManualAdjustString(string text, ref string value, ref float target)
@@ -199,9 +199,9 @@ namespace SubjectModel
         private static void ManualAdjustIntUpdating(string text, ref string value, ref bool update, string targetName,
             Variables target)
         {
-            var v = (int) target.declarations.GetDeclaration(targetName).value;
+            var v = (int) target.declarations.Get(targetName);
             ManualAdjustIntUpdating(text, ref value, ref update, ref v);
-            target.declarations.GetDeclaration(targetName).value = v;
+            target.declarations.Set(targetName, v);
         }
 
         private static void ManualAdjustIntUpdating(string text, ref string value, ref bool update, ref int target)
@@ -218,9 +218,9 @@ namespace SubjectModel
         private static void ManualAdjustFloatUpdating(string text, ref string value, ref bool update, string targetName,
             Variables target)
         {
-            var v = (float) target.declarations.GetDeclaration(targetName).value;
+            var v = (float) target.declarations.Get(targetName);
             ManualAdjustFloatUpdating(text, ref value, ref update, ref v);
-            target.declarations.GetDeclaration(targetName).value = v;
+            target.declarations.Set(targetName, v);
         }
 
         private static void ManualAdjustFloatUpdating(string text, ref string value, ref bool update, ref float target)
@@ -237,10 +237,10 @@ namespace SubjectModel
         private static void ManualAdjustSlider(string text, ref float value, ref bool update, string maxName,
             string targetName, Variables target)
         {
-            var max = (float) target.declarations.GetDeclaration(maxName).value;
-            var v = (float) target.declarations.GetDeclaration(targetName).value;
+            var max = (float) target.declarations.Get(maxName);
+            var v = (float) target.declarations.Get(targetName);
             ManualAdjustSlider(text, ref value, ref update, max, ref v);
-            target.declarations.GetDeclaration(targetName).value = v;
+            target.declarations.Set(targetName, v);
         }
 
         private static void ManualAdjustSlider(string text, ref float value, ref bool update, float max,

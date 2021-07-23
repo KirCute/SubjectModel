@@ -88,9 +88,8 @@ namespace SubjectModel
 
             private static void Invoke(string variable, GameObject host, float v)
             {
-                var origin = (float) host.GetComponent<Variables>().declarations.GetDeclaration(variable).value;
-                host.GetComponent<Variables>().declarations.GetDeclaration(variable).value =
-                    origin - v * Time.deltaTime;
+                var origin = (float) host.GetComponent<Variables>().declarations.Get(variable);
+                host.GetComponent<Variables>().declarations.Set(variable, origin - v * Time.deltaTime);
             }
         }
 
@@ -125,8 +124,8 @@ namespace SubjectModel
 
             private static void Speed(GameObject host, float speed)
             {
-                var origin = (float) (host.GetComponent<Variables>().declarations.GetDeclaration("Speed").value);
-                host.GetComponent<Variables>().declarations.GetDeclaration("Speed").value = origin * speed;
+                var origin = (float) (host.GetComponent<Variables>().declarations.Get("Speed"));
+                host.GetComponent<Variables>().declarations.Set("Speed", origin * speed);
             }
         }
 
@@ -160,18 +159,18 @@ namespace SubjectModel
                 base.UpdateAfterDelay(host);
                 var variables = host.GetComponent<Variables>();
 
-                var health = (float) variables.declarations.GetDeclaration("Health").value;
+                var health = (float) variables.declarations.Get("Health");
                 var lost = GetLevel() * Time.deltaTime;
                 if (reserveHealth >= health)
                 {
                     lost += (reserveHealth - health) * healthLost;
-                    variables.declarations.GetDeclaration("Health").value = reserveHealth;
+                    variables.declarations.Set("Health", reserveHealth);
                 }
                 else reserveHealth = health;
 
                 if (!variables.declarations.IsDefined("Energy")) return;
-                var origin = (float) variables.declarations.GetDeclaration("Energy").value;
-                variables.declarations.GetDeclaration("Energy").value = origin - lost;
+                var origin = (float) variables.declarations.Get("Energy");
+                variables.declarations.Set("Energy", origin - lost);
             }
         }
 

@@ -37,10 +37,10 @@ namespace SubjectModel
 
         private void Update()
         {
-            var loading = (float) GetComponent<Variables>().declarations.GetDeclaration("Loading").value;
+            var loading = (float) GetComponent<Variables>().declarations.Get("Loading");
             loading -= Time.deltaTime;
             if (loading < .0f) loading = .0f;
-            GetComponent<Variables>().declarations.GetDeclaration("Loading").value = loading;
+            GetComponent<Variables>().declarations.Set("Loading", loading);
 
             trackTime -= Time.deltaTime;
             if (trackTime > .0f) GetComponent<LineRenderer>().enabled = true;
@@ -57,25 +57,25 @@ namespace SubjectModel
         public void Shoot(Vector2 aim)
         {
             if (bulletRemain <= 0) return;
-            if ((float) GetComponent<Variables>().declarations.GetDeclaration("Loading").value > .0f) return;
+            if ((float) GetComponent<Variables>().declarations.Get("Loading") > .0f) return;
             aim.x = Utils.GenerateGaussian(aim.x, deviation * distance, maxRange);
             aim.y = Utils.GenerateGaussian(aim.y, deviation * distance, maxRange);
             var shooterPosition = GetComponent<Rigidbody2D>().position;
             if (shooterPosition == aim) return;
 
             bulletRemain--;
-            GetComponent<Variables>().declarations.GetDeclaration("Loading").value = loadingTime;
+            GetComponent<Variables>().declarations.Set("Loading", loadingTime);
             var hit = DrawLine(shooterPosition, aim, HitColor, MissColor);
             trackTime = .1f;
 
             if (hit.collider == null || hit.collider.gameObject.layer != 6) return;
             var variables = hit.collider.GetComponent<Variables>();
             var defence = variables.declarations.IsDefined("Defence")
-                ? (float) variables.declarations.GetDeclaration("Defence").value
+                ? (float) variables.declarations.Get("Defence")
                 : .0f;
-            var health = (float) variables.declarations.GetDeclaration("Health").value;
-            variables.declarations.GetDeclaration("Health").value =
-                health - (defence > depth ? Utils.Map(.0f, defence, .0f, damage, depth) : damage);
+            var health = (float) variables.declarations.Get("Health");
+            variables.declarations.Set("Health", 
+                health - (defence > depth ? Utils.Map(.0f, defence, .0f, damage, depth) : damage));
         }
 
         private RaycastHit2D DrawLine(Vector2 from, Vector2 to, Pair<Color> success, Pair<Color> fault)
