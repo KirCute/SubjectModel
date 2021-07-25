@@ -106,7 +106,7 @@ namespace SubjectModel
                 case Element.Solid:
                     return;
                 case Element.Gas:
-                    var origin = (float) GetComponent<Variables>().declarations.Get("Health");
+                    var origin = GetComponent<Variables>().declarations.Get<float>("Health");
                     GetComponent<Variables>().declarations
                         .Set("Health", origin - stack.Amount * MotiveDamageCoefficient);
                     if (stack.Element.buffType[stack.Index] != Buff.Empty)
@@ -223,7 +223,7 @@ namespace SubjectModel
             reactionAmount -= MinimumDamagePotential;
             if (reactionAmount >= 0)
             {
-                var origin = (float) GetComponent<Variables>().declarations.Get("Health");
+                var origin = GetComponent<Variables>().declarations.Get<float>("Health");
                 GetComponent<Variables>().declarations
                     .Set("Health", origin - reactionAmount * ThermalDamageCoefficient);
             }

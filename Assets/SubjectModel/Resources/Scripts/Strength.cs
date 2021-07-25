@@ -12,21 +12,21 @@ namespace SubjectModel
 
         private void Start()
         {
-            runSpeed = (float) GetComponent<Variables>().declarations.Get("RunSpeed");
+            runSpeed = GetComponent<Variables>().declarations.Get<float>("RunSpeed");
         }
 
         private void Update()
         {
             var variables = GetComponent<Variables>();
-            var strength = (float) variables.declarations.Get("Strength");
-            var max = (float) variables.declarations.Get("Energy");
+            var strength = variables.declarations.Get<float>("Strength");
+            var max = variables.declarations.Get<float>("Energy");
             strength += RecoverSpeed * Time.deltaTime;
             if (strength > max) strength = max;
-            var speed = strength >= (float) variables.declarations.Get("RunnableStrength")
+            var speed = strength >= variables.declarations.Get<float>("RunnableStrength")
                 ? runSpeed
                 : 1.0f;
             variables.declarations.Set("RunSpeed", speed);
-            if ((bool) variables.declarations.Get("Running") && speed > 1.0f &&
+            if (variables.declarations.Get<bool>("Running") && speed > 1.0f &&
                 GetComponent<Rigidbody2D>().velocity != Vector2.zero) strength -= CostWhenRunning * Time.deltaTime;
             variables.declarations.Set("Strength", strength);
         }

@@ -17,7 +17,7 @@ namespace SubjectModel
         {
             if (boss != null)
             {
-                var health = (float) boss.GetComponent<Variables>().declarations.Get("Health");
+                var health = boss.GetComponent<Variables>().declarations.Get<float>("Health");
                 GetComponent<RectTransform>().sizeDelta = new Vector2(
                     Utils.Map(.0f, maxHealth, .0f, 900f, health), 7.5f);
             }
@@ -28,7 +28,7 @@ namespace SubjectModel
         {
             GetComponent<RectTransform>().sizeDelta = new Vector2(900f, 7.5f);
             this.boss = boss;
-            maxHealth = (float) boss.GetComponent<Variables>().declarations.Get("Health");
+            maxHealth = boss.GetComponent<Variables>().declarations.Get<float>("Health");
             this.raf += raf;
             fighting = true;
         }

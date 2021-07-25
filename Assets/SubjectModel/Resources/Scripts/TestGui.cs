@@ -33,6 +33,7 @@ namespace SubjectModel
         private string bossSpeed;
         private string bossDefence;
         private GunShoot playerGun;
+        private string bulletContains;
         private string bulletRemain;
         private bool bulletRemainUpdate;
         private string damage;
@@ -41,8 +42,10 @@ namespace SubjectModel
         private string maxRange;
         private string loadingTime;
         private string loading;
+        private string reload;
+        private string weight;
+        private string kick;
         private bool loadingUpdate;
-        private string distance;
         private string mdc;
         private string tdc;
         private string mdp;
@@ -57,12 +60,12 @@ namespace SubjectModel
             var player = GameObject.FindWithTag("Player");
             playerVariables = player.GetComponent<Variables>();
             maxHealth = playerVariables.declarations.Get("MaxHealth").ToString();
-            health = (float) playerVariables.declarations.Get("Health");
+            health = playerVariables.declarations.Get<float>("Health");
             healthUpdate = false;
             maxStrength = playerVariables.declarations.Get("MaxStrength").ToString();
-            energy = (float) playerVariables.declarations.Get("Energy");
+            energy = playerVariables.declarations.Get<float>("Energy");
             energyUpdate = false;
-            strength = (float) playerVariables.declarations.Get("Strength");
+            strength = playerVariables.declarations.Get<float>("Strength");
             strengthUpdate = false;
             speed = playerVariables.declarations.Get("Speed").ToString();
             speedUpdate = false;
@@ -73,16 +76,19 @@ namespace SubjectModel
             bossSpeed = bossSpawner.bossSpeed.ToString();
             bossDefence = bossSpawner.bossDefence.ToString();
             playerGun = player.GetComponent<GunShoot>();
+            bulletContains = playerGun.bulletContains.ToString();
             bulletRemain = playerGun.bulletRemain.ToString();
             bulletRemainUpdate = false;
-            damage = playerGun.damage.ToString();
-            depth = playerGun.depth.ToString();
-            deviation = playerGun.deviation.ToString();
-            maxRange = playerGun.maxRange.ToString();
-            loadingTime = playerGun.loadingTime.ToString();
+            damage = playerGun.firearm.Data[FirearmComponent.Damage].ToString();
+            depth = playerGun.firearm.Data[FirearmComponent.Depth].ToString();
+            deviation = playerGun.firearm.Data[FirearmComponent.Deviation].ToString();
+            maxRange = playerGun.firearm.Data[FirearmComponent.MaxRange].ToString();
+            loadingTime = playerGun.firearm.Data[FirearmComponent.Loading].ToString();
+            reload = playerGun.firearm.Data[FirearmComponent.Reload].ToString();
+            weight = playerGun.firearm.Data[FirearmComponent.Weight].ToString();
+            kick = playerGun.firearm.Data[FirearmComponent.Kick].ToString();
             loading = playerVariables.declarations.Get("Loading").ToString();
             loadingUpdate = false;
-            distance = playerGun.distance.ToString();
             inventory = DrugDictionary.GetDefaultInventory();
             drugProperties = new List<string>();
             mdc = BuffRenderer.MotiveDamageCoefficient.ToString();
@@ -107,18 +113,22 @@ namespace SubjectModel
             if (float.TryParse(bossHealth, out var value)) bossSpawner.bossHealth = value;
             if (float.TryParse(bossSpeed, out value)) bossSpawner.bossSpeed = value;
             if (float.TryParse(bossDefence, out value)) bossSpawner.bossDefence = value;
-            if (float.TryParse(damage, out value)) playerGun.damage = value;
-            if (float.TryParse(depth, out value)) playerGun.depth = value;
-            if (float.TryParse(deviation, out value)) playerGun.deviation = value;
-            if (float.TryParse(maxRange, out value)) playerGun.maxRange = value;
-            if (float.TryParse(loadingTime, out value)) playerGun.loadingTime = value;
-            if (float.TryParse(distance, out value)) playerGun.distance = value;
+            if (int.TryParse(bulletContains, out var intValue)) playerGun.bulletContains = intValue;
+            if (float.TryParse(damage, out value)) playerGun.firearm.GetComponent(0).Function[FirearmComponent.Damage].value = value;
+            if (float.TryParse(depth, out value)) playerGun.firearm.GetComponent(0).Function[FirearmComponent.Depth].value = value;
+            if (float.TryParse(deviation, out value)) playerGun.firearm.GetComponent(0).Function[FirearmComponent.Deviation].value = value;
+            if (float.TryParse(maxRange, out value)) playerGun.firearm.GetComponent(0).Function[FirearmComponent.MaxRange].value = value;
+            if (float.TryParse(loadingTime, out value)) playerGun.firearm.GetComponent(0).Function[FirearmComponent.Loading].value = value;
+            if (float.TryParse(reload, out value)) playerGun.firearm.GetComponent(0).Function[FirearmComponent.Reload].value = value;
+            if (float.TryParse(weight, out value)) playerGun.firearm.GetComponent(0).Function[FirearmComponent.Weight].value = value;
+            if (float.TryParse(kick, out value)) playerGun.firearm.GetComponent(0).Function[FirearmComponent.Kick].value = value;
+            playerGun.firearm.Statistics();
             if (float.TryParse(mdc, out value)) BuffRenderer.MotiveDamageCoefficient = value;
             if (float.TryParse(tdc, out value)) BuffRenderer.ThermalDamageCoefficient = value;
             if (float.TryParse(mdp, out value)) BuffRenderer.MinimumDamagePotential = value;
             for (var i = 0; i < inventory.Count; i++)
             {
-                if (int.TryParse(drugProperties[i], out var intValue)) inventory[i].Properties = intValue;
+                if (int.TryParse(drugProperties[i], out intValue)) inventory[i].Properties = intValue;
                 for (var j = 0; j < chemistryMenu[i].Count; j++)
                 {
                     chemistryMenu[i][j][0] = inventory[i].Ions[j].GetSymbol(inventory[i].Properties);
@@ -170,10 +180,13 @@ namespace SubjectModel
                         AutoAdjustString("穿深", ref depth);
                         AutoAdjustString("精度", ref deviation);
                         AutoAdjustString("散布", ref maxRange);
-                        AutoAdjustString("总装填时间(s)", ref loadingTime);
+                        AutoAdjustString("单发装填时间(s)", ref loadingTime);
+                        AutoAdjustString("换弹匣装填时间(s)", ref reload);
+                        AutoAdjustString("重量", ref weight);
+                        AutoAdjustString("后坐力", ref kick);
+                        AutoAdjustString("弹匣容量", ref bulletContains);
                         ManualAdjustFloatUpdating("剩余装填时间(s)", ref loading, ref loadingUpdate, "Loading",
                             playerVariables);
-                        AutoAdjustString("射程(m)", ref distance);
                         GUILayout.BeginHorizontal("Box");
                         playerGun.telescope = GUILayout.Toggle(playerGun.telescope, "使用瞄具");
                         GUILayout.EndHorizontal();
@@ -209,7 +222,7 @@ namespace SubjectModel
 
         private static void ManualAdjustString(string text, ref string value, string targetName, Variables target)
         {
-            var v = (float) target.declarations.Get(targetName);
+            var v = target.declarations.Get<float>(targetName);
             ManualAdjustString(text, ref value, ref v);
             target.declarations.Set(targetName, v);
         }
@@ -226,7 +239,7 @@ namespace SubjectModel
         private static void ManualAdjustIntUpdating(string text, ref string value, ref bool update, string targetName,
             Variables target)
         {
-            var v = (int) target.declarations.Get(targetName);
+            var v = target.declarations.Get<int>(targetName);
             ManualAdjustIntUpdating(text, ref value, ref update, ref v);
             target.declarations.Set(targetName, v);
         }
@@ -245,7 +258,7 @@ namespace SubjectModel
         private static void ManualAdjustFloatUpdating(string text, ref string value, ref bool update, string targetName,
             Variables target)
         {
-            var v = (float) target.declarations.Get(targetName);
+            var v = target.declarations.Get<float>(targetName);
             ManualAdjustFloatUpdating(text, ref value, ref update, ref v);
             target.declarations.Set(targetName, v);
         }
@@ -264,8 +277,8 @@ namespace SubjectModel
         private static void ManualAdjustSlider(string text, ref float value, ref bool update, string maxName,
             string targetName, Variables target)
         {
-            var max = (float) target.declarations.Get(maxName);
-            var v = (float) target.declarations.Get(targetName);
+            var max = target.declarations.Get<float>(maxName);
+            var v = target.declarations.Get<float>(targetName);
             ManualAdjustSlider(text, ref value, ref update, max, ref v);
             target.declarations.Set(targetName, v);
         }

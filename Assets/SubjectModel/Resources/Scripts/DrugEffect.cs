@@ -88,7 +88,7 @@ namespace SubjectModel
 
             private static void Invoke(string variable, GameObject host, float v)
             {
-                var origin = (float) host.GetComponent<Variables>().declarations.Get(variable);
+                var origin = host.GetComponent<Variables>().declarations.Get<float>(variable);
                 host.GetComponent<Variables>().declarations.Set(variable, origin - v * Time.deltaTime);
             }
         }
@@ -124,7 +124,7 @@ namespace SubjectModel
 
             private static void Speed(GameObject host, float speed)
             {
-                var origin = (float) (host.GetComponent<Variables>().declarations.Get("Speed"));
+                var origin = host.GetComponent<Variables>().declarations.Get<float>("Speed");
                 host.GetComponent<Variables>().declarations.Set("Speed", origin * speed);
             }
         }
@@ -159,7 +159,7 @@ namespace SubjectModel
                 base.UpdateAfterDelay(host);
                 var variables = host.GetComponent<Variables>();
 
-                var health = (float) variables.declarations.Get("Health");
+                var health = variables.declarations.Get<float>("Health");
                 var lost = GetLevel() * Time.deltaTime;
                 if (reserveHealth >= health)
                 {
@@ -169,7 +169,7 @@ namespace SubjectModel
                 else reserveHealth = health;
 
                 if (!variables.declarations.IsDefined("Energy")) return;
-                var origin = (float) variables.declarations.Get("Energy");
+                var origin = variables.declarations.Get<float>("Energy");
                 variables.declarations.Set("Energy", origin - lost);
             }
         }
