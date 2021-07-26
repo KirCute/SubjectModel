@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SubjectModel
@@ -44,15 +45,22 @@ namespace SubjectModel
 
         public Firearm(string name)
         {
-            Data = new[] {.0f, .0f, .0f, 1f, .0f, 1f, .0f, 1f};
+            Data = new[] {.0f, .0f, .0f, 1f, .0f, 1f, .0f, 1f, .0f, .0f, 1f};
             components = new List<FirearmComponent> { new DefaultComponent(name) };
         }
 
         public bool AddComponent(FirearmComponent component)
         {
+            if (component.GetComponentType() != FirearmComponent.Other && HasType(component.GetComponentType())) 
+                return false;
             components.Add(component);
             Statistics();
             return true;
+        }
+
+        public bool HasType(int type)
+        {
+            return components.Any(component => component.GetComponentType() == type);
         }
 
         public FirearmComponent GetComponent(int index)
@@ -126,6 +134,9 @@ namespace SubjectModel
         public const int Deviation = 5;
         public const int MaxRange = 6;
         public const int Kick = 7;
+        public const int Bullet = 8;
+        public const int Distance = 9;
+        public const int ReloadSpeed = 10;
 
         public readonly ComponentFunction[] Function;
         public string name;
@@ -137,6 +148,7 @@ namespace SubjectModel
             {
                 ComponentFunction.NoEffect, ComponentFunction.NoEffect, ComponentFunction.NoEffect,
                 ComponentFunction.NoEffect, ComponentFunction.NoEffect, ComponentFunction.NoEffect,
+                ComponentFunction.NoEffect, ComponentFunction.NoEffect, ComponentFunction.NoEffect, 
                 ComponentFunction.NoEffect, ComponentFunction.NoEffect
             };
         }
@@ -169,6 +181,9 @@ namespace SubjectModel
             Function[Deviation] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 1f};
             Function[MaxRange] = new ComponentFunction {algorithm = ComponentFunction.Multiply, value = 1f};
             Function[Kick] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 1f};
+            Function[Bullet] = new ComponentFunction {algorithm = ComponentFunction.Multiply, value = 1f};
+            Function[Distance] = new ComponentFunction {algorithm = ComponentFunction.Multiply, value = 1f};
+            Function[ReloadSpeed] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 1f};
         }
 
         public override int GetComponentType()
@@ -189,6 +204,9 @@ namespace SubjectModel
             Function[Deviation] = new ComponentFunction {algorithm = ComponentFunction.Multiply, value = 0.025f};
             Function[MaxRange] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 0.5f};
             Function[Kick] = new ComponentFunction {algorithm = ComponentFunction.Multiply, value = 1f};
+            Function[Bullet] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 20f};
+            Function[Distance] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 15f};
+            Function[ReloadSpeed] = new ComponentFunction {algorithm = ComponentFunction.Multiply, value = .5f};
         }
 
         public override int GetComponentType()

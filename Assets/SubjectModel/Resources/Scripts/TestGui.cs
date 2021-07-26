@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Bolt;
+using UnityEditor;
 using UnityEngine;
 
 namespace SubjectModel
@@ -33,7 +34,6 @@ namespace SubjectModel
         private string bossSpeed;
         private string bossDefence;
         private GunShoot playerGun;
-        private string bulletContains;
         private string bulletRemain;
         private bool bulletRemainUpdate;
         private string damage;
@@ -45,6 +45,9 @@ namespace SubjectModel
         private string reload;
         private string weight;
         private string kick;
+        private string bulletContains;
+        private string distance;
+        private string reloadSpeed;
         private bool loadingUpdate;
         private string mdc;
         private string tdc;
@@ -76,7 +79,6 @@ namespace SubjectModel
             bossSpeed = bossSpawner.bossSpeed.ToString();
             bossDefence = bossSpawner.bossDefence.ToString();
             playerGun = player.GetComponent<GunShoot>();
-            bulletContains = playerGun.bulletContains.ToString();
             bulletRemain = playerGun.bulletRemain.ToString();
             bulletRemainUpdate = false;
             damage = playerGun.firearm.Data[FirearmComponent.Damage].ToString();
@@ -87,6 +89,9 @@ namespace SubjectModel
             reload = playerGun.firearm.Data[FirearmComponent.Reload].ToString();
             weight = playerGun.firearm.Data[FirearmComponent.Weight].ToString();
             kick = playerGun.firearm.Data[FirearmComponent.Kick].ToString();
+            bulletContains = playerGun.firearm.Data[FirearmComponent.Bullet].ToString();
+            distance = playerGun.firearm.Data[FirearmComponent.Distance].ToString();
+            reloadSpeed = playerGun.firearm.Data[FirearmComponent.ReloadSpeed].ToString();
             loading = playerVariables.declarations.Get("Loading").ToString();
             loadingUpdate = false;
             inventory = DrugDictionary.GetDefaultInventory();
@@ -113,7 +118,7 @@ namespace SubjectModel
             if (float.TryParse(bossHealth, out var value)) bossSpawner.bossHealth = value;
             if (float.TryParse(bossSpeed, out value)) bossSpawner.bossSpeed = value;
             if (float.TryParse(bossDefence, out value)) bossSpawner.bossDefence = value;
-            if (int.TryParse(bulletContains, out var intValue)) playerGun.bulletContains = intValue;
+            if (float.TryParse(bulletContains, out value)) playerGun.firearm.Data[FirearmComponent.Bullet] = value;
             if (float.TryParse(damage, out value)) playerGun.firearm.GetComponent(0).Function[FirearmComponent.Damage].value = value;
             if (float.TryParse(depth, out value)) playerGun.firearm.GetComponent(0).Function[FirearmComponent.Depth].value = value;
             if (float.TryParse(deviation, out value)) playerGun.firearm.GetComponent(0).Function[FirearmComponent.Deviation].value = value;
@@ -122,13 +127,15 @@ namespace SubjectModel
             if (float.TryParse(reload, out value)) playerGun.firearm.GetComponent(0).Function[FirearmComponent.Reload].value = value;
             if (float.TryParse(weight, out value)) playerGun.firearm.GetComponent(0).Function[FirearmComponent.Weight].value = value;
             if (float.TryParse(kick, out value)) playerGun.firearm.GetComponent(0).Function[FirearmComponent.Kick].value = value;
+            if (float.TryParse(distance, out value)) playerGun.firearm.GetComponent(0).Function[FirearmComponent.Distance].value = value;
+            if (float.TryParse(reloadSpeed, out value)) playerGun.firearm.GetComponent(0).Function[FirearmComponent.ReloadSpeed].value = value;
             playerGun.firearm.Statistics();
             if (float.TryParse(mdc, out value)) BuffRenderer.MotiveDamageCoefficient = value;
             if (float.TryParse(tdc, out value)) BuffRenderer.ThermalDamageCoefficient = value;
             if (float.TryParse(mdp, out value)) BuffRenderer.MinimumDamagePotential = value;
             for (var i = 0; i < inventory.Count; i++)
             {
-                if (int.TryParse(drugProperties[i], out intValue)) inventory[i].Properties = intValue;
+                if (int.TryParse(drugProperties[i], out var intValue)) inventory[i].Properties = intValue;
                 for (var j = 0; j < chemistryMenu[i].Count; j++)
                 {
                     chemistryMenu[i][j][0] = inventory[i].Ions[j].GetSymbol(inventory[i].Properties);
@@ -141,9 +148,9 @@ namespace SubjectModel
 
         private void OnGUI()
         {
-            GUILayout.Window(0, new Rect(30, 40, 300, 20), id =>
+            GUILayout.Window(0, new Rect(60, 80, 300, 20), id =>
             {
-                selected = GUILayout.Toolbar(selected, new[] {"玩家", "敌人", "枪械", "炼金术", "收起"});
+                selected = GUILayout.Toolbar(selected, new[] {"玩家", "敌人", "枪械", "炼金术", "收起", "退出"});
                 switch (selected)
                 {
                     case 0:
@@ -185,6 +192,8 @@ namespace SubjectModel
                         AutoAdjustString("重量", ref weight);
                         AutoAdjustString("后坐力", ref kick);
                         AutoAdjustString("弹匣容量", ref bulletContains);
+                        AutoAdjustString("射程", ref distance);
+                        AutoAdjustString("装弹减速", ref reloadSpeed);
                         ManualAdjustFloatUpdating("剩余装填时间(s)", ref loading, ref loadingUpdate, "Loading",
                             playerVariables);
                         GUILayout.BeginHorizontal("Box");
@@ -198,7 +207,7 @@ namespace SubjectModel
                         AutoAdjustString("最小热力伤害电势差", ref mdp);
                         GUILayout.EndVertical();
                         chemistryScrollPos = GUILayout.BeginScrollView(chemistryScrollPos,
-                            true, false, GUILayout.Height(200));
+                            true, false, GUILayout.Height(300));
                         for (var i = 0; i < chemistryMenu.Count; i++)
                         {
                             var drugProperty = drugProperties[i];
@@ -206,7 +215,13 @@ namespace SubjectModel
                             drugProperties[i] = drugProperty;
                         }
                         GUILayout.EndScrollView();
-
+                        break;
+                    case 5:
+#if UNITY_EDITOR
+                        EditorApplication.isPlaying = false;
+#else
+                        Application.Quit();
+#endif
                         break;
                 }
             }, "测试窗口");

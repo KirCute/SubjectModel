@@ -19,7 +19,7 @@ namespace SubjectModel
             {
                 var health = boss.GetComponent<Variables>().declarations.Get<float>("Health");
                 GetComponent<RectTransform>().sizeDelta = new Vector2(
-                    Utils.Map(.0f, maxHealth, .0f, 900f, health), 7.5f);
+                    Utils.Map(.0f, maxHealth, .0f, 1800f, health), 15f);
             }
             else if (fighting) BossDead();
         }
