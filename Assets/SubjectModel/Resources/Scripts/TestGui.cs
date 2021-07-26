@@ -56,7 +56,10 @@ namespace SubjectModel
         private IList<IList<IList<string>>> chemistryMenu;
         private IList<string> drugProperties;
         private Vector2 chemistryScrollPos;
-
+        private bool standOnly;
+        private bool standOnlyInvoke;
+        private bool pause;
+        
         private void Start()
         {
             selected = 4;
@@ -110,7 +113,11 @@ namespace SubjectModel
                 }).Cast<IList<string>>().ToList();
                 chemistryMenu.Add(drugList);
             }
+
             chemistryScrollPos = Vector2.zero;
+            standOnly = false;
+            standOnlyInvoke = false;
+            pause = false;
         }
 
         private void Update()
@@ -119,16 +126,26 @@ namespace SubjectModel
             if (float.TryParse(bossSpeed, out value)) bossSpawner.bossSpeed = value;
             if (float.TryParse(bossDefence, out value)) bossSpawner.bossDefence = value;
             if (float.TryParse(bulletContains, out value)) playerGun.firearm.Data[FirearmComponent.Bullet] = value;
-            if (float.TryParse(damage, out value)) playerGun.firearm.GetComponent(0).Function[FirearmComponent.Damage].value = value;
-            if (float.TryParse(depth, out value)) playerGun.firearm.GetComponent(0).Function[FirearmComponent.Depth].value = value;
-            if (float.TryParse(deviation, out value)) playerGun.firearm.GetComponent(0).Function[FirearmComponent.Deviation].value = value;
-            if (float.TryParse(maxRange, out value)) playerGun.firearm.GetComponent(0).Function[FirearmComponent.MaxRange].value = value;
-            if (float.TryParse(loadingTime, out value)) playerGun.firearm.GetComponent(0).Function[FirearmComponent.Loading].value = value;
-            if (float.TryParse(reload, out value)) playerGun.firearm.GetComponent(0).Function[FirearmComponent.Reload].value = value;
-            if (float.TryParse(weight, out value)) playerGun.firearm.GetComponent(0).Function[FirearmComponent.Weight].value = value;
-            if (float.TryParse(kick, out value)) playerGun.firearm.GetComponent(0).Function[FirearmComponent.Kick].value = value;
-            if (float.TryParse(distance, out value)) playerGun.firearm.GetComponent(0).Function[FirearmComponent.Distance].value = value;
-            if (float.TryParse(reloadSpeed, out value)) playerGun.firearm.GetComponent(0).Function[FirearmComponent.ReloadSpeed].value = value;
+            if (float.TryParse(damage, out value))
+                playerGun.firearm.GetComponent(1).Function[FirearmComponent.Damage].value = value;
+            if (float.TryParse(depth, out value))
+                playerGun.firearm.GetComponent(1).Function[FirearmComponent.Depth].value = value;
+            if (float.TryParse(deviation, out value))
+                playerGun.firearm.GetComponent(1).Function[FirearmComponent.Deviation].value = value;
+            if (float.TryParse(maxRange, out value))
+                playerGun.firearm.GetComponent(1).Function[FirearmComponent.MaxRange].value = value;
+            if (float.TryParse(loadingTime, out value))
+                playerGun.firearm.GetComponent(1).Function[FirearmComponent.Loading].value = value;
+            if (float.TryParse(reload, out value))
+                playerGun.firearm.GetComponent(1).Function[FirearmComponent.Reload].value = value;
+            if (float.TryParse(weight, out value))
+                playerGun.firearm.GetComponent(1).Function[FirearmComponent.Weight].value = value;
+            if (float.TryParse(kick, out value))
+                playerGun.firearm.GetComponent(1).Function[FirearmComponent.Kick].value = value;
+            if (float.TryParse(distance, out value))
+                playerGun.firearm.GetComponent(1).Function[FirearmComponent.Distance].value = value;
+            if (float.TryParse(reloadSpeed, out value))
+                playerGun.firearm.GetComponent(1).Function[FirearmComponent.ReloadSpeed].value = value;
             playerGun.firearm.Statistics();
             if (float.TryParse(mdc, out value)) BuffRenderer.MotiveDamageCoefficient = value;
             if (float.TryParse(tdc, out value)) BuffRenderer.ThermalDamageCoefficient = value;
@@ -144,13 +161,20 @@ namespace SubjectModel
                     if (float.TryParse(chemistryMenu[i][j][3], out value)) inventory[i].Ions[j].Concentration = value;
                 }
             }
+            if (standOnly != standOnlyInvoke)
+            {
+                standOnlyInvoke = standOnly;
+                playerVariables.declarations.Set("Standonly", 
+                    playerVariables.declarations.Get<int>("Standonly") + (standOnly ? 1 : -1));
+            }
+            Time.timeScale = pause ? 0f : 1f;
         }
 
         private void OnGUI()
         {
             GUILayout.Window(0, new Rect(60, 80, 300, 20), id =>
             {
-                selected = GUILayout.Toolbar(selected, new[] {"玩家", "敌人", "枪械", "炼金术", "收起", "退出"});
+                selected = GUILayout.Toolbar(selected, new[] {"玩家", "敌人", "枪械", "炼金术", "收起", "系统"});
                 switch (selected)
                 {
                     case 0:
@@ -189,8 +213,8 @@ namespace SubjectModel
                         AutoAdjustString("散布", ref maxRange);
                         AutoAdjustString("单发装填时间(s)", ref loadingTime);
                         AutoAdjustString("换弹匣装填时间(s)", ref reload);
-                        AutoAdjustString("重量", ref weight);
-                        AutoAdjustString("后坐力", ref kick);
+                        AutoAdjustString("重量(未实现)", ref weight);
+                        AutoAdjustString("后坐力(未实现)", ref kick);
                         AutoAdjustString("弹匣容量", ref bulletContains);
                         AutoAdjustString("射程", ref distance);
                         AutoAdjustString("装弹减速", ref reloadSpeed);
@@ -214,14 +238,21 @@ namespace SubjectModel
                             DrugStackAdjuster(inventory[i].Tag, ref drugProperty, chemistryMenu[i]);
                             drugProperties[i] = drugProperty;
                         }
+
                         GUILayout.EndScrollView();
                         break;
                     case 5:
+                        standOnly = GUILayout.Toggle(standOnly, "锁定玩家操作");
+                        pause = GUILayout.Toggle(pause, "暂停");
+                        if (GUILayout.Button("退出游戏"))
+                        {
 #if UNITY_EDITOR
-                        EditorApplication.isPlaying = false;
+                            EditorApplication.isPlaying = false;
 #else
-                        Application.Quit();
+                            Application.Quit();
 #endif
+                        }
+
                         break;
                 }
             }, "测试窗口");

@@ -205,7 +205,7 @@ namespace SubjectModel
             Function[MaxRange] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 0.5f};
             Function[Kick] = new ComponentFunction {algorithm = ComponentFunction.Multiply, value = 1f};
             Function[Bullet] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 20f};
-            Function[Distance] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 15f};
+            Function[Distance] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 20f};
             Function[ReloadSpeed] = new ComponentFunction {algorithm = ComponentFunction.Multiply, value = .5f};
         }
 

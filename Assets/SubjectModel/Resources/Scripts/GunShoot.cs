@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Bolt;
 using UnityEngine;
 
@@ -101,8 +102,7 @@ namespace SubjectModel
             if (hit.collider == null || hit.collider.gameObject.layer != 6) return;
             var variables = hit.collider.GetComponent<Variables>();
             var defence = variables.declarations.IsDefined("Defence")
-                ? variables.declarations.Get<float>("Defence")
-                : .0f;
+                ? variables.declarations.Get<float>("Defence") : .0f;
             var health = variables.declarations.Get<float>("Health");
             variables.declarations.Set("Health",
                 health - (defence > firearm.Data[FirearmComponent.Depth]
