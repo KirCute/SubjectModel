@@ -58,7 +58,7 @@ namespace SubjectModel
         {
             if (Utils.GetMagnitudeSquare2D(position, hostPosition) <= SelfAttackRange * SelfAttackRange)
             {
-                Invoke(drug.Clone(), position, keepTime);
+                Invoke((DrugStack) drug.Fetch(), position, keepTime);
                 return;
             }
 
@@ -73,7 +73,7 @@ namespace SubjectModel
             position = Utils.LengthenArrow(origin, position, distance);
 
             var flyingDrug = (GameObject) GameObject.Instantiate(Resources.Load("Prefab/FlyingDrug"));
-            flyingDrug.GetComponent<FlyingDrug>().Initialize(drug.Clone(), origin, position, keepTime);
+            flyingDrug.GetComponent<FlyingDrug>().Initialize((DrugStack) drug.Fetch(), origin, position, keepTime);
         }
 
         public static void Invoke(DrugStack drug, Vector2 position, float keepTime = DefaultKeepTime)

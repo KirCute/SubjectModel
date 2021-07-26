@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using Bolt;
 using UnityEngine;
 
 namespace SubjectModel
 {
     public static class GunDictionary
     {
+        /*
         private static List<Firearm> defaultInventory;
         
         public static List<Firearm> GetDefaultInventory()
@@ -19,8 +19,7 @@ namespace SubjectModel
             defaultInventory.Add(defaultFirearm);
             return defaultInventory;
         }
-
-        /*
+        
         [MenuItem("Data/Generate Firearms Data")]
         private static void GenerateFirearmsData()
         {
@@ -38,57 +37,190 @@ namespace SubjectModel
         */
     }
 
-    public class Firearm
+    [Serializable]
+    public class FirearmTemple
     {
-        public readonly float[] Data;
-        private readonly IList<FirearmComponent> components;
+        public readonly string Name;
+        public readonly float Damage;
+        public readonly float Reload; // 换弹匣时间
+        public readonly float Loading; // 自动换弹时间
+        public readonly float Weight;
+        public readonly float Depth;
+        public readonly float Deviation;
+        public readonly float MaxRange;
+        public readonly float Kick;
+        public readonly float Distance;
+        public readonly float ReloadSpeed;
+        public readonly MagazineTemple Magazine;
 
-        public Firearm(string name)
+        public FirearmTemple(string name, float damage, float reload, float loading, float weight, float depth,
+            float deviation, float maxRange, float kick, float distance, float reloadSpeed, MagazineTemple magazine)
         {
-            Data = new[] {.0f, .0f, .0f, 1f, .0f, 1f, .0f, 1f, .0f, .0f, 1f};
-            components = new List<FirearmComponent> { new DefaultComponent(name) };
+            Name = name;
+            Damage = damage;
+            Reload = reload;
+            Loading = loading;
+            Weight = weight;
+            Depth = depth;
+            Deviation = deviation;
+            MaxRange = maxRange;
+            Kick = kick;
+            Distance = distance;
+            ReloadSpeed = reloadSpeed;
+            Magazine = magazine;
+        }
+    }
+
+    public class Firearm : ItemStack
+    {
+        public readonly FirearmTemple Temple;
+        public Magazine Magazine;
+        public Magazine ReadyMagazine;
+        public float Loading;
+        public bool SwitchingMagazine;
+        private bool fetched;
+
+        public Firearm(FirearmTemple temple)
+        {
+            Temple = temple;
+            Magazine = null;
+            fetched = false;
         }
 
-        public bool AddComponent(FirearmComponent component)
+        public string GetName()
         {
-            if (component.GetComponentType() != FirearmComponent.Other && HasType(component.GetComponentType())) 
-                return false;
-            components.Add(component);
-            Statistics();
-            return true;
+            return Temple.Name;
         }
 
-        public bool HasType(int type)
+        public void OnMouseClickLeft(GameObject user)
         {
-            return components.Any(component => component.GetComponentType() == type);
+            if (Loading > .0f || Magazine == null || Magazine.BulletRemain <= 0 || Camera.main == null) return;
+            var aim = Utils.Vector3To2(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+            aim.x = Utils.GenerateGaussian(aim.x, Temple.Deviation * Temple.Distance, Temple.MaxRange);
+            aim.y = Utils.GenerateGaussian(aim.y, Temple.Deviation * Temple.Distance, Temple.MaxRange);
+            var shooterPosition = user.GetComponent<Rigidbody2D>().position;
+            if (shooterPosition == aim) return;
+
+            Magazine.BulletRemain--;
+            if (Magazine.BulletRemain != 0) Loading = Temple.Loading;
+            var collider = user.GetComponent<GunFlash>().Shoot(shooterPosition, aim);
+            if (collider == null) return;
+            var declarations = collider.GetComponent<Variables>().declarations;
+            var defence = declarations.IsDefined("Defence") ? declarations.Get<float>("Defence") : .0f;
+            var health = declarations.Get<float>("Health");
+            declarations.Set("Health",
+                health - (defence > Temple.Depth
+                    ? Utils.Map(.0f, defence, .0f, Temple.Damage, Temple.Depth)
+                    : Temple.Damage));
         }
 
-        public FirearmComponent GetComponent(int index)
+        public void OnMouseClickRight(GameObject user)
         {
-            return components[index];
+            SwitchMagazine(user);
         }
 
-        public bool RemoveComponent(FirearmComponent component)
+        public void Selecting(GameObject user)
         {
-            var ret = components.Remove(component);
-            if (ret) Statistics();
-            return ret;
+            Loading -= Time.deltaTime;
+            if (!(Loading <= .0f)) return;
+            Loading = .0f;
+            if (!SwitchingMagazine) return;
+            SwitchingMagazine = false;
+            Magazine = ReadyMagazine;
+            user.GetComponent<Inventory>().Remove(ReadyMagazine);
+            ReadyMagazine = null;
+            var declarations = user.GetComponent<Variables>().declarations;
+            declarations.Set("Speed", declarations.Get<float>("Speed") / Temple.ReloadSpeed);
         }
 
-        public void RemoveComponentAt(int index)
+        public void OnSelected(GameObject user)
         {
-            components.RemoveAt(index);
-            Statistics();
+            user.GetComponent<GunFlash>().distance = Temple.Distance;
+            user.GetComponent<GunFlash>().enabled = true;
         }
 
-        public void Statistics()
+        public void LoseSelected(GameObject user)
         {
-            for (var i = 0; i < Data.Length; i++)
-            {
-                float add = .0f, multiply = .0f;
-                foreach (var component in components) component.Statistics(i, ref add, ref multiply);
-                Data[i] = add * multiply;
-            }
+            user.GetComponent<LineRenderer>().enabled = false;
+            user.GetComponent<GunFlash>().enabled = false;
+            if (!SwitchingMagazine) return;
+            SwitchingMagazine = false;
+            Loading = .0f;
+            ReadyMagazine = null;
+            var declarations = user.GetComponent<Variables>().declarations;
+            declarations.Set("Speed", declarations.Get<float>("Speed") / Temple.ReloadSpeed);
+        }
+
+        public Func<ItemStack, bool> SubInventory()
+        {
+            return item => item.GetType() == typeof(Magazine) && ((Magazine) item).Temple == Temple.Magazine;
+        }
+
+        private void SwitchMagazine(GameObject user)
+        {
+            if (SwitchingMagazine || !user.GetComponent<Inventory>().TryGetSubItem(out var ready) ||
+                ready.GetType() != typeof(Magazine)) return;
+            ReadyMagazine = (Magazine) ready;
+            SwitchingMagazine = true;
+            Loading = Temple.Reload;
+            var declarations = user.GetComponent<Variables>().declarations;
+            declarations.Set("Speed", declarations.Get<float>("Speed") * Temple.ReloadSpeed);
+            user.GetComponent<Inventory>().Add(Magazine);
+            Magazine = null;
+        }
+
+        public int GetCount()
+        {
+            return fetched ? 0 : 1;
+        }
+
+        public ItemStack Fetch()
+        {
+            fetched = true;
+            return this;
+        }
+    }
+
+    [Serializable]
+    public class MagazineTemple
+    {
+        public readonly string Name;
+        public readonly int BulletContains;
+
+        public MagazineTemple(string name, int bulletContains)
+        {
+            Name = name;
+            BulletContains = bulletContains;
+        }
+    }
+
+    public class Magazine : Material
+    {
+        public readonly MagazineTemple Temple;
+        public int BulletRemain;
+        private bool fetched;
+
+        public Magazine(MagazineTemple temple)
+        {
+            Temple = temple;
+            BulletRemain = 0;
+            fetched = false;
+        }
+
+        public override string GetName()
+        {
+            return Temple.Name;
+        }
+
+        public override int GetCount()
+        {
+            return fetched ? 0 : 1;
+        }
+
+        public override ItemStack Fetch()
+        {
+            fetched = true;
+            return this;
         }
     }
 
@@ -98,107 +230,14 @@ namespace SubjectModel
         //public List<> guns;
     }
 
-    [Serializable]
-    public struct ComponentFunction
-    {
-        public const int Add = 0;
-        public const int Multiply = 1;
-
-        public static readonly ComponentFunction NoEffect = new ComponentFunction
-        {
-            algorithm = Add,
-            value = .0f
-        };
-
-        public int algorithm;
-        public float value;
-    }
-
-    [Serializable]
-    public abstract class FirearmComponent
-    {
-        public const int Sight = 0;
-        public const int Barrel = 1;
-        public const int Action = 2;
-        public const int Body = 3;
-        public const int Grip = 4;
-        public const int Buttstock = 5;
-        public const int Magazine = 6;
-        public const int Other = 7;
-
-        public const int Damage = 0;
-        public const int Reload = 1; // 换弹匣时间
-        public const int Loading = 2; // 自动换弹时间
-        public const int Weight = 3;
-        public const int Depth = 4;
-        public const int Deviation = 5;
-        public const int MaxRange = 6;
-        public const int Kick = 7;
-        public const int Bullet = 8;
-        public const int Distance = 9;
-        public const int ReloadSpeed = 10;
-
-        public readonly ComponentFunction[] Function;
-        public string name;
-
-        protected FirearmComponent(string name)
-        {
-            this.name = name;
-            Function = new[]
-            {
-                ComponentFunction.NoEffect, ComponentFunction.NoEffect, ComponentFunction.NoEffect,
-                ComponentFunction.NoEffect, ComponentFunction.NoEffect, ComponentFunction.NoEffect,
-                ComponentFunction.NoEffect, ComponentFunction.NoEffect, ComponentFunction.NoEffect, 
-                ComponentFunction.NoEffect, ComponentFunction.NoEffect
-            };
-        }
-
-        public void Statistics(int type, ref float addValue, ref float multiplyValue)
-        {
-            switch (Function[type].algorithm)
-            {
-                case ComponentFunction.Add:
-                    addValue += Function[type].value;
-                    break;
-                case ComponentFunction.Multiply:
-                    multiplyValue += Function[type].value;
-                    break;
-            }
-        }
-
-        public abstract int GetComponentType();
-    }
-
-    public class DefaultComponent : FirearmComponent
-    {
-        public DefaultComponent(string name) : base(name)
-        {
-            Function[Damage] = new ComponentFunction {algorithm = ComponentFunction.Multiply, value = 1f};
-            Function[Reload] = new ComponentFunction {algorithm = ComponentFunction.Multiply, value = 1f};
-            Function[Loading] = new ComponentFunction {algorithm = ComponentFunction.Multiply, value = 1f};
-            Function[Weight] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 1f};
-            Function[Depth] = new ComponentFunction {algorithm = ComponentFunction.Multiply, value = 1f};
-            Function[Deviation] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 1f};
-            Function[MaxRange] = new ComponentFunction {algorithm = ComponentFunction.Multiply, value = 1f};
-            Function[Kick] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 1f};
-            Function[Bullet] = new ComponentFunction {algorithm = ComponentFunction.Multiply, value = 1f};
-            Function[Distance] = new ComponentFunction {algorithm = ComponentFunction.Multiply, value = 1f};
-            Function[ReloadSpeed] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 1f};
-        }
-
-        public override int GetComponentType()
-        {
-            return Other;
-        }
-    }
-    
+    /*
     public class DebugComponent : FirearmComponent
     {
         public DebugComponent() : base("Testing Data")
         {
             Function[Damage] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 100.0f};
-            Function[Reload] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 0.75f};
-            Function[Loading] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 0.2f};
+            //Function[Reload] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 0.75f};
+            //Function[Loading] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 0.2f};
             Function[Weight] = new ComponentFunction {algorithm = ComponentFunction.Multiply, value = 1f};
             Function[Depth] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 20.0f};
             Function[Deviation] = new ComponentFunction {algorithm = ComponentFunction.Multiply, value = 0.025f};
@@ -208,10 +247,6 @@ namespace SubjectModel
             Function[Distance] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 20f};
             Function[ReloadSpeed] = new ComponentFunction {algorithm = ComponentFunction.Multiply, value = .5f};
         }
-
-        public override int GetComponentType()
-        {
-            return Other;
-        }
     }
+    */
 }

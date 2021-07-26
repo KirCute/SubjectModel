@@ -19,7 +19,7 @@ namespace SubjectModel
     public static class Elements
     {
         private static readonly float[] DefaultParam = {1f, 1f};
-        
+
         public static readonly Element H = new Element("H")
         {
             valences = new[] {0, 1},
@@ -41,7 +41,7 @@ namespace SubjectModel
                 new[] {Element.Gas, Element.Aqua},
             }
         };
-        
+
         public static readonly Element O = new Element("O")
         {
             valences = new[] {-2, -1, 0},
@@ -85,7 +85,7 @@ namespace SubjectModel
                 new[] {Element.Aqua, Element.Gas},
             }
         };
-        
+
         public static readonly Element K = new Element("K")
         {
             valences = new[] {1},
@@ -95,8 +95,8 @@ namespace SubjectModel
             },
             potential = new[]
             {
-                new float[] {},
-                new float[] {}
+                new float[] { },
+                new float[] { }
             },
             buffType = new[] {Buff.Empty},
             buffParam = new[] {DefaultParam},
@@ -257,112 +257,7 @@ namespace SubjectModel
         public static IList<DrugStack> GetDefaultInventory()
         {
             if (DefaultInventory.Count != 0) return DefaultInventory;
-            DefaultInventory.Add(new DrugStack
-            {
-                Tag = "FeCl3",
-                Ions = new List<IonStack>
-                {
-                    new IonStack
-                    {
-                        Element = Elements.Fe, Index = Elements.Fe.GetIndex(3),
-                        Amount = 1f, Concentration = 1f
-                    },
-                    new IonStack
-                    {
-                        Element = Elements.Cl, Index = Elements.Cl.GetIndex(-1),
-                        Amount = 3f, Concentration = 3f
-                    }
-                },
-                Properties = Element.Acid
-            });
-            DefaultInventory.Add(new DrugStack
-            {
-                Tag = "CuSO4",
-                Ions = new List<IonStack>
-                {
-                    new IonStack
-                    {
-                        Element = Elements.Cu, Index = Elements.Cu.GetIndex(2),
-                        Amount = 1f, Concentration = 1f
-                    }
-                },
-                Properties = Element.Acid
-            });
-            DefaultInventory.Add(new DrugStack
-            {
-                Tag = "CoSO4",
-                Ions = new List<IonStack>
-                {
-                    new IonStack
-                    {
-                        Element = Elements.Co, Index = Elements.Co.GetIndex(2),
-                        Amount = 1f, Concentration = 1f
-                    }
-                },
-                Properties = Element.Acid
-            });
-            DefaultInventory.Add(new DrugStack
-            {
-                Tag = "HCl",
-                Ions = new List<IonStack>
-                {
-                    new IonStack
-                    {
-                        Element = Elements.H, Index = Elements.H.GetIndex(1),
-                        Amount = 1f, Concentration = 1f
-                    },
-                    new IonStack
-                    {
-                        Element = Elements.Cl, Index = Elements.Cl.GetIndex(-1),
-                        Amount = 1f, Concentration = 1f
-                    }
-                },
-                Properties = Element.Acid
-            });
-            DefaultInventory.Add(new DrugStack
-            {
-                Tag = "FeSO4",
-                Ions = new List<IonStack>
-                {
-                    new IonStack
-                    {
-                        Element = Elements.Fe, Index = Elements.Fe.GetIndex(2),
-                        Amount = 1f, Concentration = 1f
-                    }
-                },
-                Properties = Element.Acid
-            });
-            DefaultInventory.Add(new DrugStack
-            {
-                Tag = "H2O2",
-                Ions = new List<IonStack>
-                {
-                    new IonStack
-                    {
-                        Element = Elements.O, Index = Elements.O.GetIndex(-1),
-                        Amount = 1f, Concentration = 1f
-                    }
-                },
-                Properties = Element.Acid
-            });
-            DefaultInventory.Add(new DrugStack
-            {
-                Tag = "KMnO4",
-                Ions = new List<IonStack>
-                {
-                    new IonStack
-                    {
-                        Element = Elements.K, Index = Elements.K.GetIndex(1),
-                        Amount = 1f, Concentration = 1f
-                    },
-                    new IonStack
-                    {
-                        Element = Elements.Mn, Index = Elements.Mn.GetIndex(7),
-                        Amount = 1f, Concentration = 1f
-                    }
-                },
-                Properties = Element.Acid
-            });
+
             //DefaultInventory.Add(DrugStackFactory(Buff.Ghost, new object[] {6.0f, 10.0f, 0.15f}));
             return DefaultInventory;
         }
@@ -390,23 +285,67 @@ namespace SubjectModel
         }
     }
 
-    public class DrugStack
+    public class DrugStack : ItemStack
     {
         public string Tag;
         public IList<IonStack> Ions;
         public int Properties;
+        public int Count;
 
-        public DrugStack Clone()
+        public ItemStack Fetch()
         {
             var ions = Ions.Select(ion => new IonStack
                     {Element = ion.Element, Index = ion.Index, Amount = ion.Amount, Concentration = ion.Concentration})
                 .ToList();
+            Count--;
             return new DrugStack
             {
                 Tag = Tag,
                 Ions = ions,
-                Properties = Properties
+                Properties = Properties,
+                Count = 1
             };
+        }
+
+        public int GetCount()
+        {
+            return Count;
+        }
+
+        public string GetName()
+        {
+            return Tag;
+        }
+
+        public void OnMouseClickLeft(GameObject user)
+        {
+            if (Camera.main == null) return;
+            BuffInvoker.InvokeByThrower(this, Utils.Vector3To2(Camera.main.ScreenToWorldPoint(Input.mousePosition)),
+                user.GetComponent<Rigidbody2D>().position);
+        }
+
+        public void OnMouseClickRight(GameObject user)
+        {
+            if (Camera.main == null) return;
+            BuffInvoker.InvokeByThrower(this, user.GetComponent<Rigidbody2D>().position,
+                user.GetComponent<Rigidbody2D>().position);
+        }
+
+        public void Selecting(GameObject user)
+        {
+        }
+
+        public void OnSelected(GameObject user)
+        {
+        }
+
+        public void LoseSelected(GameObject user)
+        {
+        }
+
+        public Func<ItemStack, bool> SubInventory()
+        {
+            return item => false;
         }
     }
 

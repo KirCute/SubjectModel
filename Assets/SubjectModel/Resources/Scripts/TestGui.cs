@@ -15,6 +15,7 @@ namespace SubjectModel
 
     public class TestGui : MonoBehaviour
     {
+        /*
         private int selected;
         private Variables playerVariables;
         private string maxHealth;
@@ -33,7 +34,7 @@ namespace SubjectModel
         private string bossHealth;
         private string bossSpeed;
         private string bossDefence;
-        private GunShoot playerGun;
+        private GunF playerGun;
         private string bulletRemain;
         private bool bulletRemainUpdate;
         private string damage;
@@ -361,5 +362,6 @@ namespace SubjectModel
                 stack[i] = GUILayout.TextField(stack[i], GUILayout.ExpandWidth(true));
             GUILayout.EndHorizontal();
         }
+        */
     }
 }
