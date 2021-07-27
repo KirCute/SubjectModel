@@ -19,7 +19,7 @@ namespace SubjectModel
         private float remainTime;
         private IList<Collider2D> stained;
 
-        private void Start()
+        private void Awake()
         {
             remainTime = .0f;
             stained = new List<Collider2D>();

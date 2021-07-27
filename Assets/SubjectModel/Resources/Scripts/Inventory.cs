@@ -8,8 +8,8 @@ namespace SubjectModel
     public interface ItemStack
     {
         public string GetName();
-        public void OnMouseClickLeft(GameObject user);
-        public void OnMouseClickRight(GameObject user);
+        public void OnMouseClickLeft(GameObject user, Vector2 pos);
+        public void OnMouseClickRight(GameObject user, Vector2 pos);
         public void Selecting(GameObject user);
         public void OnSelected(GameObject user);
         public void LoseSelected(GameObject user);
@@ -24,11 +24,11 @@ namespace SubjectModel
         public abstract int GetCount();
         public abstract ItemStack Fetch();
 
-        public void OnMouseClickLeft(GameObject user)
+        public void OnMouseClickLeft(GameObject user, Vector2 pos)
         {
         }
 
-        public void OnMouseClickRight(GameObject user)
+        public void OnMouseClickRight(GameObject user, Vector2 pos)
         {
         }
 
@@ -57,137 +57,12 @@ namespace SubjectModel
         public int selecting;
         public int subSelecting;
 
-        private void Start()
+        private void Awake()
         {
             bag = new List<ItemStack>();
             sub = new List<ItemStack>();
             selecting = 0;
             subSelecting = 0;
-
-            // Debug
-            var debugMagazine = new MagazineTemple("测试用弹匣", 20);
-            bag.Add(new Firearm(new FirearmTemple("模板0", 100f, 0.75f, 0.2f, 1f, 20f, 0.025f, 0.5f, 1f, 20f, 0.5f,
-                debugMagazine)));
-            bag.Add(new Magazine(debugMagazine) {BulletRemain = 20});
-            bag.Add(new Magazine(debugMagazine) {BulletRemain = 20});
-            bag.Add(new Magazine(debugMagazine) {BulletRemain = 20});
-            bag.Add(new DrugStack
-            {
-                Tag = "FeCl3",
-                Ions = new List<IonStack>
-                {
-                    new IonStack
-                    {
-                        Element = Elements.Fe, Index = Elements.Fe.GetIndex(3),
-                        Amount = 1f, Concentration = 1f
-                    },
-                    new IonStack
-                    {
-                        Element = Elements.Cl, Index = Elements.Cl.GetIndex(-1),
-                        Amount = 3f, Concentration = 3f
-                    }
-                },
-                Properties = Element.Acid,
-                Count = 10
-            });
-            bag.Add(new DrugStack
-            {
-                Tag = "CuSO4",
-                Ions = new List<IonStack>
-                {
-                    new IonStack
-                    {
-                        Element = Elements.Cu, Index = Elements.Cu.GetIndex(2),
-                        Amount = 1f, Concentration = 1f
-                    }
-                },
-                Properties = Element.Acid,
-                Count = 10
-            });
-            bag.Add(new DrugStack
-            {
-                Tag = "CoSO4",
-                Ions = new List<IonStack>
-                {
-                    new IonStack
-                    {
-                        Element = Elements.Co, Index = Elements.Co.GetIndex(2),
-                        Amount = 1f, Concentration = 1f
-                    }
-                },
-                Properties = Element.Acid,
-                Count = 10
-            });
-            bag.Add(new DrugStack
-            {
-                Tag = "HCl",
-                Ions = new List<IonStack>
-                {
-                    new IonStack
-                    {
-                        Element = Elements.H, Index = Elements.H.GetIndex(1),
-                        Amount = 1f, Concentration = 1f
-                    },
-                    new IonStack
-                    {
-                        Element = Elements.Cl, Index = Elements.Cl.GetIndex(-1),
-                        Amount = 1f, Concentration = 1f
-                    }
-                },
-                Properties = Element.Acid,
-                Count = 10
-            });
-            bag.Add(new DrugStack
-            {
-                Tag = "FeSO4",
-                Ions = new List<IonStack>
-                {
-                    new IonStack
-                    {
-                        Element = Elements.Fe, Index = Elements.Fe.GetIndex(2),
-                        Amount = 1f, Concentration = 1f
-                    }
-                },
-                Properties = Element.Acid,
-                Count = 10
-            });
-            bag.Add(new DrugStack
-            {
-                Tag = "H2O2",
-                Ions = new List<IonStack>
-                {
-                    new IonStack
-                    {
-                        Element = Elements.O, Index = Elements.O.GetIndex(-1),
-                        Amount = 1f, Concentration = 1f
-                    }
-                },
-                Properties = Element.Acid,
-                Count = 10
-            });
-            bag.Add(new DrugStack
-            {
-                Tag = "KMnO4",
-                Ions = new List<IonStack>
-                {
-                    new IonStack
-                    {
-                        Element = Elements.K, Index = Elements.K.GetIndex(1),
-                        Amount = 1f, Concentration = 1f
-                    },
-                    new IonStack
-                    {
-                        Element = Elements.Mn, Index = Elements.Mn.GetIndex(7),
-                        Amount = 1f, Concentration = 1f
-                    }
-                },
-                Properties = Element.Acid,
-                Count = 10
-            });
-            
-            if (bag.Count == 0) return;
-            bag[selecting].OnSelected(gameObject);
-            foreach (var item in bag.Where(bag[selecting].SubInventory())) sub.Add(item);
         }
 
         private void Update()
@@ -198,33 +73,27 @@ namespace SubjectModel
                     Remove(bag[i]);
                     i--;
                 }
-
-            bag[selecting].Selecting(gameObject);
-            if (Input.GetMouseButtonDown(0)) bag[selecting].OnMouseClickLeft(gameObject);
-            if (Input.GetMouseButtonDown(1)) bag[selecting].OnMouseClickRight(gameObject);
-            var alpha = GetAlphaDown();
-            if (alpha != -1 && sub.Count > alpha) subSelecting = alpha;
-            var mouseAxis = (int) (Input.GetAxisRaw("Mouse ScrollWheel") * 10);
-            if (mouseAxis == 0 || selecting + mouseAxis < 0 || selecting + mouseAxis >= bag.Count) return;
-            bag[selecting].LoseSelected(gameObject);
-            sub.Clear();
-            selecting += mouseAxis;
-            bag[selecting].OnSelected(gameObject);
-            foreach (var item in bag.Where(bag[selecting].SubInventory())) sub.Add(item);
+            if (selecting < bag.Count) bag[selecting].Selecting(gameObject);
         }
 
         public bool Remove(ItemStack item)
         {
             if (item == null) return true;
-            sub.Remove(item);
             if (!bag.Contains(item)) return false;
             var index = bag.IndexOf(item);
+            var hasSub = TryGetSubItem(out var s);
             if (!bag.Remove(item)) return false;
-            if (index < selecting) selecting--;
-            if (index != selecting) return true;
-            item.LoseSelected(gameObject);
-            if (selecting == bag.Count) selecting--;
-            if (selecting != -1) bag[selecting].OnSelected(gameObject);
+            if (hasSub && s == item) subSelecting = 0;
+            if (index == selecting)
+            {
+                subSelecting = 0;
+                item.LoseSelected(gameObject);
+                if (selecting == bag.Count) selecting--;
+                if (selecting != -1) bag[selecting].OnSelected(gameObject);
+                else selecting = 0;
+            }
+            else if (index < selecting) selecting--;
+            RebuildSubInventory();
             return true;
         }
 
@@ -232,6 +101,11 @@ namespace SubjectModel
         {
             if (item == null) return;
             bag.Add(item);
+            if (bag.Count == 1)
+            {
+                bag[selecting].OnSelected(gameObject);
+                foreach (var i in bag.Where(bag[selecting].SubInventory())) sub.Add(i);
+            }
             if (bag[selecting].SubInventory()(item)) sub.Add(item);
         }
 
@@ -243,19 +117,33 @@ namespace SubjectModel
             return true;
         }
 
-        private static int GetAlphaDown()
+        public void SwitchTo(int target)
         {
-            if (Input.GetKey(KeyCode.Alpha1)) return 0;
-            if (Input.GetKey(KeyCode.Alpha2)) return 1;
-            if (Input.GetKey(KeyCode.Alpha3)) return 2;
-            if (Input.GetKey(KeyCode.Alpha4)) return 3;
-            if (Input.GetKey(KeyCode.Alpha5)) return 4;
-            if (Input.GetKey(KeyCode.Alpha6)) return 5;
-            if (Input.GetKey(KeyCode.Alpha7)) return 6;
-            if (Input.GetKey(KeyCode.Alpha8)) return 7;
-            if (Input.GetKey(KeyCode.Alpha9)) return 8;
-            if (Input.GetKey(KeyCode.Alpha0)) return 9;
-            return -1;
+            if (target == selecting || target < 0 || target >= bag.Count) return;
+            bag[selecting].LoseSelected(gameObject);
+            selecting = target;
+            subSelecting = 0;
+            RebuildSubInventory();
+            bag[target].OnSelected(gameObject);
+        }
+
+        public void LeftUse(Vector2 pos)
+        {
+            if (selecting >= bag.Count) return;
+            bag[selecting].OnMouseClickLeft(gameObject, pos);
+        }
+
+        public void RightUse(Vector2 pos)
+        {
+            if (selecting >= bag.Count) return;
+            bag[selecting].OnMouseClickRight(gameObject, pos);
+        }
+
+        private void RebuildSubInventory()
+        {
+            if (selecting >= bag.Count) return;
+            sub.Clear();
+            foreach (var item in bag.Where(bag[selecting].SubInventory())) sub.Add(item);
         }
     }
 }

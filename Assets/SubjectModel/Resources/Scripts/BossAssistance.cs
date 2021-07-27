@@ -24,12 +24,12 @@ namespace SubjectModel
             else if (fighting) BossDead();
         }
 
-        public void StartBossFight(GameObject boss, RecoverAfterFight raf)
+        public void StartBossFight(GameObject theBoss, RecoverAfterFight itsRaf)
         {
             GetComponent<RectTransform>().sizeDelta = new Vector2(900f, 7.5f);
-            this.boss = boss;
+            boss = theBoss;
             maxHealth = boss.GetComponent<Variables>().declarations.Get<float>("Health");
-            this.raf += raf;
+            raf += itsRaf;
             fighting = true;
         }
 

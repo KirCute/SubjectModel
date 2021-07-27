@@ -89,13 +89,12 @@ namespace SubjectModel
 
         public string GetName()
         {
-            return Temple.Name;
+            return Magazine == null ? Temple.Name : $"{Temple.Name} {Magazine.BulletRemain}/{Temple.Magazine.BulletContains}";
         }
 
-        public void OnMouseClickLeft(GameObject user)
+        public void OnMouseClickLeft(GameObject user, Vector2 aim)
         {
             if (Loading > .0f || Magazine == null || Magazine.BulletRemain <= 0 || Camera.main == null) return;
-            var aim = Utils.Vector3To2(Camera.main.ScreenToWorldPoint(Input.mousePosition));
             aim.x = Utils.GenerateGaussian(aim.x, Temple.Deviation * Temple.Distance, Temple.MaxRange);
             aim.y = Utils.GenerateGaussian(aim.y, Temple.Deviation * Temple.Distance, Temple.MaxRange);
             var shooterPosition = user.GetComponent<Rigidbody2D>().position;
@@ -114,7 +113,7 @@ namespace SubjectModel
                     : Temple.Damage));
         }
 
-        public void OnMouseClickRight(GameObject user)
+        public void OnMouseClickRight(GameObject user, Vector2 aim)
         {
             SwitchMagazine(user);
         }
@@ -209,7 +208,7 @@ namespace SubjectModel
 
         public override string GetName()
         {
-            return Temple.Name;
+            return $"{Temple.Name} {BulletRemain}/{Temple.BulletContains}";
         }
 
         public override int GetCount()

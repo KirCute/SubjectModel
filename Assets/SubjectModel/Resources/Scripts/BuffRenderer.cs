@@ -16,7 +16,7 @@ namespace SubjectModel
         private List<IBuff> buffs;
         private IList<IonStack> stain;
 
-        private void Start()
+        private void Awake()
         {
             buffs = new List<IBuff>();
             stain = new List<IonStack>();
@@ -64,7 +64,7 @@ namespace SubjectModel
 
         private void Remove(IonStack ion)
         {
-            Debug.LogFormat("Remove: {0}({1})", ion.Element.symbol, ion.Element.valences[ion.Index]);
+            //Debug.LogFormat("Remove: {0}({1})", ion.Element.symbol, ion.Element.valences[ion.Index]);
             stain.Remove(ion);
         }
 
@@ -116,8 +116,8 @@ namespace SubjectModel
                             stack.Concentration * stack.Element.buffParam[stack.Index][1]));
                     return;
                 case Element.Aqua:
-                    Debug.LogFormat("Insert: {0}({1}) {2}mol {3}mol/L", stack.Element.symbol,
-                        stack.Element.valences[stack.Index], stack.Amount, stack.Concentration);
+                    //Debug.LogFormat("Insert: {0}({1}) {2}mol {3}mol/L", stack.Element.symbol,
+                    //    stack.Element.valences[stack.Index], stack.Amount, stack.Concentration);
                     if (stack.Element.buffType[stack.Index] != Buff.Empty)
                         Apply((IBuff) Activator.CreateInstance(
                             DrugDictionary.GetTypeOfBuff(stack.Element.buffType[stack.Index]),
@@ -177,12 +177,14 @@ namespace SubjectModel
             //Debug.Log("Reducer: " + reducer.Element.symbol + " " + reducer.Element.valences[reducer.Index] +
             //          " " + reducer.Amount);
 
+            /*
             Debug.LogFormat("Reaction happens: {0}({1} -> {2}) ↓   {3}({4} -> {5}) ↑",
                 oxidizer.Element.symbol,
                 oxidizer.Element.valences[oxidizer.Index], oxidizer.Element.valences[oxidizer.Index - 1],
                 reducer.Element.symbol,
                 reducer.Element.valences[reducer.Index], reducer.Element.valences[reducer.Index + 1]
             );
+            */
 
             var m = oxidizer.Element.GetReducedCoefficient(oxidizer.Index);
             var n = reducer.Element.GetOxidizedCoefficient(reducer.Index);

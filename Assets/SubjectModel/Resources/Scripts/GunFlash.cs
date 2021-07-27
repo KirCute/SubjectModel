@@ -1,6 +1,4 @@
-using Bolt;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace SubjectModel
 {
@@ -21,10 +19,12 @@ namespace SubjectModel
         private float trackTime;
         public float distance;
         public bool sight;
+        public Vector2 aimPos;
 
-        private void Start()
+        private void Awake()
         {
             Physics2D.queriesStartInColliders = false;
+            aimPos = Vector2.zero;
         }
 
         private void Update()
@@ -35,9 +35,8 @@ namespace SubjectModel
             {
                 trackTime = .0f;
                 GetComponent<LineRenderer>().enabled = sight;
-                if (sight && Camera.main != null)
-                    DrawLine(GetComponent<Rigidbody2D>().position,
-                        Utils.Vector3To2(Camera.main.ScreenToWorldPoint(Input.mousePosition)), SightLineColor);
+                if (sight && Camera.main != null) 
+                    DrawLine(GetComponent<Rigidbody2D>().position,aimPos, SightLineColor);
             }
         }
 
@@ -45,7 +44,7 @@ namespace SubjectModel
         {
             var hit = DrawLine(shooterPosition, aim, HitColor, MissColor);
             trackTime = .1f;
-            return hit.collider.gameObject.layer != 6 ? null : hit.collider;
+            return hit.collider == null || hit.collider.gameObject.layer != 6 ? null : hit.collider;
         }
 
         private RaycastHit2D DrawLine(Vector2 from, Vector2 to, Pair<Color> success, Pair<Color> fault)

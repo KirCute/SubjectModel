@@ -204,7 +204,6 @@ namespace SubjectModel
         private static readonly Dictionary<Buff, Type> BuffDictionary = new Dictionary<Buff, Type>();
         private static readonly Dictionary<Buff, string> BuffName = new Dictionary<Buff, string>();
         private static readonly Dictionary<Buff, Vector3> BuffColor = new Dictionary<Buff, Vector3>();
-        private static readonly List<DrugStack> DefaultInventory = new List<DrugStack>();
 
         public static Type GetTypeOfBuff(Buff buff)
         {
@@ -253,14 +252,6 @@ namespace SubjectModel
         {
             return GetColor(stack.Element.buffType[stack.Index]);
         }
-
-        public static IList<DrugStack> GetDefaultInventory()
-        {
-            if (DefaultInventory.Count != 0) return DefaultInventory;
-
-            //DefaultInventory.Add(DrugStackFactory(Buff.Ghost, new object[] {6.0f, 10.0f, 0.15f}));
-            return DefaultInventory;
-        }
     }
 
     public class IonStack
@@ -287,29 +278,31 @@ namespace SubjectModel
 
     public class DrugStack : ItemStack
     {
-        public string Tag;
-        public IList<IonStack> Ions;
-        public int Properties;
-        public int Count;
+        public readonly string Tag;
+        public readonly IList<IonStack> Ions;
+        public readonly int Properties;
+        private int count;
 
+        public DrugStack(string tag, IList<IonStack> ions, int properties, int count)
+        {
+            Tag = tag;
+            Ions = ions;
+            Properties = properties;
+            this.count = count;
+        }
+        
         public ItemStack Fetch()
         {
             var ions = Ions.Select(ion => new IonStack
                     {Element = ion.Element, Index = ion.Index, Amount = ion.Amount, Concentration = ion.Concentration})
                 .ToList();
-            Count--;
-            return new DrugStack
-            {
-                Tag = Tag,
-                Ions = ions,
-                Properties = Properties,
-                Count = 1
-            };
+            count--;
+            return new DrugStack(Tag, ions, Properties, 1);
         }
 
         public int GetCount()
         {
-            return Count;
+            return count;
         }
 
         public string GetName()
@@ -317,14 +310,13 @@ namespace SubjectModel
             return Tag;
         }
 
-        public void OnMouseClickLeft(GameObject user)
+        public void OnMouseClickLeft(GameObject user, Vector2 pos)
         {
             if (Camera.main == null) return;
-            BuffInvoker.InvokeByThrower(this, Utils.Vector3To2(Camera.main.ScreenToWorldPoint(Input.mousePosition)),
-                user.GetComponent<Rigidbody2D>().position);
+            BuffInvoker.InvokeByThrower(this, pos, user.GetComponent<Rigidbody2D>().position);
         }
 
-        public void OnMouseClickRight(GameObject user)
+        public void OnMouseClickRight(GameObject user, Vector2 pos)
         {
             if (Camera.main == null) return;
             BuffInvoker.InvokeByThrower(this, user.GetComponent<Rigidbody2D>().position,

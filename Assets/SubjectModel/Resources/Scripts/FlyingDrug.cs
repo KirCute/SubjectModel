@@ -10,19 +10,19 @@ namespace SubjectModel
         private Vector2 origin;
         private Vector2 target;
         private float distanceSquare;
-        private float keepTime;
+        private float remainTime;
 
-        public void Initialize(DrugStack drug, Vector2 origin, Vector2 target, float keepTime)
+        public void Initialize(DrugStack drugStack, Vector2 originPos, Vector2 targetPos, float keepTime)
         {
-            gameObject.name = "FlyingDrug_" + drug.Tag;
-            this.drug = drug;
-            this.origin = origin;
-            GetComponent<Rigidbody2D>().position = origin;
+            gameObject.name = "FlyingDrug_" + drugStack.Tag;
+            this.drug = drugStack;
+            this.origin = originPos;
+            GetComponent<Rigidbody2D>().position = originPos;
             GetComponent<Rigidbody2D>().velocity =
-                Utils.LengthenArrow(origin, target, FlyingVelocity);
-            this.target = target;
-            this.distanceSquare = Utils.GetMagnitudeSquare2D(origin, target);
-            this.keepTime = keepTime;
+                Utils.LengthenArrow(originPos, targetPos, FlyingVelocity);
+            this.target = targetPos;
+            this.distanceSquare = Utils.GetMagnitudeSquare2D(originPos, targetPos);
+            this.remainTime = keepTime;
         }
 
         private void Update()
@@ -33,7 +33,7 @@ namespace SubjectModel
 
         private void Invoke()
         {
-            BuffInvoker.Invoke(drug, target, keepTime);
+            BuffInvoker.Invoke(drug, target, remainTime);
             Destroy(gameObject);
         }
     }

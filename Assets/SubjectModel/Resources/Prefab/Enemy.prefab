@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 2645565174689144944}
   - component: {fileID: 3783856003099380856}
   - component: {fileID: 7834381494281578483}
+  - component: {fileID: 3751485004116039209}
   - component: {fileID: 8476038742562072724}
   m_Layer: 6
   m_Name: Enemy
@@ -161,8 +162,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _data:
-    _json: '{"declarations":{"collection":{"$content":[{"name":"Speed","value":{"$content":15.0,"$type":"System.Single"},"$version":"A"},{"name":"Health","value":{"$content":20.0,"$type":"System.Single"},"$version":"A"},{"name":"MaxHealth","value":{"$content":20.0,"$type":"System.Single"},"$version":"A"},{"name":"Defence","value":{"$content":10.0,"$type":"System.Single"},"$version":"A"},{"name":"Inventory","value":{"$content":[],"$type":"System.Collections.Generic.List`1[[SubjectModel.DrugStack,
-      Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]"},"$version":"A"}],"$version":"A"},"$version":"A"}}'
+    _json: '{"declarations":{"collection":{"$content":[{"name":"Speed","value":{"$content":15.0,"$type":"System.Single"},"$version":"A"},{"name":"Health","value":{"$content":20.0,"$type":"System.Single"},"$version":"A"},{"name":"MaxHealth","value":{"$content":20.0,"$type":"System.Single"},"$version":"A"},{"name":"Defence","value":{"$content":10.0,"$type":"System.Single"},"$version":"A"}],"$version":"A"},"$version":"A"}}'
     _objectReferences: []
 --- !u!114 &8447671915212957988
 MonoBehaviour:
@@ -240,6 +240,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 862196d02ef02e04d99b713bd18bd0c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &3751485004116039209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9204706058163521875}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dda043e3bbf8af640b4bdef4e7b0454a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  selecting: 0
+  subSelecting: 0
 --- !u!114 &8476038742562072724
 MonoBehaviour:
   m_ObjectHideFlags: 0
