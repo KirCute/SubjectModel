@@ -45,7 +45,7 @@ namespace SubjectModel
             var sb = new StringBuilder();
             for (var i = inventory.sub.Count - 1; i >= 0; i--)
             {
-                sb.Append(inventory.subSelecting == i ? "> " : "   ");
+                sb.Append(inventory.subSelecting == i ? "> " : "  ");
                 sb.Append(inventory.sub[i].GetName());
                 sb.Append("\n");
             }

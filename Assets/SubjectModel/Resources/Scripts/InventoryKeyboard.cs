@@ -20,7 +20,7 @@ namespace SubjectModel
             var alpha = GetAlphaDown();
             if (alpha != -1 && inventory.sub.Count > alpha) inventory.subSelecting = alpha;
             var mouseAxis = (int) (Input.GetAxisRaw("Mouse ScrollWheel") * 10);
-            inventory.SwitchTo(inventory.selecting + mouseAxis);
+            inventory.SwitchTo(inventory.selecting - mouseAxis);
         }
 
         private static Vector2 GetMousePosition()

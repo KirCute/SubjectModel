@@ -15,6 +15,7 @@ namespace SubjectModel
             FirearmTemples.Add(new FirearmTemple("模板0", 100f, 0.75f, 0.2f, 1f, 
                 20f, 0.025f, 0.5f, 1f, 20f, 0.5f, MagazineTemples[0]));
             inventory.Add(new Firearm(FirearmTemples[0]));
+            inventory.Add(new Sling());
             inventory.Add(new DrugStack
             (
                 "FeCl3",

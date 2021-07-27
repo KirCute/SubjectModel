@@ -55,6 +55,7 @@ namespace SubjectModel
         private string bulletContains;
 
         private Inventory inventory;
+        private GunFlash playerFlash;
         private string firearm;
         private string magazine;
 
@@ -64,7 +65,7 @@ namespace SubjectModel
 
         private void Start()
         {
-            selected = 3;
+            selected = 4;
             var player = GameObject.FindWithTag("Player");
             playerVariables = player.GetComponent<Variables>();
             maxHealth = playerVariables.declarations.Get("MaxHealth").ToString();
@@ -90,6 +91,7 @@ namespace SubjectModel
             standOnlyInvoke = false;
             pause = false;
             inventory = player.GetComponent<Inventory>();
+            playerFlash = player.GetComponent<GunFlash>();
         }
 
         private void Update()
@@ -114,7 +116,7 @@ namespace SubjectModel
         {
             GUILayout.Window(0, new Rect(60, 80, 400, 20), id =>
             {
-                selected = GUILayout.Toolbar(selected, new[] {"玩家", "敌人", "炼金术", "枪械模板", "收起", "系统"});
+                selected = GUILayout.Toolbar(selected, new[] {"玩家", "敌人", "炼金术", "枪械", "收起", "系统"});
                 switch (selected)
                 {
                     case 0:
@@ -150,6 +152,8 @@ namespace SubjectModel
                         AutoAdjustString("最小热力伤害电势差", ref mdp);
                         break;
                     case 3:
+                        GUILayout.BeginVertical();
+                        
                         GUILayout.BeginVertical("Box");
                         GUILayout.Label("枪械模板");
                         for (var i = 0; i < Test.FirearmTemples.Count; i++)
@@ -234,6 +238,12 @@ namespace SubjectModel
                             });
                         }
                         GUILayout.EndHorizontal();
+                        
+                        GUILayout.BeginVertical("Box");
+                        playerFlash.sight = GUILayout.Toggle(playerFlash.sight, "使用瞄具");
+                        GUILayout.EndVertical();
+                        
+                        GUILayout.EndVertical();
                         break;
                     case 5:
                         GUILayout.BeginVertical("Box");

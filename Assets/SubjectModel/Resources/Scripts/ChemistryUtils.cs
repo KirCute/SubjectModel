@@ -307,7 +307,7 @@ namespace SubjectModel
 
         public string GetName()
         {
-            return Tag;
+            return $"{Tag}({count})";
         }
 
         public void OnMouseClickLeft(GameObject user, Vector2 pos)
@@ -338,6 +338,55 @@ namespace SubjectModel
         public Func<ItemStack, bool> SubInventory()
         {
             return item => false;
+        }
+    }
+    
+    public class Sling : ItemStack
+    {
+        private bool fetched;
+
+        public Sling()
+        {
+            fetched = false;
+        }
+        
+        public string GetName()
+        {
+            return "弹弓";
+        }
+
+        public void OnMouseClickLeft(GameObject user, Vector2 pos)
+        {
+            if (!user.GetComponent<Inventory>().TryGetSubItem(out var stone)) return;
+            stone.OnMouseClickLeft(user, pos);
+        }
+
+        public void OnMouseClickRight(GameObject user, Vector2 pos)
+        {
+            if (!user.GetComponent<Inventory>().TryGetSubItem(out var stone)) return;
+            stone.OnMouseClickRight(user, pos);
+        }
+
+        public void Selecting(GameObject user) { }
+
+        public void OnSelected(GameObject user) { }
+
+        public void LoseSelected(GameObject user) { }
+
+        public int GetCount()
+        {
+            return fetched ? 0 : 1;
+        }
+
+        public ItemStack Fetch()
+        {
+            fetched = true;
+            return this;
+        }
+
+        public Func<ItemStack, bool> SubInventory()
+        {
+            return item => item.GetType() == typeof(DrugStack);
         }
     }
 
