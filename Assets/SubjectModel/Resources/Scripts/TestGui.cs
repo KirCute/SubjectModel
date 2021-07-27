@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Bolt;
 using UnityEditor;
 using UnityEngine;
@@ -15,9 +13,9 @@ namespace SubjectModel
 
     public class TestGui : MonoBehaviour
     {
-        /*
         private int selected;
         private Variables playerVariables;
+        
         private string maxHealth;
         private float health;
         private bool healthUpdate;
@@ -30,40 +28,43 @@ namespace SubjectModel
         private bool speedUpdate;
         private string defence;
         private bool defenceUpdate;
+
         private BossSpawner bossSpawner;
         private string bossHealth;
         private string bossSpeed;
         private string bossDefence;
-        private GunF playerGun;
-        private string bulletRemain;
-        private bool bulletRemainUpdate;
-        private string damage;
-        private string depth;
-        private string deviation;
-        private string maxRange;
-        private string loadingTime;
-        private string loading;
-        private string reload;
-        private string weight;
-        private string kick;
-        private string bulletContains;
-        private string distance;
-        private string reloadSpeed;
-        private bool loadingUpdate;
+
         private string mdc;
         private string tdc;
         private string mdp;
-        private IList<DrugStack> inventory;
-        private IList<IList<IList<string>>> chemistryMenu;
-        private IList<string> drugProperties;
-        private Vector2 chemistryScrollPos;
+
+        private string firearmName;
+        private string damage;
+        private string reload;
+        private string loading;
+        private string weight;
+        private string depth;
+        private string deviation;
+        private string maxRange;
+        private string kick;
+        private string distance;
+        private string reloadSpeed;
+        private string magazineTemple;
+
+        private string magazineName;
+        private string bulletContains;
+
+        private Inventory inventory;
+        private string firearm;
+        private string magazine;
+
         private bool standOnly;
         private bool standOnlyInvoke;
         private bool pause;
-        
+
         private void Start()
         {
-            selected = 4;
+            selected = 3;
             var player = GameObject.FindWithTag("Player");
             playerVariables = player.GetComponent<Variables>();
             maxHealth = playerVariables.declarations.Get("MaxHealth").ToString();
@@ -82,43 +83,13 @@ namespace SubjectModel
             bossHealth = bossSpawner.bossHealth.ToString();
             bossSpeed = bossSpawner.bossSpeed.ToString();
             bossDefence = bossSpawner.bossDefence.ToString();
-            playerGun = player.GetComponent<GunShoot>();
-            bulletRemain = playerGun.bulletRemain.ToString();
-            bulletRemainUpdate = false;
-            damage = playerGun.firearm.Data[FirearmComponent.Damage].ToString();
-            depth = playerGun.firearm.Data[FirearmComponent.Depth].ToString();
-            deviation = playerGun.firearm.Data[FirearmComponent.Deviation].ToString();
-            maxRange = playerGun.firearm.Data[FirearmComponent.MaxRange].ToString();
-            loadingTime = playerGun.firearm.Data[FirearmComponent.Loading].ToString();
-            reload = playerGun.firearm.Data[FirearmComponent.Reload].ToString();
-            weight = playerGun.firearm.Data[FirearmComponent.Weight].ToString();
-            kick = playerGun.firearm.Data[FirearmComponent.Kick].ToString();
-            bulletContains = playerGun.firearm.Data[FirearmComponent.Bullet].ToString();
-            distance = playerGun.firearm.Data[FirearmComponent.Distance].ToString();
-            reloadSpeed = playerGun.firearm.Data[FirearmComponent.ReloadSpeed].ToString();
-            loading = playerVariables.declarations.Get("Loading").ToString();
-            loadingUpdate = false;
-            inventory = DrugDictionary.GetDefaultInventory();
-            drugProperties = new List<string>();
             mdc = BuffRenderer.MotiveDamageCoefficient.ToString();
             tdc = BuffRenderer.ThermalDamageCoefficient.ToString();
             mdp = BuffRenderer.MinimumDamagePotential.ToString();
-            chemistryMenu = new List<IList<IList<string>>>();
-            foreach (var drug in inventory)
-            {
-                drugProperties.Add(drug.Properties.ToString());
-                var drugList = drug.Ions.Select(ion => new List<string>
-                {
-                    ion.GetSymbol(drug.Properties), ion.Index.ToString(),
-                    ion.Amount.ToString(), ion.Concentration.ToString()
-                }).Cast<IList<string>>().ToList();
-                chemistryMenu.Add(drugList);
-            }
-
-            chemistryScrollPos = Vector2.zero;
             standOnly = false;
             standOnlyInvoke = false;
             pause = false;
+            inventory = player.GetComponent<Inventory>();
         }
 
         private void Update()
@@ -126,56 +97,24 @@ namespace SubjectModel
             if (float.TryParse(bossHealth, out var value)) bossSpawner.bossHealth = value;
             if (float.TryParse(bossSpeed, out value)) bossSpawner.bossSpeed = value;
             if (float.TryParse(bossDefence, out value)) bossSpawner.bossDefence = value;
-            if (float.TryParse(bulletContains, out value)) playerGun.firearm.Data[FirearmComponent.Bullet] = value;
-            if (float.TryParse(damage, out value))
-                playerGun.firearm.GetComponent(1).Function[FirearmComponent.Damage].value = value;
-            if (float.TryParse(depth, out value))
-                playerGun.firearm.GetComponent(1).Function[FirearmComponent.Depth].value = value;
-            if (float.TryParse(deviation, out value))
-                playerGun.firearm.GetComponent(1).Function[FirearmComponent.Deviation].value = value;
-            if (float.TryParse(maxRange, out value))
-                playerGun.firearm.GetComponent(1).Function[FirearmComponent.MaxRange].value = value;
-            if (float.TryParse(loadingTime, out value))
-                playerGun.firearm.GetComponent(1).Function[FirearmComponent.Loading].value = value;
-            if (float.TryParse(reload, out value))
-                playerGun.firearm.GetComponent(1).Function[FirearmComponent.Reload].value = value;
-            if (float.TryParse(weight, out value))
-                playerGun.firearm.GetComponent(1).Function[FirearmComponent.Weight].value = value;
-            if (float.TryParse(kick, out value))
-                playerGun.firearm.GetComponent(1).Function[FirearmComponent.Kick].value = value;
-            if (float.TryParse(distance, out value))
-                playerGun.firearm.GetComponent(1).Function[FirearmComponent.Distance].value = value;
-            if (float.TryParse(reloadSpeed, out value))
-                playerGun.firearm.GetComponent(1).Function[FirearmComponent.ReloadSpeed].value = value;
-            playerGun.firearm.Statistics();
             if (float.TryParse(mdc, out value)) BuffRenderer.MotiveDamageCoefficient = value;
             if (float.TryParse(tdc, out value)) BuffRenderer.ThermalDamageCoefficient = value;
             if (float.TryParse(mdp, out value)) BuffRenderer.MinimumDamagePotential = value;
-            for (var i = 0; i < inventory.Count; i++)
-            {
-                if (int.TryParse(drugProperties[i], out var intValue)) inventory[i].Properties = intValue;
-                for (var j = 0; j < chemistryMenu[i].Count; j++)
-                {
-                    chemistryMenu[i][j][0] = inventory[i].Ions[j].GetSymbol(inventory[i].Properties);
-                    if (int.TryParse(chemistryMenu[i][j][1], out intValue)) inventory[i].Ions[j].Index = intValue;
-                    if (float.TryParse(chemistryMenu[i][j][2], out value)) inventory[i].Ions[j].Amount = value;
-                    if (float.TryParse(chemistryMenu[i][j][3], out value)) inventory[i].Ions[j].Concentration = value;
-                }
-            }
             if (standOnly != standOnlyInvoke)
             {
                 standOnlyInvoke = standOnly;
-                playerVariables.declarations.Set("Standonly", 
+                playerVariables.declarations.Set("Standonly",
                     playerVariables.declarations.Get<int>("Standonly") + (standOnly ? 1 : -1));
             }
+
             Time.timeScale = pause ? 0f : 1f;
         }
 
         private void OnGUI()
         {
-            GUILayout.Window(0, new Rect(60, 80, 300, 20), id =>
+            GUILayout.Window(0, new Rect(60, 80, 400, 20), id =>
             {
-                selected = GUILayout.Toolbar(selected, new[] {"玩家", "敌人", "枪械", "炼金术", "收起", "系统"});
+                selected = GUILayout.Toolbar(selected, new[] {"玩家", "敌人", "炼金术", "枪械模板", "收起", "系统"});
                 switch (selected)
                 {
                     case 0:
@@ -206,43 +145,98 @@ namespace SubjectModel
 
                         break;
                     case 2:
-                        ManualAdjustIntUpdating("剩余弹药数", ref bulletRemain, ref bulletRemainUpdate,
-                            ref playerGun.bulletRemain);
-                        AutoAdjustString("伤害", ref damage);
-                        AutoAdjustString("穿深", ref depth);
-                        AutoAdjustString("精度", ref deviation);
-                        AutoAdjustString("散布", ref maxRange);
-                        AutoAdjustString("单发装填时间(s)", ref loadingTime);
-                        AutoAdjustString("换弹匣装填时间(s)", ref reload);
-                        AutoAdjustString("重量(未实现)", ref weight);
-                        AutoAdjustString("后坐力(未实现)", ref kick);
-                        AutoAdjustString("弹匣容量", ref bulletContains);
-                        AutoAdjustString("射程", ref distance);
-                        AutoAdjustString("装弹减速", ref reloadSpeed);
-                        ManualAdjustFloatUpdating("剩余装填时间(s)", ref loading, ref loadingUpdate, "Loading",
-                            playerVariables);
-                        GUILayout.BeginHorizontal("Box");
-                        playerGun.telescope = GUILayout.Toggle(playerGun.telescope, "使用瞄具");
-                        GUILayout.EndHorizontal();
-                        break;
-                    case 3:
-                        GUILayout.BeginVertical("Box");
                         AutoAdjustString("动力伤害系数", ref mdc);
                         AutoAdjustString("热力伤害系数", ref tdc);
                         AutoAdjustString("最小热力伤害电势差", ref mdp);
-                        GUILayout.EndVertical();
-                        chemistryScrollPos = GUILayout.BeginScrollView(chemistryScrollPos,
-                            true, false, GUILayout.Height(300));
-                        for (var i = 0; i < chemistryMenu.Count; i++)
+                        break;
+                    case 3:
+                        GUILayout.BeginVertical("Box");
+                        GUILayout.Label("枪械模板");
+                        for (var i = 0; i < Test.FirearmTemples.Count; i++)
                         {
-                            var drugProperty = drugProperties[i];
-                            DrugStackAdjuster(inventory[i].Tag, ref drugProperty, chemistryMenu[i]);
-                            drugProperties[i] = drugProperty;
+                            GUILayout.BeginHorizontal("Box");
+                            GUILayout.Label($"{i} - {Test.FirearmTemples[i].Name}");
+                            if (GUILayout.Button("-", GUILayout.ExpandWidth(false)))
+                            {
+                                Test.FirearmTemples.RemoveAt(i);
+                                i--;
+                            }
+
+                            GUILayout.EndHorizontal();
                         }
 
-                        GUILayout.EndScrollView();
+                        GUILayout.BeginVertical("Box");
+                        GUILayout.BeginHorizontal();
+                        firearmName = GUILayout.TextField(firearmName);
+                        magazineTemple = GUILayout.TextField(magazineTemple);
+                        if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
+                            Test.FirearmTemples.Add(new FirearmTemple(firearmName, float.Parse(damage),
+                                float.Parse(reload), float.Parse(loading), float.Parse(weight), float.Parse(depth),
+                                float.Parse(deviation), float.Parse(maxRange), float.Parse(kick), float.Parse(distance),
+                                float.Parse(reloadSpeed), Test.MagazineTemples[int.Parse(magazineTemple)]));
+                        GUILayout.EndHorizontal();
+                        GUILayout.BeginHorizontal();
+                        damage = GUILayout.TextField(damage);
+                        reload = GUILayout.TextField(reload);
+                        loading = GUILayout.TextField(loading);
+                        weight = GUILayout.TextField(weight);
+                        depth = GUILayout.TextField(depth);
+                        GUILayout.EndHorizontal();
+                        GUILayout.BeginHorizontal();
+                        deviation = GUILayout.TextField(deviation);
+                        maxRange = GUILayout.TextField(maxRange);
+                        kick = GUILayout.TextField(kick);
+                        distance = GUILayout.TextField(distance);
+                        reloadSpeed = GUILayout.TextField(reloadSpeed);
+                        GUILayout.EndHorizontal();
+                        GUILayout.EndVertical();
+                        GUILayout.EndVertical();
+
+                        GUILayout.BeginVertical("Box");
+                        GUILayout.Label("弹匣模板");
+                        for (var i = 0; i < Test.MagazineTemples.Count; i++)
+                        {
+                            GUILayout.BeginHorizontal("Box");
+                            GUILayout.Label($"{i} - {Test.MagazineTemples[i].Name}");
+                            GUILayout.Label(Test.MagazineTemples[i].BulletContains.ToString());
+                            if (GUILayout.Button("-", GUILayout.ExpandWidth(false)))
+                            {
+                                Test.MagazineTemples.RemoveAt(i);
+                                i--;
+                            }
+
+                            GUILayout.EndHorizontal();
+                        }
+
+                        GUILayout.BeginHorizontal("Box");
+                        magazineName = GUILayout.TextField(magazineName);
+                        bulletContains = GUILayout.TextField(bulletContains);
+                        if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
+                            Test.MagazineTemples.Add(new MagazineTemple(magazineName, int.Parse(bulletContains)));
+                        GUILayout.EndHorizontal();
+                        GUILayout.EndVertical();
+
+                        GUILayout.BeginHorizontal("Box");
+                        GUILayout.Label("枪械物品栏");
+                        firearm = GUILayout.TextField(firearm, GUILayout.ExpandWidth(true));
+                        if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
+                            inventory.Add(new Firearm(Test.FirearmTemples[int.Parse(firearm)]));
+                        GUILayout.EndHorizontal();
+
+                        GUILayout.BeginHorizontal("Box");
+                        GUILayout.Label("弹匣物品栏");
+                        magazine = GUILayout.TextField(magazine, GUILayout.ExpandWidth(true));
+                        if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
+                        {
+                            var index = int.Parse(magazine);
+                            inventory.Add(new Magazine(Test.MagazineTemples[index]) {
+                                    BulletRemain = Test.MagazineTemples[index].BulletContains
+                            });
+                        }
+                        GUILayout.EndHorizontal();
                         break;
                     case 5:
+                        GUILayout.BeginVertical("Box");
                         standOnly = GUILayout.Toggle(standOnly, "锁定玩家操作");
                         pause = GUILayout.Toggle(pause, "暂停");
                         if (GUILayout.Button("退出游戏"))
@@ -254,6 +248,7 @@ namespace SubjectModel
 #endif
                         }
 
+                        GUILayout.EndVertical();
                         break;
                 }
             }, "测试窗口");
@@ -342,26 +337,5 @@ namespace SubjectModel
             if (update) value = target;
             GUILayout.EndHorizontal();
         }
-
-        private static void DrugStackAdjuster(string tag, ref string properties, IList<IList<string>> stack)
-        {
-            GUILayout.BeginVertical("Box");
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(tag);
-            properties = GUILayout.TextField(properties, GUILayout.ExpandWidth(true));
-            GUILayout.EndHorizontal();
-            foreach (var t in stack) IonStackAdjuster(t);
-            GUILayout.EndVertical();
-        }
-
-        private static void IonStackAdjuster(IList<string> stack)
-        {
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(stack[0]);
-            for (var i = 1; i < stack.Count; i++)
-                stack[i] = GUILayout.TextField(stack[i], GUILayout.ExpandWidth(true));
-            GUILayout.EndHorizontal();
-        }
-        */
     }
 }

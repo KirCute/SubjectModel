@@ -4,11 +4,17 @@ namespace SubjectModel
 {
     public static class Test
     {
+        public static IList<FirearmTemple> FirearmTemples = new List<FirearmTemple>();
+        public static IList<MagazineTemple> MagazineTemples = new List<MagazineTemple>
+        {
+            new MagazineTemple("测试用弹匣", 20)
+        };
+
         public static void GeneratePlayerInventory(Inventory inventory)
         {
-            var debugMagazine = new MagazineTemple("测试用弹匣", 20);
-            inventory.Add(new Firearm(new FirearmTemple("模板0", 100f, 0.75f, 0.2f,
-                1f, 20f, 0.025f, 0.5f, 1f, 20f, 0.5f, debugMagazine)));
+            FirearmTemples.Add(new FirearmTemple("模板0", 100f, 0.75f, 0.2f, 1f, 
+                20f, 0.025f, 0.5f, 1f, 20f, 0.5f, MagazineTemples[0]));
+            inventory.Add(new Firearm(FirearmTemples[0]));
             inventory.Add(new DrugStack
             (
                 "FeCl3",
@@ -112,9 +118,9 @@ namespace SubjectModel
                 Element.Acid,
                 10
             ));
-            inventory.Add(new Magazine(debugMagazine) {BulletRemain = 20});
-            inventory.Add(new Magazine(debugMagazine) {BulletRemain = 20});
-            inventory.Add(new Magazine(debugMagazine) {BulletRemain = 20});
+            inventory.Add(new Magazine(MagazineTemples[0]) {BulletRemain = 20});
+            inventory.Add(new Magazine(MagazineTemples[0]) {BulletRemain = 20});
+            inventory.Add(new Magazine(MagazineTemples[0]) {BulletRemain = 20});
         }
 
         public static void GenerateChemicalEnemyInventory(Inventory inventory)
