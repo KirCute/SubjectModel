@@ -14,7 +14,7 @@ namespace SubjectModel
         public static void GeneratePlayerInventory(Inventory inventory)
         {
             FirearmTemples.Add(new FirearmTemple("模板0", 100f, 0.75f, 0.2f, 2f, 
-                20f, 0.025f, 0.5f, 1f, 20f, 0.5f, 
+                20f, 0.0125f, 0.5f, 2f, 20f, 0.5f, 
                 new []{MagazineTemples[0], MagazineTemples[1]}));
             inventory.Add(new Firearm(FirearmTemples[0]));
             inventory.Add(new Sling());
@@ -46,7 +46,7 @@ namespace SubjectModel
                     }
                 },
                 Element.Acid,
-                10
+                20
             ));
             inventory.Add(new DrugStack
             (
@@ -76,7 +76,7 @@ namespace SubjectModel
                     }
                 },
                 Element.Acid,
-                10
+                20
             ));
             inventory.Add(new DrugStack
             (
@@ -102,7 +102,7 @@ namespace SubjectModel
                     }
                 },
                 Element.Acid,
-                10
+                15
             ));
             inventory.Add(new DrugStack
             (
@@ -119,7 +119,7 @@ namespace SubjectModel
                     }
                 },
                 Element.Acid,
-                10
+                15
             ));
             inventory.Add(new Magazine(MagazineTemples[0]) {BulletRemain = 20});
             inventory.Add(new Magazine(MagazineTemples[0]) {BulletRemain = 20});

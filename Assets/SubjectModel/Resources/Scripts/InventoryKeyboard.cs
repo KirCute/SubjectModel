@@ -15,8 +15,12 @@ namespace SubjectModel
 
         private void Update()
         {
-            if (Input.GetMouseButtonDown(0)) inventory.LeftUse(GetMousePosition());
-            if (Input.GetMouseButtonDown(1)) inventory.RightUse(GetMousePosition());
+            if (Input.GetMouseButtonDown(0)) inventory.LeftUseDown(GetMousePosition());
+            if (Input.GetMouseButtonDown(1)) inventory.RightUseDown(GetMousePosition());
+            if (Input.GetMouseButton(0)) inventory.LeftUse(GetMousePosition());
+            if (Input.GetMouseButton(1)) inventory.RightUse(GetMousePosition());
+            if (Input.GetMouseButtonUp(0)) inventory.LeftUseUp(GetMousePosition());
+            if (Input.GetMouseButtonUp(1)) inventory.RightUseUp(GetMousePosition());
             var alpha = GetAlphaDown();
             if (alpha != -1 && inventory.sub.Count > alpha) inventory.subSelecting = alpha;
             var mouseAxis = (int) (Input.GetAxisRaw("Mouse ScrollWheel") * 10);

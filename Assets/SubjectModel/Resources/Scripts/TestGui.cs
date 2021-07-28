@@ -249,6 +249,13 @@ namespace SubjectModel
                         
                         GUILayout.BeginVertical("Box");
                         playerFlash.sight = GUILayout.Toggle(playerFlash.sight, "使用瞄具");
+                        if (GUILayout.Button("清空空弹匣")) for (var i = 0; i < inventory.bag.Count; i++)
+                        {
+                            if (inventory.bag[i].GetType() != typeof(Magazine)) continue;
+                            if (((Magazine) inventory.bag[i]).BulletRemain != 0) continue;
+                            inventory.Remove(inventory.bag[i]);
+                            i--;
+                        }
                         GUILayout.EndVertical();
                         
                         GUILayout.EndVertical();

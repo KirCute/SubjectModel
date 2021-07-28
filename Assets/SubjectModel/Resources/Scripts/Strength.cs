@@ -6,7 +6,7 @@ namespace SubjectModel
     [RequireComponent(typeof(Variables))]
     public class Strength : MonoBehaviour
     {
-        private const float RecoverSpeed = 15f;
+        private const float RecoverSpeed = 30f;
         private const float CostWhenRunning = 50f;
         private float runSpeed;
 

@@ -276,7 +276,7 @@ namespace SubjectModel
         }
     }
 
-    public class DrugStack : ItemStack
+    public class DrugStack : ITemStack
     {
         public readonly string Tag;
         public readonly IList<IonStack> Ions;
@@ -291,7 +291,7 @@ namespace SubjectModel
             this.count = count;
         }
         
-        public ItemStack Fetch()
+        public ITemStack Fetch()
         {
             var ions = Ions.Select(ion => new IonStack
                     {Element = ion.Element, Index = ion.Index, Amount = ion.Amount, Concentration = ion.Concentration})
@@ -310,18 +310,26 @@ namespace SubjectModel
             return $"{Tag}({count})";
         }
 
-        public void OnMouseClickLeft(GameObject user, Vector2 pos)
+        public void OnMouseClickLeft(GameObject user, Vector2 pos) { }
+
+        public void OnMouseClickRight(GameObject user, Vector2 pos) { }
+
+        public void OnMouseClickLeftDown(GameObject user, Vector2 pos)
         {
             if (Camera.main == null) return;
             BuffInvoker.InvokeByThrower(this, pos, user.GetComponent<Rigidbody2D>().position);
         }
 
-        public void OnMouseClickRight(GameObject user, Vector2 pos)
+        public void OnMouseClickRightDown(GameObject user, Vector2 pos)
         {
             if (Camera.main == null) return;
             BuffInvoker.InvokeByThrower(this, user.GetComponent<Rigidbody2D>().position,
                 user.GetComponent<Rigidbody2D>().position);
         }
+
+        public void OnMouseClickLeftUp(GameObject user, Vector2 pos) { }
+
+        public void OnMouseClickRightUp(GameObject user, Vector2 pos) { }
 
         public void Selecting(GameObject user)
         {
@@ -335,13 +343,13 @@ namespace SubjectModel
         {
         }
 
-        public Func<ItemStack, bool> SubInventory()
+        public Func<ITemStack, bool> SubInventory()
         {
             return item => false;
         }
     }
     
-    public class Sling : ItemStack
+    public class Sling : ITemStack
     {
         private bool fetched;
 
@@ -367,6 +375,30 @@ namespace SubjectModel
             stone.OnMouseClickRight(user, pos);
         }
 
+        public void OnMouseClickLeftDown(GameObject user, Vector2 pos)
+        {
+            if (!user.GetComponent<Inventory>().TryGetSubItem(out var stone)) return;
+            stone.OnMouseClickLeftDown(user, pos);
+        }
+
+        public void OnMouseClickRightDown(GameObject user, Vector2 pos)
+        {
+            if (!user.GetComponent<Inventory>().TryGetSubItem(out var stone)) return;
+            stone.OnMouseClickRightDown(user, pos);
+        }
+
+        public void OnMouseClickLeftUp(GameObject user, Vector2 pos)
+        {
+            if (!user.GetComponent<Inventory>().TryGetSubItem(out var stone)) return;
+            stone.OnMouseClickLeftUp(user, pos);
+        }
+
+        public void OnMouseClickRightUp(GameObject user, Vector2 pos)
+        {
+            if (!user.GetComponent<Inventory>().TryGetSubItem(out var stone)) return;
+            stone.OnMouseClickRightUp(user, pos);
+        }
+
         public void Selecting(GameObject user) { }
 
         public void OnSelected(GameObject user) { }
@@ -378,13 +410,13 @@ namespace SubjectModel
             return fetched ? 0 : 1;
         }
 
-        public ItemStack Fetch()
+        public ITemStack Fetch()
         {
             fetched = true;
             return this;
         }
 
-        public Func<ItemStack, bool> SubInventory()
+        public Func<ITemStack, bool> SubInventory()
         {
             return item => item.GetType() == typeof(DrugStack);
         }

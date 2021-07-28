@@ -24,6 +24,7 @@ namespace SubjectModel
         private void Awake()
         {
             Physics2D.queriesStartInColliders = false;
+			sight = true;
             aimPos = Vector2.zero;
         }
 
