@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Bolt;
 using UnityEngine;
 
@@ -51,10 +52,10 @@ namespace SubjectModel
         public readonly float Kick;
         public readonly float Distance;
         public readonly float ReloadSpeed;
-        public readonly MagazineTemple Magazine;
+        public readonly MagazineTemple[] Magazine;
 
         public FirearmTemple(string name, float damage, float reload, float loading, float weight, float depth,
-            float deviation, float maxRange, float kick, float distance, float reloadSpeed, MagazineTemple magazine)
+            float deviation, float maxRange, float kick, float distance, float reloadSpeed, MagazineTemple[] magazine)
         {
             Name = name;
             Damage = damage;
@@ -78,6 +79,7 @@ namespace SubjectModel
         public Magazine ReadyMagazine;
         public float Loading;
         public bool SwitchingMagazine;
+        public float Weight;
         private bool fetched;
 
         public Firearm(FirearmTemple temple)
@@ -85,11 +87,12 @@ namespace SubjectModel
             Temple = temple;
             Magazine = null;
             fetched = false;
+            Weight = temple.Weight;
         }
 
         public string GetName()
         {
-            return Magazine == null ? Temple.Name : $"{Temple.Name} {Magazine.BulletRemain}/{Temple.Magazine.BulletContains}";
+            return Magazine == null ? Temple.Name : $"{Temple.Name} {Magazine.BulletRemain}/{Magazine.Temple.BulletContains}";
         }
 
         public void OnMouseClickLeft(GameObject user, Vector2 aim)
@@ -126,6 +129,8 @@ namespace SubjectModel
             if (!SwitchingMagazine) return;
             SwitchingMagazine = false;
             Magazine = ReadyMagazine;
+            Weight += Magazine.Temple.Weight;
+            ResetVelocity(user);
             user.GetComponent<Inventory>().Remove(ReadyMagazine);
             ReadyMagazine = null;
             var declarations = user.GetComponent<Variables>().declarations;
@@ -134,12 +139,14 @@ namespace SubjectModel
 
         public void OnSelected(GameObject user)
         {
+            ResetVelocity(user);
             user.GetComponent<GunFlash>().distance = Temple.Distance;
             user.GetComponent<GunFlash>().enabled = true;
         }
 
         public void LoseSelected(GameObject user)
         {
+            CancelVelocity(user);
             user.GetComponent<LineRenderer>().enabled = false;
             user.GetComponent<GunFlash>().enabled = false;
             if (!SwitchingMagazine) return;
@@ -152,7 +159,7 @@ namespace SubjectModel
 
         public Func<ItemStack, bool> SubInventory()
         {
-            return item => item.GetType() == typeof(Magazine) && ((Magazine) item).Temple == Temple.Magazine;
+            return item => item.GetType() == typeof(Magazine) && Temple.Magazine.Contains(((Magazine) item).Temple);
         }
 
         private void SwitchMagazine(GameObject user)
@@ -164,6 +171,11 @@ namespace SubjectModel
             Loading = Temple.Reload;
             var declarations = user.GetComponent<Variables>().declarations;
             declarations.Set("Speed", declarations.Get<float>("Speed") * Temple.ReloadSpeed);
+            if (Magazine != null)
+            {
+                Weight -= Magazine.Temple.Weight;
+                ResetVelocity(user);
+            }
             user.GetComponent<Inventory>().Add(Magazine);
             Magazine = null;
         }
@@ -178,6 +190,16 @@ namespace SubjectModel
             fetched = true;
             return this;
         }
+
+        private void ResetVelocity(GameObject user)
+        {
+            user.GetComponent<Variables>().declarations.Set("FirearmSpeed", 1f - Weight * 0.08f);
+        }
+
+        private void CancelVelocity(GameObject user)
+        {
+            user.GetComponent<Variables>().declarations.Set("FirearmSpeed", 1f);
+        }
     }
 
     [Serializable]
@@ -185,11 +207,13 @@ namespace SubjectModel
     {
         public readonly string Name;
         public readonly int BulletContains;
+        public readonly float Weight;
 
-        public MagazineTemple(string name, int bulletContains)
+        public MagazineTemple(string name, int bulletContains, float weight)
         {
             Name = name;
             BulletContains = bulletContains;
+            Weight = weight;
         }
     }
 
@@ -228,24 +252,4 @@ namespace SubjectModel
     {
         //public List<> guns;
     }
-
-    /*
-    public class DebugComponent : FirearmComponent
-    {
-        public DebugComponent() : base("Testing Data")
-        {
-            Function[Damage] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 100.0f};
-            //Function[Reload] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 0.75f};
-            //Function[Loading] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 0.2f};
-            Function[Weight] = new ComponentFunction {algorithm = ComponentFunction.Multiply, value = 1f};
-            Function[Depth] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 20.0f};
-            Function[Deviation] = new ComponentFunction {algorithm = ComponentFunction.Multiply, value = 0.025f};
-            Function[MaxRange] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 0.5f};
-            Function[Kick] = new ComponentFunction {algorithm = ComponentFunction.Multiply, value = 1f};
-            Function[Bullet] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 20f};
-            Function[Distance] = new ComponentFunction {algorithm = ComponentFunction.Add, value = 20f};
-            Function[ReloadSpeed] = new ComponentFunction {algorithm = ComponentFunction.Multiply, value = .5f};
-        }
-    }
-    */
 }

@@ -7,13 +7,15 @@ namespace SubjectModel
         public static IList<FirearmTemple> FirearmTemples = new List<FirearmTemple>();
         public static IList<MagazineTemple> MagazineTemples = new List<MagazineTemple>
         {
-            new MagazineTemple("测试用弹匣", 20)
+            new MagazineTemple("弹匣0", 20, 1f),
+            new MagazineTemple("弹匣1", 100, 3f)
         };
 
         public static void GeneratePlayerInventory(Inventory inventory)
         {
-            FirearmTemples.Add(new FirearmTemple("模板0", 100f, 0.75f, 0.2f, 1f, 
-                20f, 0.025f, 0.5f, 1f, 20f, 0.5f, MagazineTemples[0]));
+            FirearmTemples.Add(new FirearmTemple("模板0", 100f, 0.75f, 0.2f, 2f, 
+                20f, 0.025f, 0.5f, 1f, 20f, 0.5f, 
+                new []{MagazineTemples[0], MagazineTemples[1]}));
             inventory.Add(new Firearm(FirearmTemples[0]));
             inventory.Add(new Sling());
             inventory.Add(new DrugStack
@@ -122,6 +124,7 @@ namespace SubjectModel
             inventory.Add(new Magazine(MagazineTemples[0]) {BulletRemain = 20});
             inventory.Add(new Magazine(MagazineTemples[0]) {BulletRemain = 20});
             inventory.Add(new Magazine(MagazineTemples[0]) {BulletRemain = 20});
+            inventory.Add(new Magazine(MagazineTemples[1]) {BulletRemain = 100});
         }
 
         public static void GenerateChemicalEnemyInventory(Inventory inventory)

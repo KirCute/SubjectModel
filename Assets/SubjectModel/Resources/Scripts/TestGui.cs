@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Bolt;
 using UnityEditor;
 using UnityEngine;
@@ -28,6 +29,8 @@ namespace SubjectModel
         private bool speedUpdate;
         private string defence;
         private bool defenceUpdate;
+        private string firearmSpeed;
+        private bool firearmSpeedUpdate;
 
         private BossSpawner bossSpawner;
         private string bossHealth;
@@ -53,6 +56,7 @@ namespace SubjectModel
 
         private string magazineName;
         private string bulletContains;
+        private string magazineWeight;
 
         private Inventory inventory;
         private GunFlash playerFlash;
@@ -80,6 +84,8 @@ namespace SubjectModel
             speedUpdate = false;
             defence = playerVariables.declarations.Get("Defence").ToString();
             defenceUpdate = false;
+            speed = playerVariables.declarations.Get("FirearmSpeed").ToString();
+            speedUpdate = false;
             bossSpawner = GameObject.FindWithTag("BossSpawner").GetComponent<BossSpawner>();
             bossHealth = bossSpawner.bossHealth.ToString();
             bossSpeed = bossSpawner.bossSpeed.ToString();
@@ -131,6 +137,7 @@ namespace SubjectModel
                             playerVariables);
                         ManualAdjustFloatUpdating("移动速度", ref speed, ref speedUpdate, "Speed", playerVariables);
                         ManualAdjustFloatUpdating("防御", ref defence, ref defenceUpdate, "Defence", playerVariables);
+                        ManualAdjustFloatUpdating("生效速度百分比", ref firearmSpeed, ref firearmSpeedUpdate, "FirearmSpeed", playerVariables);
                         break;
                     case 1:
                         AutoAdjustString("血量", ref bossHealth);
@@ -174,10 +181,10 @@ namespace SubjectModel
                         firearmName = GUILayout.TextField(firearmName);
                         magazineTemple = GUILayout.TextField(magazineTemple);
                         if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
-                            Test.FirearmTemples.Add(new FirearmTemple(firearmName, float.Parse(damage),
-                                float.Parse(reload), float.Parse(loading), float.Parse(weight), float.Parse(depth),
-                                float.Parse(deviation), float.Parse(maxRange), float.Parse(kick), float.Parse(distance),
-                                float.Parse(reloadSpeed), Test.MagazineTemples[int.Parse(magazineTemple)]));
+                            Test.FirearmTemples.Add(new FirearmTemple(firearmName, float.Parse(damage), float.Parse(reload), 
+                                float.Parse(loading), float.Parse(weight), float.Parse(depth), float.Parse(deviation),
+                                float.Parse(maxRange), float.Parse(kick), float.Parse(distance), float.Parse(reloadSpeed), 
+                                SplitTempleString(magazineTemple).Select(i => Test.MagazineTemples[i]).ToArray()));
                         GUILayout.EndHorizontal();
                         GUILayout.BeginHorizontal();
                         damage = GUILayout.TextField(damage);
@@ -215,8 +222,9 @@ namespace SubjectModel
                         GUILayout.BeginHorizontal("Box");
                         magazineName = GUILayout.TextField(magazineName);
                         bulletContains = GUILayout.TextField(bulletContains);
+                        magazineWeight = GUILayout.TextField(magazineWeight);
                         if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
-                            Test.MagazineTemples.Add(new MagazineTemple(magazineName, int.Parse(bulletContains)));
+                            Test.MagazineTemples.Add(new MagazineTemple(magazineName, int.Parse(bulletContains), float.Parse(magazineWeight)));
                         GUILayout.EndHorizontal();
                         GUILayout.EndVertical();
 
@@ -346,6 +354,11 @@ namespace SubjectModel
             update = GUILayout.Toggle(update, "实时更新", GUILayout.ExpandWidth(false));
             if (update) value = target;
             GUILayout.EndHorizontal();
+        }
+
+        private static int[] SplitTempleString(string temple)
+        {
+            return temple.Split(',').Select(int.Parse).ToArray();
         }
     }
 }
