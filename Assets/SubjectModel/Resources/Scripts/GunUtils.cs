@@ -105,10 +105,10 @@ namespace SubjectModel
         public void OnMouseClickLeft(GameObject user, Vector2 aim)
         {
             if (loading > .0f || magazine == null || magazine.BulletRemain <= 0 || Camera.main == null) return;
-            aim.x = Utils.GenerateGaussian(aim.x, deviation * temple.Distance, temple.MaxRange);
-            aim.y = Utils.GenerateGaussian(aim.y, deviation * temple.Distance, temple.MaxRange);
             var shooterPosition = user.GetComponent<Rigidbody2D>().position;
             if (shooterPosition == aim) return;
+            aim = Utils.GetRotatedVector(aim - shooterPosition,
+                Utils.GenerateGaussian(.0f, deviation, temple.MaxRange)) + shooterPosition;
             Debug.Log(deviation);
 
             magazine.BulletRemain--;

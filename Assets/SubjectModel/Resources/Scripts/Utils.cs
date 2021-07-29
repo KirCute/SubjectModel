@@ -71,7 +71,7 @@ namespace SubjectModel
                 v1 = 2.0f * Random.Range(0f, 1f) - 1.0f;
                 var v2 = 2.0f * Random.Range(0f, 1f) - 1.0f;
                 s = v1 * v1 + v2 * v2;
-            } while (s >= 1.0f || Math.Abs(s) < .0000001f);
+            } while (s >= 1.0f || Math.Abs(s) < .00001f);
 
             s = Mathf.Sqrt((-2.0f * Mathf.Log(s)) / s);
             return v1 * s;
@@ -93,12 +93,17 @@ namespace SubjectModel
             return x;
         }
 
-        public static Vector2 GetRotatedForce(Vector2 force, Vector2 reference, float magnitude,
+        public static Vector2 GetRotatedVector(Vector2 vec, double radian = Math.PI / 2)
+        {
+            return new Vector2((float) (vec.x * Math.Cos(radian) - vec.y * Math.Sin(radian)),
+                (float) (vec.x * Math.Sin(radian) + vec.y * Math.Cos(radian)));
+        }
+
+        public static Vector2 GetRotatedFocus(Vector2 focus, Vector2 reference, float magnitude,
             double radian = Math.PI / 2)
         {
-            var origin = LengthenVector(reference - force, magnitude);
-            return new Vector2((float) (origin.x * Math.Cos(radian) - origin.y * Math.Sin(radian)),
-                (float) (origin.x * Math.Sin(radian) + origin.y * Math.Cos(radian))) + force;
+            var origin = LengthenVector(reference - focus, magnitude);
+            return GetRotatedVector(origin, radian) + focus;
         }
     }
 }
