@@ -1,6 +1,5 @@
 using System.Linq;
 using System.Text;
-using SubjectModel;
 using UnityEngine;
 using UnityEngine.UI;
 

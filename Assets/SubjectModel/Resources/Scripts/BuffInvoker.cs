@@ -10,8 +10,8 @@ namespace SubjectModel
         public const float StartRange = 0.18f;
         public const float SelfAttackRange = 0.25f;
         public const float StartColorAlpha = 0.5f;
-        public const float DefaultKeepTime = 0.5f;
-        public const float MaxDistance = 5f;
+        public const float DefaultKeepTime = 0.2f;
+        public const float MaxDistance = 2.5f;
         private static readonly LayerMask DrugMask = 1 << 3 | 1 << 6;
 
         private float aliveTime;
@@ -58,7 +58,7 @@ namespace SubjectModel
         {
             if (Utils.GetMagnitudeSquare2D(position, hostPosition) <= SelfAttackRange * SelfAttackRange)
             {
-                Invoke((DrugStack) drug.Fetch(), position, keepTime);
+                Invoke((DrugStack) drug.Fetch(1), position, keepTime);
                 return;
             }
 
@@ -73,7 +73,7 @@ namespace SubjectModel
             position = Utils.LengthenArrow(origin, position, distance);
 
             var flyingDrug = (GameObject) GameObject.Instantiate(Resources.Load("Prefab/FlyingDrug"));
-            flyingDrug.GetComponent<FlyingDrug>().Initialize((DrugStack) drug.Fetch(), origin, position, keepTime);
+            flyingDrug.GetComponent<FlyingDrug>().Initialize((DrugStack) drug.Fetch(1), origin, position, keepTime);
         }
 
         public static void Invoke(DrugStack drug, Vector2 position, float keepTime = DefaultKeepTime)

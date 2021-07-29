@@ -1,6 +1,5 @@
 using UnityEngine;
 
-
 namespace SubjectModel
 {
     [RequireComponent(typeof(Inventory))]

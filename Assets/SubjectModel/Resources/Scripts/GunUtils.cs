@@ -72,11 +72,11 @@ namespace SubjectModel
         }
     }
 
-    public class Firearm : ITemStack
+    public class Firearm : IItemStack
     {
         private const float KickTime = .01f;
         private const float DeceleratePercentPerWeight = .08f;
-        
+
         private readonly FirearmTemple temple;
         private Magazine magazine;
         private Magazine readyMagazine;
@@ -99,44 +99,59 @@ namespace SubjectModel
 
         public string GetName()
         {
-            return magazine == null ? temple.Name : $"{temple.Name} {magazine.BulletRemain}/{magazine.Temple.BulletContains}";
+            return magazine == null
+                ? temple.Name
+                : magazine.Containing == null 
+                    ? $"{temple.Name}({magazine.Temple.Name})"
+                    : $"{temple.Name}({magazine.Containing.Temple.Name} {magazine.Containing.Count}/{magazine.Temple.BulletContains})";
         }
 
         public void OnMouseClickLeft(GameObject user, Vector2 aim)
         {
-            if (loading > .0f || magazine == null || magazine.BulletRemain <= 0 || Camera.main == null) return;
+            if (loading > .0f || magazine?.Containing == null || magazine.Containing.Count <= 0 ||
+                Camera.main == null) return;
             var shooterPosition = user.GetComponent<Rigidbody2D>().position;
             if (shooterPosition == aim) return;
             aim = Utils.GetRotatedVector(aim - shooterPosition,
-                Utils.GenerateGaussian(.0f, deviation, temple.MaxRange)) + shooterPosition;
-            Debug.Log(deviation);
+                Utils.GenerateGaussian(.0f, deviation, (float) (Math.PI / temple.MaxRange))) + shooterPosition;
 
-            magazine.BulletRemain--;
-            if (magazine.BulletRemain != 0) loading = temple.Loading;
+            magazine.Containing.Count--;
+            if (magazine.Containing.Count != 0) loading = temple.Loading;
             InvokeKick(user);
             var collider = user.GetComponent<GunFlash>().Shoot(shooterPosition, aim);
+            if (magazine.Containing.Count == 0) magazine.Containing = null;
             if (collider == null) return;
             var declarations = collider.GetComponent<Variables>().declarations;
             var defence = declarations.IsDefined("Defence") ? declarations.Get<float>("Defence") : .0f;
             var health = declarations.Get<float>("Health");
+            var depth = temple.Depth + magazine.Containing.Temple.Depth;
+            var damage = temple.Damage * magazine.Containing.Temple.Damage;
             declarations.Set("Health",
-                health - (defence > temple.Depth
-                    ? Utils.Map(.0f, defence, .0f, temple.Damage, temple.Depth)
-                    : temple.Damage));
+                health - (defence > depth
+                    ? Utils.Map(.0f, defence, .0f, damage, depth)
+                    : damage));
         }
 
-        public void OnMouseClickLeftDown(GameObject user, Vector2 pos) { }
+        public void OnMouseClickLeftDown(GameObject user, Vector2 pos)
+        {
+        }
 
-        public void OnMouseClickRight(GameObject user, Vector2 pos) { }
+        public void OnMouseClickRight(GameObject user, Vector2 pos)
+        {
+        }
 
         public void OnMouseClickRightDown(GameObject user, Vector2 aim)
         {
             SwitchMagazine(user);
         }
 
-        public void OnMouseClickLeftUp(GameObject user, Vector2 pos) { }
+        public void OnMouseClickLeftUp(GameObject user, Vector2 pos)
+        {
+        }
 
-        public void OnMouseClickRightUp(GameObject user, Vector2 pos) { }
+        public void OnMouseClickRightUp(GameObject user, Vector2 pos)
+        {
+        }
 
         public void Selecting(GameObject user)
         {
@@ -177,7 +192,12 @@ namespace SubjectModel
             declarations.Set("Speed", declarations.Get<float>("Speed") / temple.ReloadSpeed);
         }
 
-        public Func<ITemStack, bool> SubInventory()
+        public IItemStack Fetch(int count)
+        {
+            return count == 0 ? new Firearm(temple) {fetched = true} : this;
+        }
+
+        public Func<IItemStack, bool> SubInventory()
         {
             return item => item.GetType() == typeof(Magazine) && temple.Magazine.Contains(((Magazine) item).Temple);
         }
@@ -196,6 +216,7 @@ namespace SubjectModel
                 weight -= magazine.Temple.Weight;
                 ResetVelocity(user);
             }
+
             user.GetComponent<Inventory>().Add(magazine);
             magazine = null;
         }
@@ -205,10 +226,13 @@ namespace SubjectModel
             return fetched ? 0 : 1;
         }
 
-        public ITemStack Fetch()
+        public bool CanMerge(IItemStack item)
         {
-            fetched = true;
-            return this;
+            return false;
+        }
+
+        public void Merge(IItemStack item)
+        {
         }
 
         private void ResetVelocity(GameObject user)
@@ -248,42 +272,169 @@ namespace SubjectModel
         public readonly string Name;
         public readonly int BulletContains;
         public readonly float Weight;
+        public readonly float Radius;
+        public readonly float Length;
 
-        public MagazineTemple(string name, int bulletContains, float weight)
+        public MagazineTemple(string name, int bulletContains, float weight, float radius, float length)
         {
             Name = name;
             BulletContains = bulletContains;
             Weight = weight;
+            Radius = radius;
+            Length = length;
         }
     }
 
-    public class Magazine : Material
+    public class Magazine : IItemStack
     {
         public readonly MagazineTemple Temple;
-        public int BulletRemain;
+        public Bullet Containing;
         private bool fetched;
 
         public Magazine(MagazineTemple temple)
         {
             Temple = temple;
-            BulletRemain = 0;
+            Containing = null;
             fetched = false;
         }
 
-        public override string GetName()
+        public string GetName()
         {
-            return $"{Temple.Name} {BulletRemain}/{Temple.BulletContains}";
+            return Containing == null
+                ? Temple.Name
+                : $"{Temple.Name}({Containing.Temple.Name} {Containing.Count}/{Temple.BulletContains})";
         }
 
-        public override int GetCount()
+        public void OnMouseClickLeft(GameObject user, Vector2 pos)
+        {
+        }
+
+        public void OnMouseClickRight(GameObject user, Vector2 pos)
+        {
+        }
+
+        public void OnMouseClickLeftDown(GameObject user, Vector2 pos)
+        {
+            user.GetComponent<Inventory>().Add(Containing);
+            Containing = null;
+        }
+
+        public void OnMouseClickRightDown(GameObject user, Vector2 pos)
+        {
+            if (!user.GetComponent<Inventory>().TryGetSubItem(out var item)) return;
+            var bullet = (Bullet) item;
+            user.GetComponent<Inventory>().Add(Containing);
+            if (bullet.Count > Temple.BulletContains) Containing = (Bullet) bullet.Fetch(Temple.BulletContains);
+            else
+            {
+                Containing = bullet;
+                user.GetComponent<Inventory>().Remove(bullet);
+            }
+        }
+
+        public void OnMouseClickLeftUp(GameObject user, Vector2 pos)
+        {
+        }
+
+        public void OnMouseClickRightUp(GameObject user, Vector2 pos)
+        {
+        }
+
+        public void Selecting(GameObject user)
+        {
+        }
+
+        public void OnSelected(GameObject user)
+        {
+        }
+
+        public void LoseSelected(GameObject user)
+        {
+        }
+
+        public int GetCount()
         {
             return fetched ? 0 : 1;
         }
 
-        public override ITemStack Fetch()
+        public bool CanMerge(IItemStack item)
         {
-            fetched = true;
-            return this;
+            return false;
+        }
+
+        public void Merge(IItemStack item)
+        {
+        }
+
+        public IItemStack Fetch(int count)
+        {
+            return count == 0 ? new Magazine(Temple) {Containing = Containing, fetched = true} : this;
+        }
+
+        public Func<IItemStack, bool> SubInventory()
+        {
+            return item =>
+                item.GetType() == typeof(Bullet) &&
+                Math.Abs(((Bullet) item).Temple.Length - Temple.Length) < 0.000001f &&
+                Math.Abs(((Bullet) item).Temple.Radius - Temple.Radius) < 0.000001f;
+        }
+    }
+
+    [Serializable]
+    public class BulletTemple
+    {
+        public readonly string Name;
+        public readonly float Damage;
+        public readonly float Depth;
+        public readonly float Radius;
+        public readonly float Length;
+
+        public BulletTemple(string name, float damage, float depth, float radius, float length)
+        {
+            Name = name;
+            Damage = damage;
+            Depth = depth;
+            Radius = radius;
+            Length = length;
+        }
+    }
+
+    public class Bullet : Material
+    {
+        public readonly BulletTemple Temple;
+        public int Count;
+
+        public Bullet(BulletTemple temple, int count)
+        {
+            Temple = temple;
+            Count = count;
+        }
+
+        public override string GetName()
+        {
+            return $"{Temple.Name}({Count})";
+        }
+
+        public override int GetCount()
+        {
+            return Count;
+        }
+
+        public override bool CanMerge(IItemStack item)
+        {
+            return item.GetType() == typeof(Bullet) && ((Bullet) item).Temple == Temple;
+        }
+
+        public override void Merge(IItemStack item)
+        {
+            Count += ((Bullet) item).Count;
+        }
+
+        public override IItemStack Fetch(int count)
+        {
+            if (count > Count) count = Count;
+            Count -= count;
+            return new Bullet(Temple, count);
         }
     }
 

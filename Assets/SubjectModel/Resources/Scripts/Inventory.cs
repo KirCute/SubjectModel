@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SubjectModel
 {
-    public interface ITemStack
+    public interface IItemStack
     {
         public string GetName();
         public void OnMouseClickLeft(GameObject user, Vector2 pos);
@@ -19,15 +19,19 @@ namespace SubjectModel
         public void OnSelected(GameObject user);
         public void LoseSelected(GameObject user);
         public int GetCount();
-        public ITemStack Fetch();
-        public Func<ITemStack, bool> SubInventory();
+        public bool CanMerge(IItemStack item);
+        public void Merge(IItemStack item);
+        public IItemStack Fetch(int count);
+        public Func<IItemStack, bool> SubInventory();
     }
 
-    public abstract class Material : ITemStack
+    public abstract class Material : IItemStack
     {
         public abstract string GetName();
         public abstract int GetCount();
-        public abstract ITemStack Fetch();
+        public abstract IItemStack Fetch(int count);
+        public abstract bool CanMerge(IItemStack item);
+        public abstract void Merge(IItemStack item);
 
         public void OnMouseClickLeft(GameObject user, Vector2 pos)
         {
@@ -65,7 +69,7 @@ namespace SubjectModel
         {
         }
 
-        public Func<ITemStack, bool> SubInventory()
+        public Func<IItemStack, bool> SubInventory()
         {
             return item => false;
         }
@@ -74,15 +78,15 @@ namespace SubjectModel
     [RequireComponent(typeof(Variables))]
     public class Inventory : MonoBehaviour
     {
-        public IList<ITemStack> bag;
-        public IList<ITemStack> sub;
+        public IList<IItemStack> bag;
+        public IList<IItemStack> sub;
         public int selecting;
         public int subSelecting;
 
         private void Awake()
         {
-            bag = new List<ITemStack>();
-            sub = new List<ITemStack>();
+            bag = new List<IItemStack>();
+            sub = new List<IItemStack>();
             selecting = 0;
             subSelecting = 0;
         }
@@ -95,10 +99,11 @@ namespace SubjectModel
                     Remove(bag[i]);
                     i--;
                 }
+
             if (selecting < bag.Count) bag[selecting].Selecting(gameObject);
         }
 
-        public bool Remove(ITemStack item)
+        public bool Remove(IItemStack item)
         {
             if (item == null) return true;
             if (!bag.Contains(item)) return false;
@@ -115,23 +120,32 @@ namespace SubjectModel
                 else selecting = 0;
             }
             else if (index < selecting) selecting--;
+
             RebuildSubInventory();
             return true;
         }
 
-        public void Add(ITemStack item)
+        public void Add(IItemStack item)
         {
             if (item == null) return;
+            foreach (var i in bag)
+            {
+                if (!i.CanMerge(item)) continue;
+                i.Merge(item);
+                return;
+            }
+
             bag.Add(item);
             if (bag.Count == 1)
             {
                 bag[selecting].OnSelected(gameObject);
                 foreach (var i in bag.Where(bag[selecting].SubInventory())) sub.Add(i);
             }
+
             if (bag[selecting].SubInventory()(item)) sub.Add(item);
         }
 
-        public bool TryGetSubItem(out ITemStack item)
+        public bool TryGetSubItem(out IItemStack item)
         {
             item = null;
             if (subSelecting >= sub.Count) return false;

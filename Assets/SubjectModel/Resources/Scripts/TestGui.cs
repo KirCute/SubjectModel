@@ -16,7 +16,7 @@ namespace SubjectModel
     {
         private int selected;
         private Variables playerVariables;
-        
+
         private string maxHealth;
         private float health;
         private bool healthUpdate;
@@ -57,11 +57,21 @@ namespace SubjectModel
         private string magazineName;
         private string bulletContains;
         private string magazineWeight;
+        private string magazineRadius;
+        private string magazineLength;
+
+        private string bulletName;
+        private string bulletDamage;
+        private string bulletDepth;
+        private string bulletRadius;
+        private string bulletLength;
 
         private Inventory inventory;
         private GunFlash playerFlash;
         private string firearm;
         private string magazine;
+        private string bullet;
+        private string bulletCount;
 
         private bool standOnly;
         private bool standOnlyInvoke;
@@ -120,7 +130,7 @@ namespace SubjectModel
 
         private void OnGUI()
         {
-            GUILayout.Window(0, new Rect(60, 80, 400, 20), id =>
+            GUILayout.Window(0, new Rect(60, 80, 500, 20), id =>
             {
                 selected = GUILayout.Toolbar(selected, new[] {"玩家", "敌人", "炼金术", "枪械", "收起", "系统"});
                 switch (selected)
@@ -137,7 +147,8 @@ namespace SubjectModel
                             playerVariables);
                         ManualAdjustFloatUpdating("移动速度", ref speed, ref speedUpdate, "Speed", playerVariables);
                         ManualAdjustFloatUpdating("防御", ref defence, ref defenceUpdate, "Defence", playerVariables);
-                        ManualAdjustFloatUpdating("生效速度百分比", ref firearmSpeed, ref firearmSpeedUpdate, "FirearmSpeed", playerVariables);
+                        ManualAdjustFloatUpdating("生效速度百分比", ref firearmSpeed, ref firearmSpeedUpdate, "FirearmSpeed",
+                            playerVariables);
                         break;
                     case 1:
                         AutoAdjustString("血量", ref bossHealth);
@@ -160,13 +171,18 @@ namespace SubjectModel
                         break;
                     case 3:
                         GUILayout.BeginVertical();
-                        
+
                         GUILayout.BeginVertical("Box");
                         GUILayout.Label("枪械模板");
                         for (var i = 0; i < Test.FirearmTemples.Count; i++)
                         {
                             GUILayout.BeginHorizontal("Box");
                             GUILayout.Label($"{i} - {Test.FirearmTemples[i].Name}");
+                            GUILayout.Label(Test.FirearmTemples[i].Damage.ToString());
+                            GUILayout.Label(Test.FirearmTemples[i].Depth.ToString());
+                            GUILayout.Label($"{Test.FirearmTemples[i].Loading}({Test.FirearmTemples[i].Reload})");
+                            GUILayout.Label($"{Test.FirearmTemples[i].Deviation}({Test.FirearmTemples[i].MaxRange})");
+                            GUILayout.Label(Test.FirearmTemples[i].Weight.ToString());
                             if (GUILayout.Button("-", GUILayout.ExpandWidth(false)))
                             {
                                 Test.FirearmTemples.RemoveAt(i);
@@ -181,24 +197,26 @@ namespace SubjectModel
                         firearmName = GUILayout.TextField(firearmName);
                         magazineTemple = GUILayout.TextField(magazineTemple);
                         if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
-                            Test.FirearmTemples.Add(new FirearmTemple(firearmName, float.Parse(damage), float.Parse(reload), 
+                            Test.FirearmTemples.Add(new FirearmTemple(firearmName, float.Parse(damage),
+                                float.Parse(reload),
                                 float.Parse(loading), float.Parse(weight), float.Parse(depth), float.Parse(deviation),
-                                float.Parse(maxRange), float.Parse(kick), float.Parse(distance), float.Parse(reloadSpeed), 
+                                float.Parse(maxRange), float.Parse(kick), float.Parse(distance),
+                                float.Parse(reloadSpeed),
                                 SplitTempleString(magazineTemple).Select(i => Test.MagazineTemples[i]).ToArray()));
                         GUILayout.EndHorizontal();
                         GUILayout.BeginHorizontal();
                         damage = GUILayout.TextField(damage);
+                        depth = GUILayout.TextField(depth);
                         reload = GUILayout.TextField(reload);
                         loading = GUILayout.TextField(loading);
                         weight = GUILayout.TextField(weight);
-                        depth = GUILayout.TextField(depth);
                         GUILayout.EndHorizontal();
                         GUILayout.BeginHorizontal();
                         deviation = GUILayout.TextField(deviation);
                         maxRange = GUILayout.TextField(maxRange);
+                        reloadSpeed = GUILayout.TextField(reloadSpeed);
                         kick = GUILayout.TextField(kick);
                         distance = GUILayout.TextField(distance);
-                        reloadSpeed = GUILayout.TextField(reloadSpeed);
                         GUILayout.EndHorizontal();
                         GUILayout.EndVertical();
                         GUILayout.EndVertical();
@@ -210,6 +228,8 @@ namespace SubjectModel
                             GUILayout.BeginHorizontal("Box");
                             GUILayout.Label($"{i} - {Test.MagazineTemples[i].Name}");
                             GUILayout.Label(Test.MagazineTemples[i].BulletContains.ToString());
+                            GUILayout.Label($"{Test.MagazineTemples[i].Radius}*{Test.MagazineTemples[i].Length}");
+                            GUILayout.Label(Test.MagazineTemples[i].Weight.ToString());
                             if (GUILayout.Button("-", GUILayout.ExpandWidth(false)))
                             {
                                 Test.MagazineTemples.RemoveAt(i);
@@ -223,8 +243,41 @@ namespace SubjectModel
                         magazineName = GUILayout.TextField(magazineName);
                         bulletContains = GUILayout.TextField(bulletContains);
                         magazineWeight = GUILayout.TextField(magazineWeight);
+                        magazineRadius = GUILayout.TextField(magazineRadius);
+                        magazineLength = GUILayout.TextField(magazineLength);
                         if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
-                            Test.MagazineTemples.Add(new MagazineTemple(magazineName, int.Parse(bulletContains), float.Parse(magazineWeight)));
+                            Test.MagazineTemples.Add(new MagazineTemple(magazineName, int.Parse(bulletContains),
+                                float.Parse(magazineWeight), float.Parse(magazineRadius), float.Parse(magazineLength)));
+                        GUILayout.EndHorizontal();
+                        GUILayout.EndVertical();
+
+                        GUILayout.BeginVertical("Box");
+                        GUILayout.Label("子弹模板");
+                        for (var i = 0; i < Test.BulletTemples.Count; i++)
+                        {
+                            GUILayout.BeginHorizontal("Box");
+                            GUILayout.Label($"{i} - {Test.BulletTemples[i].Name}");
+                            GUILayout.Label(Test.BulletTemples[i].Damage.ToString());
+                            GUILayout.Label(Test.BulletTemples[i].Depth.ToString());
+                            GUILayout.Label($"{Test.BulletTemples[i].Radius}*{Test.BulletTemples[i].Length}");
+                            if (GUILayout.Button("-", GUILayout.ExpandWidth(false)))
+                            {
+                                Test.BulletTemples.RemoveAt(i);
+                                i--;
+                            }
+
+                            GUILayout.EndHorizontal();
+                        }
+
+                        GUILayout.BeginHorizontal("Box");
+                        bulletName = GUILayout.TextField(bulletName);
+                        bulletDamage = GUILayout.TextField(bulletDamage);
+                        bulletDepth = GUILayout.TextField(bulletDepth);
+                        bulletRadius = GUILayout.TextField(bulletRadius);
+                        bulletLength = GUILayout.TextField(bulletLength);
+                        if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
+                            Test.BulletTemples.Add(new BulletTemple(bulletName, float.Parse(bulletDamage),
+                                float.Parse(bulletDepth), float.Parse(bulletRadius), float.Parse(bulletLength)));
                         GUILayout.EndHorizontal();
                         GUILayout.EndVertical();
 
@@ -241,23 +294,29 @@ namespace SubjectModel
                         if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
                         {
                             var index = int.Parse(magazine);
-                            inventory.Add(new Magazine(Test.MagazineTemples[index]) {
-                                    BulletRemain = Test.MagazineTemples[index].BulletContains
-                            });
+                            inventory.Add(new Magazine(Test.MagazineTemples[index]));
                         }
+
                         GUILayout.EndHorizontal();
-                        
+
+                        GUILayout.BeginHorizontal("Box");
+                        GUILayout.Label("子弹物品栏");
+                        bullet = GUILayout.TextField(bullet);
+                        bulletCount = GUILayout.TextField(bulletCount);
+                        if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
+                        {
+                            var index = int.Parse(bullet);
+                            var count = int.Parse(bulletCount);
+                            inventory.Add(new Bullet(Test.BulletTemples[index], count));
+                        }
+
+                        GUILayout.EndHorizontal();
+
                         GUILayout.BeginVertical("Box");
                         playerFlash.sight = GUILayout.Toggle(playerFlash.sight, "使用瞄具");
-                        if (GUILayout.Button("清空空弹匣")) for (var i = 0; i < inventory.bag.Count; i++)
-                        {
-                            if (inventory.bag[i].GetType() != typeof(Magazine)) continue;
-                            if (((Magazine) inventory.bag[i]).BulletRemain != 0) continue;
-                            inventory.Remove(inventory.bag[i]);
-                            i--;
-                        }
+
                         GUILayout.EndVertical();
-                        
+
                         GUILayout.EndVertical();
                         break;
                     case 5:

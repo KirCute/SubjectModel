@@ -1,22 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace SubjectModel
 {
     public static class Test
     {
         public static readonly IList<FirearmTemple> FirearmTemples = new List<FirearmTemple>();
+
         public static readonly IList<MagazineTemple> MagazineTemples = new List<MagazineTemple>
         {
-            new MagazineTemple("弹匣0", 20, 1f),
-            new MagazineTemple("弹匣1", 100, 3f)
+            new MagazineTemple("弹匣0", 20, 1f, 1f, 1f),
+            new MagazineTemple("弹匣1", 100, 3f, 1f, 1f)
+        };
+
+        public static readonly IList<BulletTemple> BulletTemples = new List<BulletTemple>
+        {
+            new BulletTemple("子弹0", 50f, 10f, 1f, 1f)
         };
 
         public static void GeneratePlayerInventory(Inventory inventory)
         {
-            FirearmTemples.Add(new FirearmTemple("模板0", 100f, 0.75f, 0.2f, 2f, 
-                20f, 0.025f, (float) (Math.PI / 6.0), 2f, 20f, 0.5f, 
-                new []{MagazineTemples[0], MagazineTemples[1]}));
+            FirearmTemples.Add(new FirearmTemple("模板0", 2f, 0.75f, 0.2f, 2f,
+                10f, 0.025f, 6f, 2f, 20f, 0.5f,
+                new[] {MagazineTemples[0], MagazineTemples[1]}));
             inventory.Add(new Firearm(FirearmTemples[0]));
             inventory.Add(new Sling());
             inventory.Add(new DrugStack
@@ -122,10 +127,11 @@ namespace SubjectModel
                 Element.Acid,
                 15
             ));
-            inventory.Add(new Magazine(MagazineTemples[0]) {BulletRemain = 20});
-            inventory.Add(new Magazine(MagazineTemples[0]) {BulletRemain = 20});
-            inventory.Add(new Magazine(MagazineTemples[0]) {BulletRemain = 20});
-            inventory.Add(new Magazine(MagazineTemples[1]) {BulletRemain = 100});
+            inventory.Add(new Magazine(MagazineTemples[0]));
+            inventory.Add(new Magazine(MagazineTemples[0]));
+            inventory.Add(new Magazine(MagazineTemples[0]));
+            inventory.Add(new Magazine(MagazineTemples[1]));
+            inventory.Add(new Bullet(BulletTemples[0], 1000));
         }
 
         public static void GenerateChemicalEnemyInventory(Inventory inventory)
@@ -141,7 +147,8 @@ namespace SubjectModel
                     },
                     new IonStack
                     {
-                        Element = Elements.Cl, Index = Elements.Cl.GetIndex(-1), Amount = 2f, Concentration = 3f}
+                        Element = Elements.Cl, Index = Elements.Cl.GetIndex(-1), Amount = 2f, Concentration = 3f
+                    }
                 },
                 Element.Acid,
                 10000

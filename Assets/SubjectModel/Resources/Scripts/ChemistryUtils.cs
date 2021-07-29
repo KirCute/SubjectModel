@@ -276,7 +276,7 @@ namespace SubjectModel
         }
     }
 
-    public class DrugStack : ITemStack
+    public class DrugStack : IItemStack
     {
         public readonly string Tag;
         public readonly IList<IonStack> Ions;
@@ -290,14 +290,20 @@ namespace SubjectModel
             Properties = properties;
             this.count = count;
         }
-        
-        public ITemStack Fetch()
+
+        public void Merge(IItemStack item)
         {
+            count += ((DrugStack) item).count;
+        }
+
+        public IItemStack Fetch(int c)
+        {
+            if (c > count) c = count;
             var ions = Ions.Select(ion => new IonStack
                     {Element = ion.Element, Index = ion.Index, Amount = ion.Amount, Concentration = ion.Concentration})
                 .ToList();
-            count--;
-            return new DrugStack(Tag, ions, Properties, 1);
+            count -= c;
+            return new DrugStack(Tag, ions, Properties, c);
         }
 
         public int GetCount()
@@ -305,14 +311,28 @@ namespace SubjectModel
             return count;
         }
 
+        public bool CanMerge(IItemStack item)
+        {
+            if (item.GetType() != typeof(DrugStack)) return false;
+            var drug = (DrugStack) item;
+            if (drug.Ions.Count != Ions.Count || drug.Tag != Tag || drug.Properties != Properties) return false;
+            return Ions.All(ion => drug.Ions.Any(i =>
+                ion.Element == i.Element && ion.Index == i.Index && Math.Abs(ion.Amount - i.Amount) < 0.000001f &&
+                Math.Abs(ion.Concentration - i.Concentration) < 0.000001f));
+        }
+
         public string GetName()
         {
             return $"{Tag}({count})";
         }
 
-        public void OnMouseClickLeft(GameObject user, Vector2 pos) { }
+        public void OnMouseClickLeft(GameObject user, Vector2 pos)
+        {
+        }
 
-        public void OnMouseClickRight(GameObject user, Vector2 pos) { }
+        public void OnMouseClickRight(GameObject user, Vector2 pos)
+        {
+        }
 
         public void OnMouseClickLeftDown(GameObject user, Vector2 pos)
         {
@@ -327,9 +347,13 @@ namespace SubjectModel
                 user.GetComponent<Rigidbody2D>().position);
         }
 
-        public void OnMouseClickLeftUp(GameObject user, Vector2 pos) { }
+        public void OnMouseClickLeftUp(GameObject user, Vector2 pos)
+        {
+        }
 
-        public void OnMouseClickRightUp(GameObject user, Vector2 pos) { }
+        public void OnMouseClickRightUp(GameObject user, Vector2 pos)
+        {
+        }
 
         public void Selecting(GameObject user)
         {
@@ -343,13 +367,13 @@ namespace SubjectModel
         {
         }
 
-        public Func<ITemStack, bool> SubInventory()
+        public Func<IItemStack, bool> SubInventory()
         {
             return item => false;
         }
     }
-    
-    public class Sling : ITemStack
+
+    public class Sling : IItemStack
     {
         private bool fetched;
 
@@ -357,7 +381,7 @@ namespace SubjectModel
         {
             fetched = false;
         }
-        
+
         public string GetName()
         {
             return "弹弓";
@@ -399,24 +423,38 @@ namespace SubjectModel
             stone.OnMouseClickRightUp(user, pos);
         }
 
-        public void Selecting(GameObject user) { }
+        public void Selecting(GameObject user)
+        {
+        }
 
-        public void OnSelected(GameObject user) { }
+        public void OnSelected(GameObject user)
+        {
+        }
 
-        public void LoseSelected(GameObject user) { }
+        public void LoseSelected(GameObject user)
+        {
+        }
 
         public int GetCount()
         {
             return fetched ? 0 : 1;
         }
 
-        public ITemStack Fetch()
+        public bool CanMerge(IItemStack item)
         {
-            fetched = true;
-            return this;
+            return false;
         }
 
-        public Func<ITemStack, bool> SubInventory()
+        public void Merge(IItemStack item)
+        {
+        }
+
+        public IItemStack Fetch(int count)
+        {
+            return count == 0 ? new Sling {fetched = true} : this;
+        }
+
+        public Func<IItemStack, bool> SubInventory()
         {
             return item => item.GetType() == typeof(DrugStack);
         }
