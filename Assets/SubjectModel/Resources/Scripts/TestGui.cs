@@ -61,8 +61,10 @@ namespace SubjectModel
         private string magazineLength;
 
         private string bulletName;
-        private string bulletDamage;
+        private string bulletBreak;
+        private string bulletExplode;
         private string bulletDepth;
+        private string bulletMinDefence;
         private string bulletRadius;
         private string bulletLength;
 
@@ -257,8 +259,9 @@ namespace SubjectModel
                         {
                             GUILayout.BeginHorizontal("Box");
                             GUILayout.Label($"{i} - {Test.BulletTemples[i].Name}");
-                            GUILayout.Label(Test.BulletTemples[i].Damage.ToString());
-                            GUILayout.Label(Test.BulletTemples[i].Depth.ToString());
+                            GUILayout.Label(
+                                $"{Test.BulletTemples[i].BreakDamage}(+{Test.BulletTemples[i].ExplodeDamage})");
+                            GUILayout.Label($"{Test.BulletTemples[i].Depth}({Test.BulletTemples[i].MinDefence})");
                             GUILayout.Label($"{Test.BulletTemples[i].Radius}*{Test.BulletTemples[i].Length}");
                             if (GUILayout.Button("-", GUILayout.ExpandWidth(false)))
                             {
@@ -271,13 +274,16 @@ namespace SubjectModel
 
                         GUILayout.BeginHorizontal("Box");
                         bulletName = GUILayout.TextField(bulletName);
-                        bulletDamage = GUILayout.TextField(bulletDamage);
+                        bulletBreak = GUILayout.TextField(bulletBreak);
+                        bulletExplode = GUILayout.TextField(bulletExplode);
                         bulletDepth = GUILayout.TextField(bulletDepth);
+                        bulletMinDefence = GUILayout.TextField(bulletMinDefence);
                         bulletRadius = GUILayout.TextField(bulletRadius);
                         bulletLength = GUILayout.TextField(bulletLength);
                         if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
-                            Test.BulletTemples.Add(new BulletTemple(bulletName, float.Parse(bulletDamage),
-                                float.Parse(bulletDepth), float.Parse(bulletRadius), float.Parse(bulletLength)));
+                            Test.BulletTemples.Add(new BulletTemple(bulletName, float.Parse(bulletBreak),
+                                float.Parse(bulletExplode), float.Parse(bulletDepth), float.Parse(bulletMinDefence),
+                                float.Parse(bulletRadius), float.Parse(bulletLength)));
                         GUILayout.EndHorizontal();
                         GUILayout.EndVertical();
 

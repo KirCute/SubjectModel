@@ -34,7 +34,7 @@ namespace SubjectModel
                 new[] {.0f}
             },
             buffType = new[] {Buff.Empty, Buff.Corrosion},
-            buffParam = new[] {DefaultParam, new[] {2.0f, 50f}},
+            buffParam = new[] {DefaultParam, new[] {0.25f, 400f}},
             state = new[]
             {
                 new[] {Element.Gas, Element.Aqua},
@@ -184,13 +184,10 @@ namespace SubjectModel
             potential = new[]
             {
                 new[] {1.8f},
-                new[]
-                {
-                    /* Offstandard */ 0.65f
-                }
+                new[] {0.65f} // Off-standard
             },
             buffType = new[] {Buff.Poison, Buff.Empty},
-            buffParam = new[] {new[] {2f, 12.5f}, DefaultParam},
+            buffParam = new[] {new[] {2f, 17.5f}, DefaultParam},
             state = new[]
             {
                 new[] {Element.Aqua, Element.Aqua},
@@ -276,7 +273,7 @@ namespace SubjectModel
         }
     }
 
-    public class DrugStack : IItemStack
+    public class DrugStack : IItemStack, IFiller
     {
         public readonly string Tag;
         public readonly IList<IonStack> Ions;
@@ -309,6 +306,11 @@ namespace SubjectModel
         public int GetCount()
         {
             return count;
+        }
+
+        public void CountAppend(int c)
+        {
+            count += c;
         }
 
         public bool CanMerge(IItemStack item)
@@ -370,6 +372,22 @@ namespace SubjectModel
         public Func<IItemStack, bool> SubInventory()
         {
             return item => false;
+        }
+
+        public void OnBulletHit(GameObject target)
+        {
+            if (!target.TryGetComponent<BuffRenderer>(out var br)) return;
+            br.Register((DrugStack) Fetch(1));
+        }
+
+        public string GetFillerName()
+        {
+            return Tag;
+        }
+
+        public bool Equals(IFiller other)
+        {
+            return other != null && other.GetType() == typeof(DrugStack) && CanMerge((DrugStack) other);
         }
     }
 

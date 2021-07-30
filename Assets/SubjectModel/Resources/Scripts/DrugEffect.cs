@@ -73,7 +73,7 @@ namespace SubjectModel
 
         public class PoisonLike : RemainingBuff
         {
-            private string variable;
+            private readonly string variable;
 
             public PoisonLike(string variable, float remain, float level) : base(remain, level)
             {

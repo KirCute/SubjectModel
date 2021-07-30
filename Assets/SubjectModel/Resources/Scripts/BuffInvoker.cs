@@ -11,7 +11,7 @@ namespace SubjectModel
         public const float SelfAttackRange = 0.25f;
         public const float StartColorAlpha = 0.5f;
         public const float DefaultKeepTime = 0.2f;
-        public const float MaxDistance = 2.5f;
+        public const float MaxDistance = 3f;
         private static readonly LayerMask DrugMask = 1 << 3 | 1 << 6;
 
         private float aliveTime;

@@ -101,9 +101,11 @@ namespace SubjectModel
         {
             return magazine == null
                 ? temple.Name
-                : magazine.Containing == null 
+                : magazine.Containing == null
                     ? $"{temple.Name}({magazine.Temple.Name})"
-                    : $"{temple.Name}({magazine.Containing.Temple.Name} {magazine.Containing.Count}/{magazine.Temple.BulletContains})";
+                    : magazine.Containing.Filler == null
+                        ? $"{temple.Name}({magazine.Containing.Temple.Name} {magazine.Containing.Count}/{magazine.Temple.BulletContains})"
+                        : $"{temple.Name}({magazine.Containing.Temple.Name} {magazine.Containing.Filler.GetFillerName()} {magazine.Containing.Count}/{magazine.Temple.BulletContains})";
         }
 
         public void OnMouseClickLeft(GameObject user, Vector2 aim)
@@ -119,17 +121,28 @@ namespace SubjectModel
             if (magazine.Containing.Count != 0) loading = temple.Loading;
             InvokeKick(user);
             var collider = user.GetComponent<GunFlash>().Shoot(shooterPosition, aim);
+            if (collider != null)
+            {
+                var declarations = collider.GetComponent<Variables>().declarations;
+                var defence = declarations.IsDefined("Defence") ? declarations.Get<float>("Defence") : .0f;
+                var health = declarations.Get<float>("Health");
+                var depth = temple.Depth + magazine.Containing.Temple.Depth;
+                var minDefence = magazine.Containing.Temple.MinDefence;
+                var damage = temple.Damage * magazine.Containing.Temple.BreakDamage;
+                var explode = magazine.Containing.Temple.ExplodeDamage;
+                declarations.Set("Health",
+                    health - (defence > depth
+                            ? Utils.Map(.0f, defence, .0f, damage, depth) // 未击穿
+                            : depth - defence <= minDefence || minDefence < 0.000001f // 未过穿 或 不存在过穿可能
+                                ? damage + (magazine.Containing.Filler == null ? explode : .0f) // 刚好击穿
+                                : damage // 过穿
+                    )
+                );
+                if (defence <= depth && (depth - defence <= minDefence || minDefence < 0.000001f))
+                    magazine.Containing.Filler?.OnBulletHit(collider.gameObject);
+            }
+
             if (magazine.Containing.Count == 0) magazine.Containing = null;
-            if (collider == null) return;
-            var declarations = collider.GetComponent<Variables>().declarations;
-            var defence = declarations.IsDefined("Defence") ? declarations.Get<float>("Defence") : .0f;
-            var health = declarations.Get<float>("Health");
-            var depth = temple.Depth + magazine.Containing.Temple.Depth;
-            var damage = temple.Damage * magazine.Containing.Temple.Damage;
-            declarations.Set("Health",
-                health - (defence > depth
-                    ? Utils.Map(.0f, defence, .0f, damage, depth)
-                    : damage));
         }
 
         public void OnMouseClickLeftDown(GameObject user, Vector2 pos)
@@ -302,7 +315,9 @@ namespace SubjectModel
         {
             return Containing == null
                 ? Temple.Name
-                : $"{Temple.Name}({Containing.Temple.Name} {Containing.Count}/{Temple.BulletContains})";
+                : Containing.Filler == null
+                    ? $"{Temple.Name}({Containing.Temple.Name} {Containing.Count}/{Temple.BulletContains})"
+                    : $"{Temple.Name}({Containing.Temple.Name} {Containing.Filler.GetFillerName()} {Containing.Count}/{Temple.BulletContains})";
         }
 
         public void OnMouseClickLeft(GameObject user, Vector2 pos)
@@ -384,16 +399,21 @@ namespace SubjectModel
     public class BulletTemple
     {
         public readonly string Name;
-        public readonly float Damage;
+        public readonly float BreakDamage;
+        public readonly float ExplodeDamage;
         public readonly float Depth;
+        public readonly float MinDefence;
         public readonly float Radius;
         public readonly float Length;
 
-        public BulletTemple(string name, float damage, float depth, float radius, float length)
+        public BulletTemple(string name, float breakDamage, float explode, float depth, float minDefence, float radius,
+            float length)
         {
             Name = name;
-            Damage = damage;
+            BreakDamage = breakDamage;
+            ExplodeDamage = explode;
             Depth = depth;
+            MinDefence = minDefence;
             Radius = radius;
             Length = length;
         }
@@ -402,17 +422,21 @@ namespace SubjectModel
     public class Bullet : Material
     {
         public readonly BulletTemple Temple;
+        public readonly IFiller Filler;
         public int Count;
 
-        public Bullet(BulletTemple temple, int count)
+        public Bullet(BulletTemple temple, int count, IFiller filler = null)
         {
             Temple = temple;
             Count = count;
+            Filler = filler;
         }
 
         public override string GetName()
         {
-            return $"{Temple.Name}({Count})";
+            return Filler == null
+                ? $"{Temple.Name}({Count})"
+                : $"{Temple.Name}({Filler.GetFillerName()})({Count})";
         }
 
         public override int GetCount()
@@ -422,20 +446,33 @@ namespace SubjectModel
 
         public override bool CanMerge(IItemStack item)
         {
-            return item.GetType() == typeof(Bullet) && ((Bullet) item).Temple == Temple;
+            if (item.GetType() != typeof(Bullet) || ((Bullet) item).Temple != Temple) return false;
+            var bullet = (Bullet) item;
+            if (Filler == null) return bullet.Filler == null;
+            return Filler.Equals(bullet.Filler);
         }
 
         public override void Merge(IItemStack item)
         {
             Count += ((Bullet) item).Count;
+            Filler?.CountAppend(((Bullet) item).Filler.GetCount());
         }
 
         public override IItemStack Fetch(int count)
         {
             if (count > Count) count = Count;
             Count -= count;
-            return new Bullet(Temple, count);
+            return new Bullet(Temple, count, Filler);
         }
+    }
+
+    public interface IFiller
+    {
+        public void OnBulletHit(GameObject target);
+        public string GetFillerName();
+        public bool Equals(IFiller other);
+        public int GetCount();
+        public void CountAppend(int count);
     }
 
     [Serializable]

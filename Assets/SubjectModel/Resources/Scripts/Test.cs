@@ -14,13 +14,15 @@ namespace SubjectModel
 
         public static readonly IList<BulletTemple> BulletTemples = new List<BulletTemple>
         {
-            new BulletTemple("子弹0", 50f, 10f, 1f, 1f)
+            new BulletTemple("子弹0", 37.5f, 0f, 50f, 0f, 1f, 1f),
+            new BulletTemple("子弹1", 6.25f, 87.5f, 200f, 120f, 1f, 1f),
+            new BulletTemple("子弹2", 10f, 0f, 100f, 0f, 1f, 1f)
         };
 
         public static void GeneratePlayerInventory(Inventory inventory)
         {
             FirearmTemples.Add(new FirearmTemple("模板0", 2f, 0.75f, 0.2f, 2f,
-                10f, 0.025f, 6f, 2f, 20f, 0.5f,
+                50f, 0.025f, 6f, 2f, 20f, 0.5f,
                 new[] {MagazineTemples[0], MagazineTemples[1]}));
             inventory.Add(new Firearm(FirearmTemples[0]));
             inventory.Add(new Sling());
@@ -39,7 +41,7 @@ namespace SubjectModel
                     }
                 },
                 Element.Acid,
-                10
+                50
             ));
             inventory.Add(new DrugStack
             (
@@ -52,7 +54,7 @@ namespace SubjectModel
                     }
                 },
                 Element.Acid,
-                20
+                100
             ));
             inventory.Add(new DrugStack
             (
@@ -65,7 +67,7 @@ namespace SubjectModel
                     }
                 },
                 Element.Acid,
-                10
+                50
             ));
             inventory.Add(new DrugStack
             (
@@ -82,7 +84,7 @@ namespace SubjectModel
                     }
                 },
                 Element.Acid,
-                20
+                100
             ));
             inventory.Add(new DrugStack
             (
@@ -95,7 +97,7 @@ namespace SubjectModel
                     }
                 },
                 Element.Acid,
-                10
+                50
             ));
             inventory.Add(new DrugStack
             (
@@ -108,7 +110,7 @@ namespace SubjectModel
                     }
                 },
                 Element.Acid,
-                15
+                75
             ));
             inventory.Add(new DrugStack
             (
@@ -125,13 +127,55 @@ namespace SubjectModel
                     }
                 },
                 Element.Acid,
-                15
+                75
             ));
             inventory.Add(new Magazine(MagazineTemples[0]));
             inventory.Add(new Magazine(MagazineTemples[0]));
             inventory.Add(new Magazine(MagazineTemples[0]));
             inventory.Add(new Magazine(MagazineTemples[1]));
             inventory.Add(new Bullet(BulletTemples[0], 1000));
+            inventory.Add(new Bullet(BulletTemples[1], 1000));
+            inventory.Add(new Bullet(BulletTemples[2], 500, new DrugStack(
+                "CuSO4",
+                new List<IonStack>
+                {
+                    new IonStack
+                    {
+                        Element = Elements.Cu, Index = Elements.Cu.GetIndex(2), Amount = 0.5f, Concentration = 1f
+                    }
+                },
+                Element.Acid,
+                500
+            )));
+            inventory.Add(new Bullet(BulletTemples[2], 500, new DrugStack(
+                "H2O2",
+                new List<IonStack>
+                {
+                    new IonStack
+                    {
+                        Element = Elements.O, Index = Elements.O.GetIndex(-1), Amount = 0.5f, Concentration = 1f
+                    }
+                },
+                Element.Acid,
+                500
+            )));
+            inventory.Add(new Bullet(BulletTemples[2], 500, new DrugStack(
+                "KMnO4",
+                new List<IonStack>
+                {
+                    new IonStack
+                    {
+                        Element = Elements.K, Index = Elements.K.GetIndex(1), Amount = 0.5f, Concentration = 1f
+                    },
+                    new IonStack
+                    {
+                        Element = Elements.Mn, Index = Elements.Mn.GetIndex(7), Amount = 0.5f, Concentration = 1f
+                    }
+                },
+                Element.Acid,
+                500
+            )));
+            inventory.Add(new Bullet(BulletTemples[2], 500));
         }
 
         public static void GenerateChemicalEnemyInventory(Inventory inventory)
