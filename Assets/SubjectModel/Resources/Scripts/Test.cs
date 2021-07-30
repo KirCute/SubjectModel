@@ -4,26 +4,30 @@ namespace SubjectModel
 {
     public static class Test
     {
-        public static readonly IList<FirearmTemple> FirearmTemples = new List<FirearmTemple>();
+        public static List<FirearmTemple> FirearmTemples; // = new List<FirearmTemple>();
 
-        public static readonly IList<MagazineTemple> MagazineTemples = new List<MagazineTemple>
+        public static List<MagazineTemple> MagazineTemples; /* = new List<MagazineTemple>
         {
             new MagazineTemple("弹匣0", 20, 1f, 1f, 1f),
             new MagazineTemple("弹匣1", 100, 3f, 1f, 1f)
         };
+        //*/
 
-        public static readonly IList<BulletTemple> BulletTemples = new List<BulletTemple>
+        public static List<BulletTemple> BulletTemples; /* = new List<BulletTemple>
         {
             new BulletTemple("子弹0", 37.5f, 0f, 50f, 0f, 1f, 1f),
             new BulletTemple("子弹1", 6.25f, 87.5f, 200f, 120f, 1f, 1f),
             new BulletTemple("子弹2", 10f, 0f, 100f, 0f, 1f, 1f)
         };
+        //*/
 
         public static void GeneratePlayerInventory(Inventory inventory)
         {
-            FirearmTemples.Add(new FirearmTemple("模板0", 2f, 0.75f, 0.2f, 2f,
+            /*
+            FirearmTemples.Add(new FirearmTemple("模板,0", 2f, 0.75f, 0.2f, 2f,
                 50f, 0.025f, 6f, 2f, 20f, 0.5f,
-                new[] {MagazineTemples[0], MagazineTemples[1]}));
+                new[] {MagazineTemples[0].Name, MagazineTemples[1].Name}));
+            //*/
             inventory.Add(new Firearm(FirearmTemples[0]));
             inventory.Add(new Sling());
             inventory.Add(new DrugStack

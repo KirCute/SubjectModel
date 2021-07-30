@@ -199,7 +199,7 @@ namespace SubjectModel
             bag[selecting].OnMouseClickRightUp(gameObject, pos);
         }
 
-        private void RebuildSubInventory()
+        public void RebuildSubInventory()
         {
             if (selecting >= bag.Count) return;
             sub.Clear();

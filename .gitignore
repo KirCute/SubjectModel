@@ -59,3 +59,7 @@ Assets/Plugins.meta
 
 # Irrelevant configure file
 ignore.conf
+
+# Backups
+*.bak
+*.bak.meta

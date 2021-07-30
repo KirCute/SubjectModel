@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Bolt;
 using UnityEngine;
@@ -52,10 +53,10 @@ namespace SubjectModel
         public readonly float Kick;
         public readonly float Distance;
         public readonly float ReloadSpeed;
-        public readonly MagazineTemple[] Magazine;
+        public readonly string[] Magazine;
 
         public FirearmTemple(string name, float damage, float reload, float loading, float weight, float depth,
-            float deviation, float maxRange, float kick, float distance, float reloadSpeed, MagazineTemple[] magazine)
+            float deviation, float maxRange, float kick, float distance, float reloadSpeed, string[] magazine)
         {
             Name = name;
             Damage = damage;
@@ -126,10 +127,10 @@ namespace SubjectModel
                 var declarations = collider.GetComponent<Variables>().declarations;
                 var defence = declarations.IsDefined("Defence") ? declarations.Get<float>("Defence") : .0f;
                 var health = declarations.Get<float>("Health");
-                var depth = temple.Depth + magazine.Containing.Temple.Depth;
+                var depth = magazine.Containing.Filler == null ? temple.Depth + magazine.Containing.Temple.Depth : 0f;
                 var minDefence = magazine.Containing.Temple.MinDefence;
                 var damage = temple.Damage * magazine.Containing.Temple.BreakDamage;
-                var explode = magazine.Containing.Temple.ExplodeDamage;
+                var explode = magazine.Containing.Temple.Explode;
                 declarations.Set("Health",
                     health - (defence > depth
                             ? Utils.Map(.0f, defence, .0f, damage, depth) // 未击穿
@@ -138,7 +139,7 @@ namespace SubjectModel
                                 : damage // 过穿
                     )
                 );
-                if (defence <= depth && (depth - defence <= minDefence || minDefence < 0.000001f))
+                if (defence <= depth)
                     magazine.Containing.Filler?.OnBulletHit(collider.gameObject);
             }
 
@@ -212,7 +213,7 @@ namespace SubjectModel
 
         public Func<IItemStack, bool> SubInventory()
         {
-            return item => item.GetType() == typeof(Magazine) && temple.Magazine.Contains(((Magazine) item).Temple);
+            return item => item.GetType() == typeof(Magazine) && temple.Magazine.Contains(((Magazine) item).Temple.Name);
         }
 
         private void SwitchMagazine(GameObject user)
@@ -400,7 +401,7 @@ namespace SubjectModel
     {
         public readonly string Name;
         public readonly float BreakDamage;
-        public readonly float ExplodeDamage;
+        public readonly float Explode;
         public readonly float Depth;
         public readonly float MinDefence;
         public readonly float Radius;
@@ -411,7 +412,7 @@ namespace SubjectModel
         {
             Name = name;
             BreakDamage = breakDamage;
-            ExplodeDamage = explode;
+            Explode = explode;
             Depth = depth;
             MinDefence = minDefence;
             Radius = radius;
@@ -478,6 +479,8 @@ namespace SubjectModel
     [Serializable]
     public class GunData
     {
-        //public List<> guns;
+        public List<FirearmTemple> firearmTemples;
+        public List<MagazineTemple> magazineTemples;
+        public List<BulletTemple> bulletTemples;
     }
 }

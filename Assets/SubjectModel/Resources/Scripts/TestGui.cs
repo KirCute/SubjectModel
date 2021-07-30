@@ -1,8 +1,12 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using Bolt;
 using UnityEditor;
 using UnityEngine;
+using Newtonsoft.Json;
 
 namespace SubjectModel
 {
@@ -53,12 +57,14 @@ namespace SubjectModel
         private string distance;
         private string reloadSpeed;
         private string magazineTemple;
+        private Vector2 firearmScroll;
 
         private string magazineName;
         private string bulletContains;
         private string magazineWeight;
         private string magazineRadius;
         private string magazineLength;
+        private Vector2 magazineScroll;
 
         private string bulletName;
         private string bulletBreak;
@@ -67,6 +73,7 @@ namespace SubjectModel
         private string bulletMinDefence;
         private string bulletRadius;
         private string bulletLength;
+        private Vector2 bulletScroll;
 
         private Inventory inventory;
         private GunFlash playerFlash;
@@ -75,13 +82,20 @@ namespace SubjectModel
         private string bullet;
         private string bulletCount;
 
+        private Vector2 inventoryScroll;
+
         private bool standOnly;
         private bool standOnlyInvoke;
         private bool pause;
 
+        private void Awake()
+        { 
+            LoadModel();
+        }
+
         private void Start()
         {
-            selected = 4;
+            selected = 5;
             var player = GameObject.FindWithTag("Player");
             playerVariables = player.GetComponent<Variables>();
             maxHealth = playerVariables.declarations.Get("MaxHealth").ToString();
@@ -102,9 +116,13 @@ namespace SubjectModel
             bossHealth = bossSpawner.bossHealth.ToString();
             bossSpeed = bossSpawner.bossSpeed.ToString();
             bossDefence = bossSpawner.bossDefence.ToString();
+            firearmScroll = new Vector2(0f, 0f);
+            magazineScroll = new Vector2(0f, 0f);
+            bulletScroll = new Vector2(0f, 0f);
             mdc = BuffRenderer.MotiveDamageCoefficient.ToString();
             tdc = BuffRenderer.ThermalDamageCoefficient.ToString();
             mdp = BuffRenderer.MinimumDamagePotential.ToString();
+            inventoryScroll = new Vector2(0f, 0f);
             standOnly = false;
             standOnlyInvoke = false;
             pause = false;
@@ -134,7 +152,7 @@ namespace SubjectModel
         {
             GUILayout.Window(0, new Rect(60, 80, 500, 20), id =>
             {
-                selected = GUILayout.Toolbar(selected, new[] {"玩家", "敌人", "炼金术", "枪械", "收起", "系统"});
+                selected = GUILayout.Toolbar(selected, new[] {"玩家", "敌人", "炼金术", "枪械", "物品栏", "收起", "系统"});
                 switch (selected)
                 {
                     case 0:
@@ -173,9 +191,9 @@ namespace SubjectModel
                         break;
                     case 3:
                         GUILayout.BeginVertical();
-
                         GUILayout.BeginVertical("Box");
                         GUILayout.Label("枪械模板");
+                        firearmScroll = GUILayout.BeginScrollView(firearmScroll, false, false, GUILayout.Height(100));
                         for (var i = 0; i < Test.FirearmTemples.Count; i++)
                         {
                             GUILayout.BeginHorizontal("Box");
@@ -193,10 +211,12 @@ namespace SubjectModel
 
                             GUILayout.EndHorizontal();
                         }
-
+                        GUILayout.EndScrollView();
                         GUILayout.BeginVertical("Box");
                         GUILayout.BeginHorizontal();
+                        GUILayout.Label("名称：", GUILayout.ExpandWidth(false));
                         firearmName = GUILayout.TextField(firearmName);
+                        GUILayout.Label("使用弹匣id：", GUILayout.ExpandWidth(false));
                         magazineTemple = GUILayout.TextField(magazineTemple);
                         if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
                             Test.FirearmTemples.Add(new FirearmTemple(firearmName, float.Parse(damage),
@@ -204,27 +224,37 @@ namespace SubjectModel
                                 float.Parse(loading), float.Parse(weight), float.Parse(depth), float.Parse(deviation),
                                 float.Parse(maxRange), float.Parse(kick), float.Parse(distance),
                                 float.Parse(reloadSpeed),
-                                SplitTempleString(magazineTemple).Select(i => Test.MagazineTemples[i]).ToArray()));
+                                SplitTempleString(magazineTemple).Select(i => Test.MagazineTemples[i].Name).ToArray()));
                         GUILayout.EndHorizontal();
                         GUILayout.BeginHorizontal();
-                        damage = GUILayout.TextField(damage);
-                        depth = GUILayout.TextField(depth);
-                        reload = GUILayout.TextField(reload);
-                        loading = GUILayout.TextField(loading);
-                        weight = GUILayout.TextField(weight);
+                        GUILayout.Label("伤害倍率：", GUILayout.ExpandWidth(false));
+                        damage = GUILayout.TextField(damage, GUILayout.ExpandWidth(true));
+                        GUILayout.Label("穿深：", GUILayout.ExpandWidth(false));
+                        depth = GUILayout.TextField(depth, GUILayout.ExpandWidth(true));
+                        GUILayout.Label("换弹匣时间：", GUILayout.ExpandWidth(false));
+                        reload = GUILayout.TextField(reload, GUILayout.ExpandWidth(true));
+                        GUILayout.Label("自动换弹时间：", GUILayout.ExpandWidth(false));
+                        loading = GUILayout.TextField(loading, GUILayout.ExpandWidth(true));
+                        GUILayout.Label("重量：", GUILayout.ExpandWidth(false));
+                        weight = GUILayout.TextField(weight, GUILayout.ExpandWidth(true));
                         GUILayout.EndHorizontal();
                         GUILayout.BeginHorizontal();
-                        deviation = GUILayout.TextField(deviation);
-                        maxRange = GUILayout.TextField(maxRange);
-                        reloadSpeed = GUILayout.TextField(reloadSpeed);
-                        kick = GUILayout.TextField(kick);
-                        distance = GUILayout.TextField(distance);
+                        GUILayout.Label("精度：", GUILayout.ExpandWidth(false));
+                        deviation = GUILayout.TextField(deviation, GUILayout.ExpandWidth(true));
+                        GUILayout.Label("散步：", GUILayout.ExpandWidth(false));
+                        maxRange = GUILayout.TextField(maxRange, GUILayout.ExpandWidth(true));
+                        GUILayout.Label("换弹匣降速：", GUILayout.ExpandWidth(false));
+                        reloadSpeed = GUILayout.TextField(reloadSpeed, GUILayout.ExpandWidth(true));
+                        GUILayout.Label("后坐力：", GUILayout.ExpandWidth(false));
+                        kick = GUILayout.TextField(kick, GUILayout.ExpandWidth(true));
+                        GUILayout.Label("射程：", GUILayout.ExpandWidth(false));
+                        distance = GUILayout.TextField(distance, GUILayout.ExpandWidth(true));
                         GUILayout.EndHorizontal();
                         GUILayout.EndVertical();
                         GUILayout.EndVertical();
-
                         GUILayout.BeginVertical("Box");
                         GUILayout.Label("弹匣模板");
+                        magazineScroll = GUILayout.BeginScrollView(magazineScroll, false, false, GUILayout.Height(100));
                         for (var i = 0; i < Test.MagazineTemples.Count; i++)
                         {
                             GUILayout.BeginHorizontal("Box");
@@ -240,27 +270,32 @@ namespace SubjectModel
 
                             GUILayout.EndHorizontal();
                         }
-
+                        GUILayout.EndScrollView();
                         GUILayout.BeginHorizontal("Box");
-                        magazineName = GUILayout.TextField(magazineName);
-                        bulletContains = GUILayout.TextField(bulletContains);
-                        magazineWeight = GUILayout.TextField(magazineWeight);
-                        magazineRadius = GUILayout.TextField(magazineRadius);
-                        magazineLength = GUILayout.TextField(magazineLength);
+                        GUILayout.Label("名称：", GUILayout.ExpandWidth(false));
+                        magazineName = GUILayout.TextField(magazineName, GUILayout.ExpandWidth(true));
+                        GUILayout.Label("载弹量：", GUILayout.ExpandWidth(false));
+                        bulletContains = GUILayout.TextField(bulletContains, GUILayout.ExpandWidth(true));
+                        GUILayout.Label("重量：", GUILayout.ExpandWidth(false));
+                        magazineWeight = GUILayout.TextField(magazineWeight, GUILayout.ExpandWidth(true));
+                        GUILayout.Label("口径：", GUILayout.ExpandWidth(false));
+                        magazineRadius = GUILayout.TextField(magazineRadius, GUILayout.ExpandWidth(true));
+                        GUILayout.Label("长度：", GUILayout.ExpandWidth(false));
+                        magazineLength = GUILayout.TextField(magazineLength, GUILayout.ExpandWidth(true));
                         if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
                             Test.MagazineTemples.Add(new MagazineTemple(magazineName, int.Parse(bulletContains),
                                 float.Parse(magazineWeight), float.Parse(magazineRadius), float.Parse(magazineLength)));
                         GUILayout.EndHorizontal();
                         GUILayout.EndVertical();
-
                         GUILayout.BeginVertical("Box");
                         GUILayout.Label("子弹模板");
+                        bulletScroll = GUILayout.BeginScrollView(bulletScroll, false, false, GUILayout.Height(100));
                         for (var i = 0; i < Test.BulletTemples.Count; i++)
                         {
                             GUILayout.BeginHorizontal("Box");
                             GUILayout.Label($"{i} - {Test.BulletTemples[i].Name}");
                             GUILayout.Label(
-                                $"{Test.BulletTemples[i].BreakDamage}(+{Test.BulletTemples[i].ExplodeDamage})");
+                                $"{Test.BulletTemples[i].BreakDamage}(+{Test.BulletTemples[i].Explode})");
                             GUILayout.Label($"{Test.BulletTemples[i].Depth}({Test.BulletTemples[i].MinDefence})");
                             GUILayout.Label($"{Test.BulletTemples[i].Radius}*{Test.BulletTemples[i].Length}");
                             if (GUILayout.Button("-", GUILayout.ExpandWidth(false)))
@@ -271,43 +306,52 @@ namespace SubjectModel
 
                             GUILayout.EndHorizontal();
                         }
-
-                        GUILayout.BeginHorizontal("Box");
-                        bulletName = GUILayout.TextField(bulletName);
-                        bulletBreak = GUILayout.TextField(bulletBreak);
-                        bulletExplode = GUILayout.TextField(bulletExplode);
-                        bulletDepth = GUILayout.TextField(bulletDepth);
-                        bulletMinDefence = GUILayout.TextField(bulletMinDefence);
-                        bulletRadius = GUILayout.TextField(bulletRadius);
-                        bulletLength = GUILayout.TextField(bulletLength);
+                        GUILayout.EndScrollView();
+                        GUILayout.BeginVertical("Box");
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Label("名称：", GUILayout.ExpandWidth(false));
+                        bulletName = GUILayout.TextField(bulletName, GUILayout.ExpandWidth(true));
+                        GUILayout.Label("基础伤害：", GUILayout.ExpandWidth(false));
+                        bulletBreak = GUILayout.TextField(bulletBreak, GUILayout.ExpandWidth(true));
+                        GUILayout.Label("击穿伤害：", GUILayout.ExpandWidth(false));
+                        bulletExplode = GUILayout.TextField(bulletExplode, GUILayout.ExpandWidth(true));
+                        GUILayout.Label("穿深：", GUILayout.ExpandWidth(false));
+                        bulletDepth = GUILayout.TextField(bulletDepth, GUILayout.ExpandWidth(true));
+                        GUILayout.EndHorizontal();
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Label("过穿防御：", GUILayout.ExpandWidth(false));
+                        bulletMinDefence = GUILayout.TextField(bulletMinDefence, GUILayout.ExpandWidth(true));
+                        GUILayout.Label("口径：", GUILayout.ExpandWidth(false));
+                        bulletRadius = GUILayout.TextField(bulletRadius, GUILayout.ExpandWidth(true));
+                        GUILayout.Label("长度：", GUILayout.ExpandWidth(false));
+                        bulletLength = GUILayout.TextField(bulletLength, GUILayout.ExpandWidth(true));
                         if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
                             Test.BulletTemples.Add(new BulletTemple(bulletName, float.Parse(bulletBreak),
                                 float.Parse(bulletExplode), float.Parse(bulletDepth), float.Parse(bulletMinDefence),
                                 float.Parse(bulletRadius), float.Parse(bulletLength)));
                         GUILayout.EndHorizontal();
                         GUILayout.EndVertical();
-
-                        GUILayout.BeginHorizontal("Box");
-                        GUILayout.Label("枪械物品栏");
+                        GUILayout.EndVertical();
+                        GUILayout.BeginVertical("Box");
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Label("枪械物品栏    ID：", GUILayout.ExpandWidth(false));
                         firearm = GUILayout.TextField(firearm, GUILayout.ExpandWidth(true));
                         if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
                             inventory.Add(new Firearm(Test.FirearmTemples[int.Parse(firearm)]));
                         GUILayout.EndHorizontal();
-
-                        GUILayout.BeginHorizontal("Box");
-                        GUILayout.Label("弹匣物品栏");
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Label("弹匣物品栏    ID：", GUILayout.ExpandWidth(false));
                         magazine = GUILayout.TextField(magazine, GUILayout.ExpandWidth(true));
                         if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
                         {
                             var index = int.Parse(magazine);
                             inventory.Add(new Magazine(Test.MagazineTemples[index]));
                         }
-
                         GUILayout.EndHorizontal();
-
-                        GUILayout.BeginHorizontal("Box");
-                        GUILayout.Label("子弹物品栏");
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Label("子弹物品栏    ID：", GUILayout.ExpandWidth(false));
                         bullet = GUILayout.TextField(bullet);
+                        GUILayout.Label("数量：", GUILayout.ExpandWidth(false));
                         bulletCount = GUILayout.TextField(bulletCount);
                         if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
                         {
@@ -315,17 +359,56 @@ namespace SubjectModel
                             var count = int.Parse(bulletCount);
                             inventory.Add(new Bullet(Test.BulletTemples[index], count));
                         }
-
                         GUILayout.EndHorizontal();
-
-                        GUILayout.BeginVertical("Box");
-                        playerFlash.sight = GUILayout.Toggle(playerFlash.sight, "使用瞄具");
-
                         GUILayout.EndVertical();
-
+                        GUILayout.BeginVertical("Box");
+                        GUILayout.BeginHorizontal();
+                        //if (GUILayout.Button("重新加载模板数据")) LoadModel();
+                        if (GUILayout.Button("保存模板数据")) SaveModel();
+                        GUILayout.EndHorizontal();
+                        playerFlash.sight = GUILayout.Toggle(playerFlash.sight, "使用瞄具");
+                        GUILayout.EndVertical();
                         GUILayout.EndVertical();
                         break;
-                    case 5:
+                    case 4:
+                        inventoryScroll =
+                            GUILayout.BeginScrollView(inventoryScroll, false, false, GUILayout.Height(600));
+                        for (var i = 0; i < inventory.bag.Count; i++)
+                        {
+                            GUILayout.BeginHorizontal();
+                            if (GUILayout.Button("·", GUILayout.ExpandWidth(false)))
+                            {
+                                inventory.selecting = i;
+                                inventory.subSelecting = 0;
+                                inventory.RebuildSubInventory();
+                            }
+                            GUILayout.Label($"{i} - {inventory.bag[i].GetName()}", GUILayout.ExpandWidth(true));
+                            if (i != 0 && GUILayout.Button("↑", GUILayout.ExpandWidth(false)))
+                            {
+                                var front = inventory.bag[i - 1];
+                                var behind = inventory.bag[i];
+                                inventory.bag[i - 1] = behind;
+                                inventory.bag[i] = front;
+                                inventory.RebuildSubInventory();
+                            }
+                            if (i != inventory.bag.Count - 1 && GUILayout.Button("↓", GUILayout.ExpandWidth(false)))
+                            {
+                                var front = inventory.bag[i];
+                                var behind = inventory.bag[i + 1];
+                                inventory.bag[i] = behind;
+                                inventory.bag[i + 1] = front;
+                                inventory.RebuildSubInventory();
+                            }
+                            if (GUILayout.Button("-", GUILayout.ExpandWidth(false)))
+                            {
+                                inventory.Remove(inventory.bag[i]);
+                                i--;
+                            }
+                            GUILayout.EndHorizontal();
+                        }
+                        GUILayout.EndScrollView();
+                        break;
+                    case 6:
                         GUILayout.BeginVertical("Box");
                         standOnly = GUILayout.Toggle(standOnly, "锁定玩家操作");
                         pause = GUILayout.Toggle(pause, "暂停");
@@ -337,7 +420,6 @@ namespace SubjectModel
                             Application.Quit();
 #endif
                         }
-
                         GUILayout.EndVertical();
                         break;
                 }
@@ -428,9 +510,68 @@ namespace SubjectModel
             GUILayout.EndHorizontal();
         }
 
-        private static int[] SplitTempleString(string temple)
+        private static IEnumerable<int> SplitTempleString(string temple)
         {
             return temple.Split(',').Select(int.Parse).ToArray();
+        }
+
+        private static void LoadModel()
+        {
+            var origin = new StringBuilder(File.ReadAllText(Path.Combine(Application.dataPath, "Firearms.json")));
+            origin.Replace("\n", "");
+            origin.Replace("\t", "");
+            var data = JsonConvert.DeserializeObject<GunData>(origin.ToString());
+            Test.FirearmTemples = data == null ? new List<FirearmTemple>() : data.firearmTemples;
+            Test.MagazineTemples = data == null ? new List<MagazineTemple>() : data.magazineTemples;
+            Test.BulletTemples = data == null ? new List<BulletTemple>() : data.bulletTemples;
+        }
+
+        private static void SaveModel()
+        {
+            var path = Path.Combine(Application.dataPath, "Firearms.json");
+            var backup = Path.Combine(Application.dataPath, "Firearms.bak");
+            if (File.Exists(path))
+            {
+                if (File.Exists(backup)) File.Delete(backup);
+                File.Move(path, backup);
+            }
+            var json = new StringBuilder(JsonConvert.SerializeObject(new GunData
+            {
+                firearmTemples = Test.FirearmTemples,
+                magazineTemples = Test.MagazineTemples,
+                bulletTemples = Test.BulletTemples
+            }));
+            var level = 0;
+            var check = true;
+            for (var i = 0; i < json.Length; i++)
+            {
+                if (json[i] == '"') check = !check;
+                if (check) switch (json[i])
+                {
+                    case '{':
+                    case '[':
+                        level++;
+                        for (var j = 0; j < level; j++) json.Insert(i + 1, "\t");
+                        json.Insert(i + 1, "\n");
+                        break;
+                    case ',':
+                        for (var j = 0; j < level; j++) json.Insert(i + 1, "\t");
+                        json.Insert(i + 1, "\n");
+                        break;
+                    case '}':
+                    case ']':
+                        level--;
+                        json.Insert(i, "\n");
+                        i++;
+                        for (var j = 0; j < level; j++)
+                        {
+                            json.Insert(i, "\t");
+                            i++;
+                        }
+                        break;
+                }
+            }
+            File.WriteAllText(path, json.ToString());
         }
     }
 }
