@@ -6,39 +6,9 @@ using UnityEngine;
 
 namespace SubjectModel
 {
-    public static class GunDictionary
-    {
-        /*
-        private static List<Firearm> defaultInventory;
-        
-        public static List<Firearm> GetDefaultInventory()
-        {
-            if (defaultInventory != null) return defaultInventory;
-            //defaultInventory = JsonUtility.FromJson<GunData>(Resources.Load<TextAsset>("Firearms").text).guns;
-            defaultInventory = new List<Firearm>();
-            var defaultFirearm = new Firearm("Debug Firearm");
-            defaultFirearm.AddComponent(new DebugComponent());
-            defaultInventory.Add(defaultFirearm);
-            return defaultInventory;
-        }
-        
-        [MenuItem("Data/Generate Firearms Data")]
-        private static void GenerateFirearmsData()
-        {
-            var data = new GunData
-            {
-                guns = new List<Gun>
-                {
-                    new Gun {name = "模板1", damage = 90f, loadingTime = .8f, clipCapacity = 4, clipSwitchTime = 5f}
-                }
-            };
-
-            var path = Path.Combine(Application.dataPath, "SubjectModel/Resources/Data/Firearms.json");
-            File.WriteAllText(path, JsonUtility.ToJson(data));
-        }
-        */
-    }
-
+    /*
+    new Gun {name = "模板1", damage = 90f, loadingTime = .8f, clipCapacity = 4, clipSwitchTime = 5f}
+    */
     [Serializable]
     public class FirearmTemple
     {

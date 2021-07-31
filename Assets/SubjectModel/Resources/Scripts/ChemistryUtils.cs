@@ -18,182 +18,214 @@ namespace SubjectModel
 
     public static class Elements
     {
-        private static readonly float[] DefaultParam = {1f, 1f};
+        //private static readonly float[] DefaultParam = {1f, 1f};
 
-        public static readonly Element H = new Element("H")
+        public static IList<Element> Dic; /* = new List<Element>
         {
-            valences = new[] {0, 1},
-            oxygenCount = new[]
+            new Element("H")
             {
-                new[] {.0f, .0f},
-                new[] {.0f, .5f}
+                valences = new[] {0, 1},
+                combination = new[]
+                {
+                    new[] {2f, .0f},
+                    new[] {2f, 1f}
+                },
+                potential = new[]
+                {
+                    new[] {.0f},
+                    new[] {.0f}
+                },
+                buffType = new[] {Buff.Empty, Buff.Corrosion},
+                buffParam = new[] {DefaultParam, new[] {0.25f, 400f}},
+                state = new[]
+                {
+                    new[] {Element.Gas, Element.Aqua},
+                    new[] {Element.Gas, Element.Aqua},
+                }
             },
-            potential = new[]
+
+            new Element("O")
             {
-                new[] {.0f},
-                new[] {.0f}
+                valences = new[] {-2, -1, 0},
+                combination = new[]
+                {
+                    new[] {-2f, -1f, 2f},
+                    new[] {-1f, -1f, 2f}
+                },
+                potential = new[]
+                {
+                    new[] {1.77f, 0.68f},
+                    new[] {0.87f, -0.08f}
+                },
+                buffType = new[] {Buff.Empty, Buff.Empty, Buff.Empty},
+                buffParam = new[] {DefaultParam, DefaultParam, DefaultParam},
+                state = new[]
+                {
+                    new[] {Element.Aqua, Element.Aqua, Element.Gas},
+                    new[] {Element.Aqua, Element.Aqua, Element.Gas},
+                }
             },
-            buffType = new[] {Buff.Empty, Buff.Corrosion},
-            buffParam = new[] {DefaultParam, new[] {0.25f, 400f}},
-            state = new[]
+
+            new Element("P")
             {
-                new[] {Element.Gas, Element.Aqua},
-                new[] {Element.Gas, Element.Aqua},
+                valences = new[] {-3, 3, 5},
+                combination = new[]
+                {
+                    new[] {-4f, 3f, 4f},
+                    new[] {-3f, 3f, 4f}
+                },
+                potential = new[]
+                {
+                    new[] {-0.565f, -0.276f},
+                    new[] {-2.6f, -1.05f}
+                },
+                buffType = new[] {Buff.Ghost, Buff.Empty, Buff.Empty},
+                buffParam = new[] {new[] {10f, 2f}, DefaultParam, DefaultParam},
+                state = new[]
+                {
+                    new[] {Element.Aqua, Element.Aqua, Element.Aqua},
+                    new[] {Element.Gas, Element.Aqua, Element.Aqua}
+                }
+            },
+
+            new Element("Cl")
+            {
+                valences = new[] {-1, 0},
+                combination = new[]
+                {
+                    new[] {.0f, 2f},
+                    new[] {.0f, 2f}
+                },
+                potential = new[]
+                {
+                    new[] {1.358f},
+                    new[] {1.358f}
+                },
+                buffType = new[] {Buff.Empty, Buff.Poison},
+                buffParam = new[] {DefaultParam, new[] {10f, 1f}},
+                state = new[]
+                {
+                    new[] {Element.Aqua, Element.Gas},
+                    new[] {Element.Aqua, Element.Gas},
+                }
+            },
+
+            new Element("K")
+            {
+                valences = new[] {1},
+                combination = new[]
+                {
+                    new[] {.0f},
+                    new[] {.0f}
+                },
+                potential = new[]
+                {
+                    new float[] { },
+                    new float[] { }
+                },
+                buffType = new[] {Buff.Empty},
+                buffParam = new[] {DefaultParam},
+                state = new[]
+                {
+                    new[] {Element.Aqua},
+                    new[] {Element.Aqua},
+                }
+            },
+
+            new Element("Mn")
+            {
+                valences = new[] {2, 4, 7},
+                combination = new[]
+                {
+                    new[] {.0f, 2f, 4f},
+                    new[] {1f, 2f, 4f}
+                },
+                potential = new[]
+                {
+                    new[] {1.23f, 1.70f},
+                    new[] {-0.05f, 0.59f}
+                },
+                buffType = new[] {Buff.Empty, Buff.Empty, Buff.Empty},
+                buffParam = new[] {DefaultParam, DefaultParam, DefaultParam},
+                state = new[]
+                {
+                    new[] {Element.Aqua, Element.Solid, Element.Aqua},
+                    new[] {Element.Solid, Element.Solid, Element.Aqua}
+                }
+            },
+
+            new Element("Fe")
+            {
+                valences = new[] {2, 3, 6},
+                combination = new[]
+                {
+                    new[] {.0f, .0f, 4f},
+                    new[] {1f, 1.5f, 4f}
+                },
+                potential = new[]
+                {
+                    new[] {0.771f, 2.2f},
+                    new[] {-0.56f, 0.72f}
+                },
+                buffType = new[] {Buff.Rapid, Buff.Slowness, Buff.Empty},
+                buffParam = new[] {new[] {3f, 3f}, new[] {3f, 3f}, DefaultParam},
+                state = new[]
+                {
+                    new[] {Element.Aqua, Element.Aqua, Element.Aqua},
+                    new[] {Element.Solid, Element.Solid, Element.Aqua}
+                }
+            },
+
+            new Element("Co")
+            {
+                valences = new[] {2, 3, 4},
+                combination = new[]
+                {
+                    new[] {.0f, .0f, 2f},
+                    new[] {1f, 1.5f, 2f}
+                },
+                potential = new[]
+                {
+                    new[] {1.82f, 1.416f},
+                    new[] {0.17f, 0.62f}
+                },
+                buffType = new[] {Buff.Curing, Buff.Empty, Buff.Empty},
+                buffParam = new[] {new[] {1f, 12.5f}, DefaultParam, DefaultParam},
+                state = new[]
+                {
+                    new[] {Element.Aqua, Element.Aqua, Element.Solid},
+                    new[] {Element.Solid, Element.Solid, Element.Solid}
+                }
+            },
+
+            new Element("Cu")
+            {
+                valences = new[] {2, 3},
+                combination = new[]
+                {
+                    new[] {.0f, 1F},
+                    new[] {1f, 2F}
+                },
+                potential = new[]
+                {
+                    new[] {1.8f},
+                    new[] {0.65f} // Off-standard
+                },
+                buffType = new[] {Buff.Poison, Buff.Empty},
+                buffParam = new[] {new[] {2f, 17.5f}, DefaultParam},
+                state = new[]
+                {
+                    new[] {Element.Aqua, Element.Aqua},
+                    new[] {Element.Solid, Element.Solid}
+                }
             }
         };
+        //*/
 
-        public static readonly Element O = new Element("O")
+        public static Element Get(string symbol)
         {
-            valences = new[] {-2, -1, 0},
-            oxygenCount = new[]
-            {
-                new[] {.0f, .0f, 1f},
-                new[] {.0f, .0f, 1f}
-            },
-            potential = new[]
-            {
-                new[] {1.77f, 0.68f},
-                new[] {0.87f, -0.08f}
-            },
-            buffType = new[] {Buff.Empty, Buff.Empty, Buff.Empty},
-            buffParam = new[] {DefaultParam, DefaultParam, DefaultParam},
-            state = new[]
-            {
-                new[] {Element.Aqua, Element.Aqua, Element.Gas},
-                new[] {Element.Aqua, Element.Aqua, Element.Gas},
-            }
-        };
-
-        public static readonly Element Cl = new Element("Cl")
-        {
-            valences = new[] {-1, 0},
-            oxygenCount = new[]
-            {
-                new[] {.0f, .0f},
-                new[] {.0f, .0f}
-            },
-            potential = new[]
-            {
-                new[] {1.358f},
-                new[] {1.358f}
-            },
-            buffType = new[] {Buff.Empty, Buff.Poison},
-            buffParam = new[] {DefaultParam, new[] {10f, 1f}},
-            state = new[]
-            {
-                new[] {Element.Aqua, Element.Gas},
-                new[] {Element.Aqua, Element.Gas},
-            }
-        };
-
-        public static readonly Element K = new Element("K")
-        {
-            valences = new[] {1},
-            oxygenCount = new[]
-            {
-                new[] {.0f, .0f}
-            },
-            potential = new[]
-            {
-                new float[] { },
-                new float[] { }
-            },
-            buffType = new[] {Buff.Empty},
-            buffParam = new[] {DefaultParam},
-            state = new[]
-            {
-                new[] {Element.Aqua},
-                new[] {Element.Aqua},
-            }
-        };
-
-        public static readonly Element Mn = new Element("Mn")
-        {
-            valences = new[] {2, 4, 7},
-            oxygenCount = new[]
-            {
-                new[] {.0f, 2f, 4f},
-                new[] {1f, 2f, 4f}
-            },
-            potential = new[]
-            {
-                new[] {1.23f, 1.70f},
-                new[] {-0.05f, 0.59f}
-            },
-            buffType = new[] {Buff.Empty, Buff.Empty, Buff.Empty},
-            buffParam = new[] {DefaultParam, DefaultParam, DefaultParam},
-            state = new[]
-            {
-                new[] {Element.Aqua, Element.Solid, Element.Aqua},
-                new[] {Element.Solid, Element.Solid, Element.Aqua}
-            }
-        };
-
-        public static readonly Element Fe = new Element("Fe")
-        {
-            valences = new[] {2, 3, 6},
-            oxygenCount = new[]
-            {
-                new[] {.0f, .0f, 4f},
-                new[] {1f, 1.5f, 4f}
-            },
-            potential = new[]
-            {
-                new[] {0.771f, 2.2f},
-                new[] {-0.56f, 0.72f}
-            },
-            buffType = new[] {Buff.Rapid, Buff.Slowness, Buff.Empty},
-            buffParam = new[] {new[] {3f, 3f}, new[] {3f, 3f}, DefaultParam},
-            state = new[]
-            {
-                new[] {Element.Aqua, Element.Aqua, Element.Aqua},
-                new[] {Element.Solid, Element.Solid, Element.Aqua}
-            }
-        };
-
-        public static readonly Element Co = new Element("Co")
-        {
-            valences = new[] {2, 3, 4},
-            oxygenCount = new[]
-            {
-                new[] {.0f, .0f, 2f},
-                new[] {1f, 1.5f, 2f}
-            },
-            potential = new[]
-            {
-                new[] {1.82f, 1.416f},
-                new[] {0.17f, 0.62f}
-            },
-            buffType = new[] {Buff.Curing, Buff.Empty, Buff.Empty},
-            buffParam = new[] {new[] {1f, 12.5f}, DefaultParam, DefaultParam},
-            state = new[]
-            {
-                new[] {Element.Aqua, Element.Aqua, Element.Solid},
-                new[] {Element.Solid, Element.Solid, Element.Solid}
-            }
-        };
-
-        public static readonly Element Cu = new Element("Cu")
-        {
-            valences = new[] {2, 3},
-            oxygenCount = new[]
-            {
-                new[] {.0f, 1F},
-                new[] {1f, 2F}
-            },
-            potential = new[]
-            {
-                new[] {1.8f},
-                new[] {0.65f} // Off-standard
-            },
-            buffType = new[] {Buff.Poison, Buff.Empty},
-            buffParam = new[] {new[] {2f, 17.5f}, DefaultParam},
-            state = new[]
-            {
-                new[] {Element.Aqua, Element.Aqua},
-                new[] {Element.Solid, Element.Solid}
-            }
-        };
+            return Dic.FirstOrDefault(e => e.symbol == symbol);
+        }
     }
 
     public static class DrugDictionary
@@ -253,6 +285,8 @@ namespace SubjectModel
 
     public class IonStack
     {
+        private const int MaxPartner = 10;
+
         public Element Element;
         public int Index;
         public float Amount;
@@ -261,15 +295,32 @@ namespace SubjectModel
 
         public string GetSymbol(int properties)
         {
-            var charge = Element.GetCharge(Index, properties);
+            if (Element.valences[Index] == 0)
+                return $"{Element.symbol}{Utils.ToInteger(Element.combination[properties][Index])}";
+            var fCombination = Element.combination[properties][Index];
+            var iPartner = FindPartner(fCombination);
+            var iCombination = Utils.ToInteger(fCombination * iPartner);
+            var partner = iPartner == 1 ? "" : iPartner.ToString();
+            var combination = iCombination == 1 ? "" : iCombination.ToString();
+            var charge = Element.GetCharge(Index, properties) * iPartner;
             var chargeStr = charge == 0
                 ? ""
                 : Math.Abs(charge) == 1
                     ? $"{(charge >= 0 ? "+" : "-")}"
-                    : $"{Math.Abs(charge).ToString()}{(charge >= 0 ? "+" : "-")}";
-            return Element.oxygenCount[properties][Index] < .5f
-                ? $"{Element.symbol}{chargeStr}"
-                : $"{Element.symbol}O{Element.oxygenCount[properties][Index]} {chargeStr}";
+                    : $"{Math.Abs(charge)}{(charge >= 0 ? "+" : "-")}";
+            return iCombination == 0
+                ? $"{Element.symbol} {chargeStr}"
+                : fCombination > .0f
+                    ? $"{Element.symbol}{partner}O{combination} {chargeStr}"
+                    : $"{Element.symbol}{partner}H{combination} {chargeStr}";
+        }
+
+        private static int FindPartner(float num)
+        {
+            for (var i = 1; i < MaxPartner; i++)
+                if (Utils.IsInteger(num * i))
+                    return i;
+            return 1;
         }
     }
 
@@ -490,7 +541,7 @@ namespace SubjectModel
         public string symbol;
         public int[] valences;
         public float[][] potential;
-        public float[][] oxygenCount;
+        public float[][] combination;
         public Buff[] buffType;
         public float[][] buffParam;
         public int[][] state;
@@ -527,28 +578,10 @@ namespace SubjectModel
             return CanBeOxidized(index);
         }
 
-        /*
-        public bool GetOxidizedPotentialWithNernst(int index, float pH, out float p)
-        {
-            var result = GetOxidizedPotential(index, out p);
-            if (result)
-                p += 0.5916f / (valences[index + 1] - valences[index]) * (-pH) *
-                     (GetOxygenCount(index + 1, pH) - GetOxygenCount(index, pH)) * 2;
-            return result;
-        }
-        */
-
         public bool GetReducedPotential(int index, int properties, out float p)
         {
             return GetOxidizedPotential(index - 1, properties, out p);
         }
-
-        /*
-        public bool GetReducedPotentialWithNernst(int index, float pH, out float p)
-        {
-            return GetOxidizedPotentialWithNernst(index - 1, pH, out p);
-        }
-        */
 
         public float GetOxidizedCoefficient(int index)
         {
@@ -560,14 +593,12 @@ namespace SubjectModel
             return valences[index] - valences[index - 1];
         }
 
-        public float GetOxygenCount(int index, int properties)
-        {
-            return oxygenCount[properties][index];
-        }
-
         public int GetCharge(int index, int properties)
         {
-            return valences[index] - (int) (GetOxygenCount(index, properties) * 2f);
+            var c = combination[properties][index];
+            return c > .0f
+                ? valences[index] - Utils.ToInteger(c * 2f)
+                : valences[index] + Utils.ToInteger(c);
         }
     }
 }

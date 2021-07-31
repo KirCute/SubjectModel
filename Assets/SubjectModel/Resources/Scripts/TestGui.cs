@@ -44,6 +44,16 @@ namespace SubjectModel
         private string mdc;
         private string tdc;
         private string mdp;
+        private string drugTag;
+        private string properties;
+        private string drugCount;
+        private IList<IonStack> ions;
+        private Vector2 ionsScroll;
+        private string element;
+        private string valence;
+        private string amount;
+        private string concentration;
+        private string chemicalBullet;
 
         private string firearmName;
         private string damage;
@@ -88,11 +98,6 @@ namespace SubjectModel
         private bool standOnlyInvoke;
         private bool pause;
 
-        private void Awake()
-        { 
-            LoadModel();
-        }
-
         private void Start()
         {
             selected = 5;
@@ -110,19 +115,21 @@ namespace SubjectModel
             speedUpdate = false;
             defence = playerVariables.declarations.Get("Defence").ToString();
             defenceUpdate = false;
-            speed = playerVariables.declarations.Get("FirearmSpeed").ToString();
-            speedUpdate = false;
+            firearmSpeed = playerVariables.declarations.Get("FirearmSpeed").ToString();
+            firearmSpeedUpdate = false;
             bossSpawner = GameObject.FindWithTag("BossSpawner").GetComponent<BossSpawner>();
-            bossHealth = bossSpawner.bossHealth.ToString();
-            bossSpeed = bossSpawner.bossSpeed.ToString();
-            bossDefence = bossSpawner.bossDefence.ToString();
-            firearmScroll = new Vector2(0f, 0f);
-            magazineScroll = new Vector2(0f, 0f);
-            bulletScroll = new Vector2(0f, 0f);
-            mdc = BuffRenderer.MotiveDamageCoefficient.ToString();
-            tdc = BuffRenderer.ThermalDamageCoefficient.ToString();
-            mdp = BuffRenderer.MinimumDamagePotential.ToString();
-            inventoryScroll = new Vector2(0f, 0f);
+            bossHealth = $"{bossSpawner.bossHealth}";
+            bossSpeed = $"{bossSpawner.bossSpeed}";
+            bossDefence = $"{bossSpawner.bossDefence}";
+            firearmScroll = Vector2.zero;
+            magazineScroll = Vector2.zero;
+            bulletScroll = Vector2.zero;
+            mdc = $"{BuffRenderer.MotiveDamageCoefficient}";
+            tdc = $"{BuffRenderer.ThermalDamageCoefficient}";
+            mdp = $"{BuffRenderer.MinimumDamagePotential}";
+            ions = new List<IonStack>();
+            ionsScroll = Vector2.zero;
+            inventoryScroll = Vector2.zero;
             standOnly = false;
             standOnlyInvoke = false;
             pause = false;
@@ -188,6 +195,78 @@ namespace SubjectModel
                         AutoAdjustString("动力伤害系数", ref mdc);
                         AutoAdjustString("热力伤害系数", ref tdc);
                         AutoAdjustString("最小热力伤害电势差", ref mdp);
+                        GUILayout.BeginVertical("Box");
+                        GUILayout.Label("炼金术物品栏");
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Label("玻封    标签：", GUILayout.ExpandWidth(false));
+                        drugTag = GUILayout.TextField(drugTag, GUILayout.ExpandWidth(true));
+                        GUILayout.Label("酸碱性：", GUILayout.ExpandWidth(false));
+                        properties = GUILayout.TextField(properties, GUILayout.ExpandWidth(true));
+                        GUILayout.Label("数量：", GUILayout.ExpandWidth(false));
+                        drugCount = GUILayout.TextField(drugCount, GUILayout.ExpandWidth(true));
+                        if (GUILayout.Button("+", GUILayout.ExpandWidth(false)) && ions.Count != 0)
+                        {
+                            inventory.Add(new DrugStack(drugTag, ions, int.Parse(properties), int.Parse(drugCount)));
+                            ions = new List<IonStack>();
+                        }
+
+                        GUILayout.EndHorizontal();
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Label("子弹    子弹外壳ID:", GUILayout.ExpandWidth(false));
+                        chemicalBullet = GUILayout.TextField(chemicalBullet, GUILayout.ExpandWidth(true));
+                        if (GUILayout.Button("+", GUILayout.ExpandWidth(false)) && ions.Count != 0)
+                        {
+                            inventory.Add(new Bullet(Test.BulletTemples[int.Parse(chemicalBullet)],
+                                int.Parse(drugCount),
+                                new DrugStack(drugTag, ions, int.Parse(properties), int.Parse(drugCount))));
+                            ions = new List<IonStack>();
+                        }
+
+                        GUILayout.EndHorizontal();
+                        GUILayout.Label("成分：");
+                        ionsScroll = GUILayout.BeginScrollView(ionsScroll, false, false, GUILayout.Height(100));
+                        for (var i = 0; i < ions.Count; i++)
+                        {
+                            GUILayout.BeginHorizontal("Box");
+                            GUILayout.Label(ions[i].Element.symbol);
+                            var v = ions[i].Element.valences[ions[i].Index];
+                            GUILayout.Label($"{(v > 0 ? "+" : "")}{v}");
+                            GUILayout.Label($"{ions[i].Amount} mol");
+                            GUILayout.Label($"{ions[i].Concentration} mol/L");
+                            if (GUILayout.Button("-", GUILayout.ExpandWidth(false)))
+                            {
+                                ions.RemoveAt(i);
+                                i--;
+                            }
+
+                            GUILayout.EndHorizontal();
+                        }
+
+                        GUILayout.EndScrollView();
+                        GUILayout.BeginHorizontal("Box");
+                        GUILayout.Label("添加成分    元素：", GUILayout.ExpandWidth(false));
+                        element = GUILayout.TextField(element, GUILayout.ExpandWidth(true));
+                        GUILayout.Label("价态：", GUILayout.ExpandWidth(false));
+                        valence = GUILayout.TextField(valence, GUILayout.ExpandWidth(true));
+                        GUILayout.Label("物质的量：", GUILayout.ExpandWidth(false));
+                        amount = GUILayout.TextField(amount, GUILayout.ExpandWidth(true));
+                        GUILayout.Label("浓度：", GUILayout.ExpandWidth(false));
+                        concentration = GUILayout.TextField(concentration, GUILayout.ExpandWidth(true));
+                        if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
+                        {
+                            var e = Elements.Dic.FirstOrDefault(item =>
+                                string.Equals(element, item.symbol, StringComparison.CurrentCultureIgnoreCase));
+                            var v = int.Parse(valence);
+                            if (e != null && e.HasValence(v))
+                                ions.Add(new IonStack
+                                {
+                                    Element = e, Index = e.GetIndex(v),
+                                    Amount = float.Parse(amount), Concentration = float.Parse(concentration)
+                                });
+                        }
+
+                        GUILayout.EndHorizontal();
+                        GUILayout.EndVertical();
                         break;
                     case 3:
                         GUILayout.BeginVertical();
@@ -198,11 +277,11 @@ namespace SubjectModel
                         {
                             GUILayout.BeginHorizontal("Box");
                             GUILayout.Label($"{i} - {Test.FirearmTemples[i].Name}");
-                            GUILayout.Label(Test.FirearmTemples[i].Damage.ToString());
-                            GUILayout.Label(Test.FirearmTemples[i].Depth.ToString());
+                            GUILayout.Label($"{Test.FirearmTemples[i].Damage}");
+                            GUILayout.Label($"{Test.FirearmTemples[i].Depth}");
                             GUILayout.Label($"{Test.FirearmTemples[i].Loading}({Test.FirearmTemples[i].Reload})");
                             GUILayout.Label($"{Test.FirearmTemples[i].Deviation}({Test.FirearmTemples[i].MaxRange})");
-                            GUILayout.Label(Test.FirearmTemples[i].Weight.ToString());
+                            GUILayout.Label($"{Test.FirearmTemples[i].Weight}");
                             if (GUILayout.Button("-", GUILayout.ExpandWidth(false)))
                             {
                                 Test.FirearmTemples.RemoveAt(i);
@@ -211,6 +290,7 @@ namespace SubjectModel
 
                             GUILayout.EndHorizontal();
                         }
+
                         GUILayout.EndScrollView();
                         GUILayout.BeginVertical("Box");
                         GUILayout.BeginHorizontal();
@@ -261,7 +341,7 @@ namespace SubjectModel
                             GUILayout.Label($"{i} - {Test.MagazineTemples[i].Name}");
                             GUILayout.Label(Test.MagazineTemples[i].BulletContains.ToString());
                             GUILayout.Label($"{Test.MagazineTemples[i].Radius}*{Test.MagazineTemples[i].Length}");
-                            GUILayout.Label(Test.MagazineTemples[i].Weight.ToString());
+                            GUILayout.Label($"{Test.MagazineTemples[i].Weight}");
                             if (GUILayout.Button("-", GUILayout.ExpandWidth(false)))
                             {
                                 Test.MagazineTemples.RemoveAt(i);
@@ -270,6 +350,7 @@ namespace SubjectModel
 
                             GUILayout.EndHorizontal();
                         }
+
                         GUILayout.EndScrollView();
                         GUILayout.BeginHorizontal("Box");
                         GUILayout.Label("名称：", GUILayout.ExpandWidth(false));
@@ -306,6 +387,7 @@ namespace SubjectModel
 
                             GUILayout.EndHorizontal();
                         }
+
                         GUILayout.EndScrollView();
                         GUILayout.BeginVertical("Box");
                         GUILayout.BeginHorizontal();
@@ -317,6 +399,10 @@ namespace SubjectModel
                         bulletExplode = GUILayout.TextField(bulletExplode, GUILayout.ExpandWidth(true));
                         GUILayout.Label("穿深：", GUILayout.ExpandWidth(false));
                         bulletDepth = GUILayout.TextField(bulletDepth, GUILayout.ExpandWidth(true));
+                        if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
+                            Test.BulletTemples.Add(new BulletTemple(bulletName, float.Parse(bulletBreak),
+                                float.Parse(bulletExplode), float.Parse(bulletDepth), float.Parse(bulletMinDefence),
+                                float.Parse(bulletRadius), float.Parse(bulletLength)));
                         GUILayout.EndHorizontal();
                         GUILayout.BeginHorizontal();
                         GUILayout.Label("过穿防御：", GUILayout.ExpandWidth(false));
@@ -325,10 +411,6 @@ namespace SubjectModel
                         bulletRadius = GUILayout.TextField(bulletRadius, GUILayout.ExpandWidth(true));
                         GUILayout.Label("长度：", GUILayout.ExpandWidth(false));
                         bulletLength = GUILayout.TextField(bulletLength, GUILayout.ExpandWidth(true));
-                        if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
-                            Test.BulletTemples.Add(new BulletTemple(bulletName, float.Parse(bulletBreak),
-                                float.Parse(bulletExplode), float.Parse(bulletDepth), float.Parse(bulletMinDefence),
-                                float.Parse(bulletRadius), float.Parse(bulletLength)));
                         GUILayout.EndHorizontal();
                         GUILayout.EndVertical();
                         GUILayout.EndVertical();
@@ -347,6 +429,7 @@ namespace SubjectModel
                             var index = int.Parse(magazine);
                             inventory.Add(new Magazine(Test.MagazineTemples[index]));
                         }
+
                         GUILayout.EndHorizontal();
                         GUILayout.BeginHorizontal();
                         GUILayout.Label("子弹物品栏    ID：", GUILayout.ExpandWidth(false));
@@ -359,12 +442,12 @@ namespace SubjectModel
                             var count = int.Parse(bulletCount);
                             inventory.Add(new Bullet(Test.BulletTemples[index], count));
                         }
+
                         GUILayout.EndHorizontal();
                         GUILayout.EndVertical();
                         GUILayout.BeginVertical("Box");
                         GUILayout.BeginHorizontal();
-                        //if (GUILayout.Button("重新加载模板数据")) LoadModel();
-                        if (GUILayout.Button("保存模板数据")) SaveModel();
+                        if (GUILayout.Button("保存模板数据")) SaveFirearmsModel();
                         GUILayout.EndHorizontal();
                         playerFlash.sight = GUILayout.Toggle(playerFlash.sight, "使用瞄具");
                         GUILayout.EndVertical();
@@ -382,6 +465,7 @@ namespace SubjectModel
                                 inventory.subSelecting = 0;
                                 inventory.RebuildSubInventory();
                             }
+
                             GUILayout.Label($"{i} - {inventory.bag[i].GetName()}", GUILayout.ExpandWidth(true));
                             if (i != 0 && GUILayout.Button("↑", GUILayout.ExpandWidth(false)))
                             {
@@ -391,6 +475,7 @@ namespace SubjectModel
                                 inventory.bag[i] = front;
                                 inventory.RebuildSubInventory();
                             }
+
                             if (i != inventory.bag.Count - 1 && GUILayout.Button("↓", GUILayout.ExpandWidth(false)))
                             {
                                 var front = inventory.bag[i];
@@ -399,13 +484,16 @@ namespace SubjectModel
                                 inventory.bag[i + 1] = front;
                                 inventory.RebuildSubInventory();
                             }
+
                             if (GUILayout.Button("-", GUILayout.ExpandWidth(false)))
                             {
                                 inventory.Remove(inventory.bag[i]);
                                 i--;
                             }
+
                             GUILayout.EndHorizontal();
                         }
+
                         GUILayout.EndScrollView();
                         break;
                     case 6:
@@ -420,6 +508,7 @@ namespace SubjectModel
                             Application.Quit();
 #endif
                         }
+
                         GUILayout.EndVertical();
                         break;
                 }
@@ -484,7 +573,7 @@ namespace SubjectModel
             value = GUILayout.TextField(value, GUILayout.ExpandWidth(true));
             if (GUILayout.Button("生效", GUILayout.ExpandWidth(false))) target = float.Parse(value);
             update = GUILayout.Toggle(update, "实时更新", GUILayout.ExpandWidth(false));
-            if (update) value = target.ToString();
+            if (update) value = $"{target}";
             GUILayout.EndHorizontal();
         }
 
@@ -502,8 +591,8 @@ namespace SubjectModel
         {
             GUILayout.BeginHorizontal("Box");
             GUILayout.Label(text, GUILayout.ExpandWidth(false));
-            value = GUILayout.HorizontalSlider(value, .0f, max, GUILayout.MinWidth(100));
-            GUILayout.Label(Math.Round(value).ToString());
+            value = GUILayout.HorizontalSlider(value, .0f, max, GUILayout.MinWidth(260));
+            GUILayout.Label($"{value:F2}");
             if (GUILayout.Button("生效", GUILayout.ExpandWidth(false))) target = value;
             update = GUILayout.Toggle(update, "实时更新", GUILayout.ExpandWidth(false));
             if (update) value = target;
@@ -515,18 +604,7 @@ namespace SubjectModel
             return temple.Split(',').Select(int.Parse).ToArray();
         }
 
-        private static void LoadModel()
-        {
-            var origin = new StringBuilder(File.ReadAllText(Path.Combine(Application.dataPath, "Firearms.json")));
-            origin.Replace("\n", "");
-            origin.Replace("\t", "");
-            var data = JsonConvert.DeserializeObject<GunData>(origin.ToString());
-            Test.FirearmTemples = data == null ? new List<FirearmTemple>() : data.firearmTemples;
-            Test.MagazineTemples = data == null ? new List<MagazineTemple>() : data.magazineTemples;
-            Test.BulletTemples = data == null ? new List<BulletTemple>() : data.bulletTemples;
-        }
-
-        private static void SaveModel()
+        private static void SaveFirearmsModel()
         {
             var path = Path.Combine(Application.dataPath, "Firearms.json");
             var backup = Path.Combine(Application.dataPath, "Firearms.bak");
@@ -535,6 +613,7 @@ namespace SubjectModel
                 if (File.Exists(backup)) File.Delete(backup);
                 File.Move(path, backup);
             }
+
             var json = new StringBuilder(JsonConvert.SerializeObject(new GunData
             {
                 firearmTemples = Test.FirearmTemples,
@@ -546,31 +625,34 @@ namespace SubjectModel
             for (var i = 0; i < json.Length; i++)
             {
                 if (json[i] == '"') check = !check;
-                if (check) switch (json[i])
-                {
-                    case '{':
-                    case '[':
-                        level++;
-                        for (var j = 0; j < level; j++) json.Insert(i + 1, "\t");
-                        json.Insert(i + 1, "\n");
-                        break;
-                    case ',':
-                        for (var j = 0; j < level; j++) json.Insert(i + 1, "\t");
-                        json.Insert(i + 1, "\n");
-                        break;
-                    case '}':
-                    case ']':
-                        level--;
-                        json.Insert(i, "\n");
-                        i++;
-                        for (var j = 0; j < level; j++)
-                        {
-                            json.Insert(i, "\t");
+                if (check)
+                    switch (json[i])
+                    {
+                        case '{':
+                        case '[':
+                            level++;
+                            for (var j = 0; j < level; j++) json.Insert(i + 1, "\t");
+                            json.Insert(i + 1, "\n");
+                            break;
+                        case ',':
+                            for (var j = 0; j < level; j++) json.Insert(i + 1, "\t");
+                            json.Insert(i + 1, "\n");
+                            break;
+                        case '}':
+                        case ']':
+                            level--;
+                            json.Insert(i, "\n");
                             i++;
-                        }
-                        break;
-                }
+                            for (var j = 0; j < level; j++)
+                            {
+                                json.Insert(i, "\t");
+                                i++;
+                            }
+
+                            break;
+                    }
             }
+
             File.WriteAllText(path, json.ToString());
         }
     }

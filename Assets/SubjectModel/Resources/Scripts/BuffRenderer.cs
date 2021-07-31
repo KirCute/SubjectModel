@@ -92,7 +92,7 @@ namespace SubjectModel
         {
             for (var i = 0; i < stain.Count; i++)
                 if (stain[i].Amount < .1f ||
-                    (stain[i].Element == Elements.O && stain[i].Index == 0))
+                    (stain[i].Element == Elements.Get("O") && stain[i].Index == 0))
                 {
                     Remove(stain[i]);
                     i--;
@@ -233,12 +233,25 @@ namespace SubjectModel
             Cleanup();
         }
 
+        private void DoubleReplace(int properties)
+        {
+            for (var i = 0; i < stain.Count; i++)
+            {
+                if (stain[i].Element.state[properties][stain[i].Index] == Element.Aqua) continue;
+                var stack = stain[i];
+                Remove(stack);
+                i--;
+                Insert(stack, properties);
+            }
+        }
+
         public void Register(DrugStack drug)
         {
             foreach (var ion in drug.Ions)
             {
                 Insert(ion, drug.Properties);
                 React(drug.Properties);
+                DoubleReplace(drug.Properties);
             }
         }
     }

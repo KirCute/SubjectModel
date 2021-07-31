@@ -105,5 +105,20 @@ namespace SubjectModel
             var origin = LengthenVector(reference - focus, magnitude);
             return GetRotatedVector(origin, radian) + focus;
         }
+
+        public static bool IsInteger(float num)
+        {
+            num = Math.Abs(num);
+            var floor = Math.Floor(num);
+            return num - floor < .1 || floor + 1.0 - num < .1;
+        }
+
+        public static int ToInteger(float num)
+        {
+            num = Math.Abs(num);
+            var floor = Math.Floor(num);
+            if (num - floor < .5f) return (int) floor;
+            return (int) floor + 1;
+        }
     }
 }

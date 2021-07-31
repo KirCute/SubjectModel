@@ -145,13 +145,15 @@ namespace SubjectModel
 
         public class PIII : RemainingBuff
         {
+            private const float RatioSecToHealth = .05f;
+            
             private float reserveHealth;
-            private float healthLost;
+            private readonly float healthLost;
 
-            public PIII(float remain, float lostPerSec, float lostPerHealth) : base(remain, lostPerSec)
+            public PIII(float remain, float lostPerSec) : base(remain, lostPerSec)
             {
                 reserveHealth = .0f;
-                healthLost = lostPerHealth;
+                healthLost = lostPerSec * RatioSecToHealth;
             }
 
             public override void UpdateAfterDelay(GameObject host)
