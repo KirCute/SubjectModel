@@ -146,7 +146,7 @@ namespace SubjectModel.Scripts.Chemistry
         public class PIII : RemainingBuff
         {
             private const float RatioSecToHealth = .05f;
-            
+
             private float reserveHealth;
             private readonly float healthLost;
 

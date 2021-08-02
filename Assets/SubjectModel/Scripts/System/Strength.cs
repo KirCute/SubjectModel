@@ -22,8 +22,9 @@ namespace SubjectModel.Scripts.System
             var max = variables.declarations.Get<float>("Energy");
             strength += RecoverSpeed * Time.deltaTime;
             if (strength > max) strength = max;
-            var speed = strength >= variables.declarations.Get<float>("RunnableStrength") 
-                ? runSpeed : 1.0f;
+            var speed = strength >= variables.declarations.Get<float>("RunnableStrength")
+                ? runSpeed
+                : 1.0f;
             variables.declarations.Set("RunSpeed", speed);
             if (variables.declarations.Get<bool>("Running") && speed > 1.0f &&
                 GetComponent<Rigidbody2D>().velocity != Vector2.zero) strength -= CostWhenRunning * Time.deltaTime;

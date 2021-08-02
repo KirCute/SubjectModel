@@ -5,7 +5,7 @@ namespace SubjectModel.Scripts.Firearms
     public class GunFlash : MonoBehaviour
     {
         private const float StartRange = 0.18f;
-        private static readonly LayerMask ShootMask = 1 << 3 | 1 << 6;
+        private static readonly LayerMask ShootMask = 1 << 3 | 1 << 6 | 1 << 8;
 
         private static readonly Pair<Color> SightLineColor = new Pair<Color>()
             {First = new Vector4(.0f, .0f, 1f, .0f), Second = new Vector4(.0f, .0f, 1f, .5f)};

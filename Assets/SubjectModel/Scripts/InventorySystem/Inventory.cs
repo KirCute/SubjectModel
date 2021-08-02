@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Bolt;
@@ -6,65 +5,6 @@ using UnityEngine;
 
 namespace SubjectModel.Scripts.InventorySystem
 {
-    public interface IItemStack
-    {
-        public string GetName();
-        public void OnMasterUseKeep(GameObject user, Vector2 pos);
-        public void OnMasterUseOnce(GameObject user, Vector2 pos);
-        public void OnSlaveUseKeep(GameObject user);
-        public void OnSlaveUseOnce(GameObject user);
-        public void Selecting(GameObject user);
-        public void OnSelected(GameObject user);
-        public void LoseSelected(GameObject user);
-        public int GetCount();
-        public bool CanMerge(IItemStack item);
-        public void Merge(IItemStack item);
-        public IItemStack Fetch(int count);
-        public Func<IItemStack, bool> SubInventory();
-    }
-
-    public abstract class Material : IItemStack
-    {
-        public abstract string GetName();
-        public abstract int GetCount();
-        public abstract IItemStack Fetch(int count);
-        public abstract bool CanMerge(IItemStack item);
-        public abstract void Merge(IItemStack item);
-
-        public void OnMasterUseKeep(GameObject user, Vector2 pos)
-        {
-        }
-
-        public void OnMasterUseOnce(GameObject user, Vector2 pos)
-        {
-        }
-
-        public void OnSlaveUseKeep(GameObject user)
-        {
-        }
-
-        public void OnSlaveUseOnce(GameObject user)
-        {
-        }
-
-        public void Selecting(GameObject user)
-        {
-        }
-
-        public void OnSelected(GameObject user)
-        {
-        }
-
-        public void LoseSelected(GameObject user)
-        {
-        }
-
-        public Func<IItemStack, bool> SubInventory()
-        {
-            return item => false;
-        }
-    }
-
     [RequireComponent(typeof(Variables))]
     public class Inventory : MonoBehaviour
     {
@@ -112,13 +52,8 @@ namespace SubjectModel.Scripts.InventorySystem
         public void Add(IItemStack item)
         {
             bag.Add(item);
-            if (bag.Contains.Count == 1)
-            {
-                bag.Contains[selecting].OnSelected(gameObject);
-                foreach (var i in bag.Contains.Where(bag.Contains[selecting].SubInventory())) sub.Add(i);
-            }
-
-            if (bag.Contains[selecting].SubInventory()(item)) sub.Add(item);
+            if (bag.Contains.Count == 1) bag.Contains[selecting].OnSelected(gameObject);
+            else if (bag.Contains[selecting].SubInventory()(item)) RebuildSubInventory();
         }
 
         public bool TryGetSubItem(out IItemStack item)
@@ -168,50 +103,6 @@ namespace SubjectModel.Scripts.InventorySystem
             if (selecting >= bag.Contains.Count) return;
             sub.Contains.Clear();
             foreach (var item in bag.Contains.Where(bag.Contains[selecting].SubInventory())) sub.Add(item);
-        }
-    }
-
-    public class Container
-    {
-        public readonly IList<IItemStack> Contains;
-
-        public Container(IList<IItemStack> contains)
-        {
-            Contains = contains;
-        }
-
-        public bool Remove(IItemStack item)
-        {
-            if (item == null) return true;
-            return Contains.Contains(item) && Contains.Remove(item);
-        }
-
-        public void Add(IItemStack item)
-        {
-            if (item == null) return;
-            foreach (var i in Contains)
-            {
-                if (!i.CanMerge(item)) continue;
-                i.Merge(item);
-                return;
-            }
-
-            Contains.Add(item);
-        }
-
-        public void Cleanup()
-        {
-            Cleanup(item => Remove(item));
-        }
-
-        public void Cleanup(Action<IItemStack> action)
-        {
-            for (var i = 0; i < Contains.Count; i++)
-                if (Contains[i].GetCount() <= 0)
-                {
-                    action(Contains[i]);
-                    i--;
-                }
         }
     }
 }

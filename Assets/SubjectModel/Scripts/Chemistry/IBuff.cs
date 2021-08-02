@@ -2,6 +2,17 @@ using UnityEngine;
 
 namespace SubjectModel.Scripts.Chemistry
 {
+    public enum Buff
+    {
+        Empty,
+        Slowness,
+        Poison,
+        Curing,
+        Ghost,
+        Corrosion,
+        Rapid
+    }
+
     public interface IBuff
     {
         void Appear(GameObject host);
