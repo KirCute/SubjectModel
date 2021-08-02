@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -15,6 +16,11 @@ namespace SubjectModel.Scripts.System
             //SaveElementsModel();
             LoadElementsModel();
             LoadFirearmsModel();
+        }
+
+        private void Start()
+        {
+            Test.GenerateContainerData();
         }
 
         private static void LoadFirearmsModel()

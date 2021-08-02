@@ -7,11 +7,11 @@ namespace SubjectModel.Scripts.Chemistry
     [RequireComponent(typeof(SpriteRenderer))]
     public class BuffInvoker : MonoBehaviour
     {
-        public const float StartRange = 0.18f;
-        public const float SelfAttackRange = 0.25f;
-        public const float StartColorAlpha = 0.5f;
-        public const float DefaultKeepTime = 0.2f;
-        public const float MaxDistance = 3f;
+        private const float StartRange = 0.18f;
+        private const float SelfAttackRange = 0.25f;
+        private const float StartColorAlpha = 0.5f;
+        private const float DefaultKeepTime = 0.2f;
+        private const float MaxDistance = 3f;
         private static readonly LayerMask DrugMask = 1 << 3 | 1 << 6;
 
         private float aliveTime;

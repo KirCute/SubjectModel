@@ -28,23 +28,23 @@ namespace SubjectModel.Scripts.InventorySystem
 
         private void Update()
         {
-            previous.text = inventory.selecting == 0 ? "" : inventory.bag[inventory.selecting - 1].GetName();
-            next.text = inventory.selecting >= inventory.bag.Count - 1
+            previous.text = inventory.selecting == 0 ? "" : inventory.bag.Contains[inventory.selecting - 1].GetName();
+            next.text = inventory.selecting >= inventory.bag.Contains.Count - 1
                 ? ""
-                : inventory.bag[inventory.selecting + 1].GetName();
-            selected.text = inventory.bag.Count > inventory.selecting
-                ? inventory.bag[inventory.selecting].GetName()
+                : inventory.bag.Contains[inventory.selecting + 1].GetName();
+            selected.text = inventory.bag.Contains.Count > inventory.selecting
+                ? inventory.bag.Contains[inventory.selecting].GetName()
                 : "";
-            sub.text = inventory.sub.Count == 0 ? "" : BuildSubString();
+            sub.text = inventory.sub.Contains.Count == 0 ? "" : BuildSubString();
         }
 
         private string BuildSubString()
         {
             var sb = new StringBuilder();
-            for (var i = inventory.sub.Count - 1; i >= 0; i--)
+            for (var i = inventory.sub.Contains.Count - 1; i >= 0; i--)
             {
                 sb.Append(inventory.subSelecting == i ? "> " : "  ");
-                sb.Append(inventory.sub[i].GetName());
+                sb.Append(inventory.sub.Contains[i].GetName());
                 sb.Append("\n");
             }
 

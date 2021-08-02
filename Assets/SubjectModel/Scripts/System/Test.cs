@@ -2,6 +2,7 @@
 using SubjectModel.Scripts.Chemistry;
 using SubjectModel.Scripts.Firearms;
 using SubjectModel.Scripts.InventorySystem;
+using UnityEngine;
 
 namespace SubjectModel.Scripts.System
 {
@@ -272,6 +273,26 @@ namespace SubjectModel.Scripts.System
                 Element.Acid,
                 10000
             ));
+        }
+
+        public static void GenerateContainerData()
+        {
+            foreach (var container in GameObject.FindGameObjectsWithTag("Container"))
+            {
+                switch (container.name)
+                {
+                    case "PhysicsAntiArmor":
+                        break;
+                    case "PhysicsAntiBody":
+                        break;
+                    case "Poison":
+                        break;
+                    case "Reaction":
+                        break;
+                    case "Suicide":
+                        break;
+                }
+            }
         }
     }
 }

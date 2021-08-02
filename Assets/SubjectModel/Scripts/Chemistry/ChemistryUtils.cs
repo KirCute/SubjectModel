@@ -381,33 +381,25 @@ namespace SubjectModel.Scripts.Chemistry
             return $"{Tag}({count})";
         }
 
-        public void OnMouseClickLeft(GameObject user, Vector2 pos)
+        public void OnMasterUseKeep(GameObject user, Vector2 pos)
         {
         }
 
-        public void OnMouseClickRight(GameObject user, Vector2 pos)
-        {
-        }
-
-        public void OnMouseClickLeftDown(GameObject user, Vector2 pos)
+        public void OnMasterUseOnce(GameObject user, Vector2 pos)
         {
             if (Camera.main == null) return;
             BuffInvoker.InvokeByThrower(this, pos, user.GetComponent<Rigidbody2D>().position);
         }
 
-        public void OnMouseClickRightDown(GameObject user, Vector2 pos)
+        public void OnSlaveUseKeep(GameObject user)
+        {
+        }
+
+        public void OnSlaveUseOnce(GameObject user)
         {
             if (Camera.main == null) return;
             BuffInvoker.InvokeByThrower(this, user.GetComponent<Rigidbody2D>().position,
                 user.GetComponent<Rigidbody2D>().position);
-        }
-
-        public void OnMouseClickLeftUp(GameObject user, Vector2 pos)
-        {
-        }
-
-        public void OnMouseClickRightUp(GameObject user, Vector2 pos)
-        {
         }
 
         public void Selecting(GameObject user)
@@ -458,40 +450,28 @@ namespace SubjectModel.Scripts.Chemistry
             return "弹弓";
         }
 
-        public void OnMouseClickLeft(GameObject user, Vector2 pos)
+        public void OnMasterUseKeep(GameObject user, Vector2 pos)
         {
             if (!user.GetComponent<Inventory>().TryGetSubItem(out var stone)) return;
-            stone.OnMouseClickLeft(user, pos);
+            stone.OnMasterUseKeep(user, pos);
         }
 
-        public void OnMouseClickRight(GameObject user, Vector2 pos)
+        public void OnMasterUseOnce(GameObject user, Vector2 pos)
         {
             if (!user.GetComponent<Inventory>().TryGetSubItem(out var stone)) return;
-            stone.OnMouseClickRight(user, pos);
+            stone.OnMasterUseOnce(user, pos);
         }
 
-        public void OnMouseClickLeftDown(GameObject user, Vector2 pos)
+        public void OnSlaveUseKeep(GameObject user)
         {
             if (!user.GetComponent<Inventory>().TryGetSubItem(out var stone)) return;
-            stone.OnMouseClickLeftDown(user, pos);
+            stone.OnSlaveUseKeep(user);
         }
 
-        public void OnMouseClickRightDown(GameObject user, Vector2 pos)
+        public void OnSlaveUseOnce(GameObject user)
         {
             if (!user.GetComponent<Inventory>().TryGetSubItem(out var stone)) return;
-            stone.OnMouseClickRightDown(user, pos);
-        }
-
-        public void OnMouseClickLeftUp(GameObject user, Vector2 pos)
-        {
-            if (!user.GetComponent<Inventory>().TryGetSubItem(out var stone)) return;
-            stone.OnMouseClickLeftUp(user, pos);
-        }
-
-        public void OnMouseClickRightUp(GameObject user, Vector2 pos)
-        {
-            if (!user.GetComponent<Inventory>().TryGetSubItem(out var stone)) return;
-            stone.OnMouseClickRightUp(user, pos);
+            stone.OnSlaveUseOnce(user);
         }
 
         public void Selecting(GameObject user)
@@ -522,6 +502,7 @@ namespace SubjectModel.Scripts.Chemistry
 
         public IItemStack Fetch(int count)
         {
+            if (count > 0) fetched = true;
             return count == 0 ? new Sling {fetched = true} : this;
         }
 

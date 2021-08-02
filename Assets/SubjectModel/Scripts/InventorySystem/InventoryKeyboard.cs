@@ -1,12 +1,15 @@
+using Bolt;
 using SubjectModel.Scripts.System;
 using UnityEngine;
 
 namespace SubjectModel.Scripts.InventorySystem
 {
     [RequireComponent(typeof(Inventory))]
+    [RequireComponent(typeof(Variables))]
     public class InventoryKeyboard : MonoBehaviour
     {
         private Inventory inventory;
+
         private void Start()
         {
             inventory = GetComponent<Inventory>();
@@ -15,25 +18,24 @@ namespace SubjectModel.Scripts.InventorySystem
 
         private void Update()
         {
-            if (Input.GetMouseButtonDown(0)) inventory.LeftUseDown(GetMousePosition());
-            if (Input.GetMouseButtonDown(1)) inventory.RightUseDown(GetMousePosition());
-            if (Input.GetMouseButton(0)) inventory.LeftUse(GetMousePosition());
-            if (Input.GetMouseButton(1)) inventory.RightUse(GetMousePosition());
-            if (Input.GetMouseButtonUp(0)) inventory.LeftUseUp(GetMousePosition());
-            if (Input.GetMouseButtonUp(1)) inventory.RightUseUp(GetMousePosition());
+            if (GetComponent<Variables>().declarations.Get<int>("Standonly") != 0) return;
+            if (Input.GetMouseButtonDown(0)) inventory.MasterUseOnce(GetMousePosition());
+            if (Input.GetKeyDown(KeyCode.R)) inventory.SlaveUseOnce();
+            if (Input.GetMouseButton(0)) inventory.MasterUseKeep(GetMousePosition());
+            if (Input.GetKey(KeyCode.R)) inventory.SlaveUseKeep();
             var alpha = GetAlphaDown();
-            if (alpha != -1 && inventory.sub.Count > alpha) inventory.subSelecting = alpha;
+            if (alpha != -1 && inventory.sub.Contains.Count > alpha) inventory.subSelecting = alpha;
             var mouseAxis = (int) (Input.GetAxisRaw("Mouse ScrollWheel") * 10);
             inventory.SwitchTo(inventory.selecting - mouseAxis);
         }
 
         private static Vector2 GetMousePosition()
         {
-            return Camera.main == null 
-                ? Vector2.zero 
+            return Camera.main == null
+                ? Vector2.zero
                 : Utils.Vector3To2(Camera.main.ScreenToWorldPoint(Input.mousePosition));
         }
-        
+
         private static int GetAlphaDown()
         {
             if (Input.GetKey(KeyCode.Alpha1)) return 0;

@@ -81,7 +81,7 @@ namespace SubjectModel.Scripts.Firearms
                         : $"{temple.Name}({magazine.Containing.Temple.Name} {magazine.Containing.Filler.GetFillerName()} {magazine.Containing.Count}/{magazine.Temple.BulletContains})";
         }
 
-        public void OnMouseClickLeft(GameObject user, Vector2 aim)
+        public void OnMasterUseKeep(GameObject user, Vector2 aim)
         {
             if (loading > .0f || magazine?.Containing == null || magazine.Containing.Count <= 0 ||
                 Camera.main == null) return;
@@ -118,25 +118,17 @@ namespace SubjectModel.Scripts.Firearms
             if (magazine.Containing.Count == 0) magazine.Containing = null;
         }
 
-        public void OnMouseClickLeftDown(GameObject user, Vector2 pos)
+        public void OnMasterUseOnce(GameObject user, Vector2 pos)
         {
         }
 
-        public void OnMouseClickRight(GameObject user, Vector2 pos)
+        public void OnSlaveUseKeep(GameObject user)
         {
         }
 
-        public void OnMouseClickRightDown(GameObject user, Vector2 aim)
+        public void OnSlaveUseOnce(GameObject user)
         {
             SwitchMagazine(user);
-        }
-
-        public void OnMouseClickLeftUp(GameObject user, Vector2 pos)
-        {
-        }
-
-        public void OnMouseClickRightUp(GameObject user, Vector2 pos)
-        {
         }
 
         public void Selecting(GameObject user)
@@ -180,12 +172,14 @@ namespace SubjectModel.Scripts.Firearms
 
         public IItemStack Fetch(int count)
         {
+            if (count > 0) fetched = true;
             return count == 0 ? new Firearm(temple) {fetched = true} : this;
         }
 
         public Func<IItemStack, bool> SubInventory()
         {
-            return item => item.GetType() == typeof(Magazine) && temple.Magazine.Contains(((Magazine) item).Temple.Name);
+            return item =>
+                item.GetType() == typeof(Magazine) && temple.Magazine.Contains(((Magazine) item).Temple.Name);
         }
 
         private void SwitchMagazine(GameObject user)
@@ -293,21 +287,21 @@ namespace SubjectModel.Scripts.Firearms
                     : $"{Temple.Name}({Containing.Temple.Name} {Containing.Filler.GetFillerName()} {Containing.Count}/{Temple.BulletContains})";
         }
 
-        public void OnMouseClickLeft(GameObject user, Vector2 pos)
+        public void OnMasterUseKeep(GameObject user, Vector2 pos)
         {
         }
 
-        public void OnMouseClickRight(GameObject user, Vector2 pos)
-        {
-        }
-
-        public void OnMouseClickLeftDown(GameObject user, Vector2 pos)
+        public void OnMasterUseOnce(GameObject user, Vector2 pos)
         {
             user.GetComponent<Inventory>().Add(Containing);
             Containing = null;
         }
 
-        public void OnMouseClickRightDown(GameObject user, Vector2 pos)
+        public void OnSlaveUseKeep(GameObject user)
+        {
+        }
+
+        public void OnSlaveUseOnce(GameObject user)
         {
             if (!user.GetComponent<Inventory>().TryGetSubItem(out var item)) return;
             var bullet = (Bullet) item;
@@ -318,14 +312,6 @@ namespace SubjectModel.Scripts.Firearms
                 Containing = bullet;
                 user.GetComponent<Inventory>().Remove(bullet);
             }
-        }
-
-        public void OnMouseClickLeftUp(GameObject user, Vector2 pos)
-        {
-        }
-
-        public void OnMouseClickRightUp(GameObject user, Vector2 pos)
-        {
         }
 
         public void Selecting(GameObject user)
@@ -356,6 +342,7 @@ namespace SubjectModel.Scripts.Firearms
 
         public IItemStack Fetch(int count)
         {
+            if (count > 0) fetched = true;
             return count == 0 ? new Magazine(Temple) {Containing = Containing, fetched = true} : this;
         }
 

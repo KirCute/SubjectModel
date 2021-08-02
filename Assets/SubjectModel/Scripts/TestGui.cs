@@ -24,7 +24,7 @@ namespace SubjectModel.Scripts
     public class TestGui : MonoBehaviour
     {
         private int selected;
-        private Variables playerVariables;
+        private VariableDeclarations playerVariables;
 
         private string maxHealth;
         private float health;
@@ -107,20 +107,20 @@ namespace SubjectModel.Scripts
         {
             selected = 5;
             var player = GameObject.FindWithTag("Player");
-            playerVariables = player.GetComponent<Variables>();
-            maxHealth = playerVariables.declarations.Get("MaxHealth").ToString();
-            health = playerVariables.declarations.Get<float>("Health");
+            playerVariables = player.GetComponent<Variables>().declarations;
+            maxHealth = playerVariables.Get("MaxHealth").ToString();
+            health = playerVariables.Get<float>("Health");
             healthUpdate = false;
-            maxStrength = playerVariables.declarations.Get("MaxStrength").ToString();
-            energy = playerVariables.declarations.Get<float>("Energy");
+            maxStrength = playerVariables.Get("MaxStrength").ToString();
+            energy = playerVariables.Get<float>("Energy");
             energyUpdate = false;
-            strength = playerVariables.declarations.Get<float>("Strength");
+            strength = playerVariables.Get<float>("Strength");
             strengthUpdate = false;
-            speed = playerVariables.declarations.Get("Speed").ToString();
+            speed = playerVariables.Get("Speed").ToString();
             speedUpdate = false;
-            defence = playerVariables.declarations.Get("Defence").ToString();
+            defence = playerVariables.Get("Defence").ToString();
             defenceUpdate = false;
-            firearmSpeed = playerVariables.declarations.Get("FirearmSpeed").ToString();
+            firearmSpeed = playerVariables.Get("FirearmSpeed").ToString();
             firearmSpeedUpdate = false;
             bossSpawner = GameObject.FindWithTag("BossSpawner").GetComponent<BossSpawner>();
             bossHealth = $"{bossSpawner.bossHealth}";
@@ -153,8 +153,8 @@ namespace SubjectModel.Scripts
             if (standOnly != standOnlyInvoke)
             {
                 standOnlyInvoke = standOnly;
-                playerVariables.declarations.Set("Standonly",
-                    playerVariables.declarations.Get<int>("Standonly") + (standOnly ? 1 : -1));
+                playerVariables.Set("Standonly",
+                    playerVariables.Get<int>("Standonly") + (standOnly ? 1 : -1));
             }
 
             Time.timeScale = pause ? 0f : 1f;
@@ -169,7 +169,7 @@ namespace SubjectModel.Scripts
                 {
                     case 0:
                         if (GUILayout.Button("回到重生点"))
-                            playerVariables.declarations.Set("Health", .0f);
+                            playerVariables.Set("Health", .0f);
                         ManualAdjustString("血量上限", ref maxHealth, "MaxHealth", playerVariables);
                         ManualAdjustSlider("血量", ref health, ref healthUpdate, "MaxHealth", "Health", playerVariables);
                         ManualAdjustString("精神上限", ref maxStrength, "MaxStrength", playerVariables);
@@ -461,7 +461,7 @@ namespace SubjectModel.Scripts
                     case 4:
                         inventoryScroll =
                             GUILayout.BeginScrollView(inventoryScroll, false, false, GUILayout.Height(600));
-                        for (var i = 0; i < inventory.bag.Count; i++)
+                        for (var i = 0; i < inventory.bag.Contains.Count; i++)
                         {
                             GUILayout.BeginHorizontal();
                             if (GUILayout.Button("·", GUILayout.ExpandWidth(false)))
@@ -471,28 +471,38 @@ namespace SubjectModel.Scripts
                                 inventory.RebuildSubInventory();
                             }
 
-                            GUILayout.Label($"{i} - {inventory.bag[i].GetName()}", GUILayout.ExpandWidth(true));
+                            GUILayout.Label($"{i} - {inventory.bag.Contains[i].GetName()}",
+                                GUILayout.ExpandWidth(true));
                             if (i != 0 && GUILayout.Button("↑", GUILayout.ExpandWidth(false)))
                             {
-                                var front = inventory.bag[i - 1];
-                                var behind = inventory.bag[i];
-                                inventory.bag[i - 1] = behind;
-                                inventory.bag[i] = front;
+                                var front = inventory.bag.Contains[i - 1];
+                                var behind = inventory.bag.Contains[i];
+                                if (inventory.selecting == i) behind.LoseSelected(inventory.gameObject);
+                                else if (inventory.selecting == i - 1) front.LoseSelected(inventory.gameObject);
+                                inventory.bag.Contains[i - 1] = behind;
+                                inventory.bag.Contains[i] = front;
                                 inventory.RebuildSubInventory();
+                                if (inventory.selecting == i) front.OnSelected(inventory.gameObject);
+                                else if (inventory.selecting == i - 1) behind.OnSelected(inventory.gameObject);
                             }
 
-                            if (i != inventory.bag.Count - 1 && GUILayout.Button("↓", GUILayout.ExpandWidth(false)))
+                            if (i != inventory.bag.Contains.Count - 1 &&
+                                GUILayout.Button("↓", GUILayout.ExpandWidth(false)))
                             {
-                                var front = inventory.bag[i];
-                                var behind = inventory.bag[i + 1];
-                                inventory.bag[i] = behind;
-                                inventory.bag[i + 1] = front;
+                                var front = inventory.bag.Contains[i];
+                                var behind = inventory.bag.Contains[i + 1];
+                                if (inventory.selecting == i + 1) behind.LoseSelected(inventory.gameObject);
+                                else if (inventory.selecting == i) front.LoseSelected(inventory.gameObject);
+                                inventory.bag.Contains[i] = behind;
+                                inventory.bag.Contains[i + 1] = front;
                                 inventory.RebuildSubInventory();
+                                if (inventory.selecting == i + 1) front.OnSelected(inventory.gameObject);
+                                else if (inventory.selecting == i) behind.OnSelected(inventory.gameObject);
                             }
 
                             if (GUILayout.Button("-", GUILayout.ExpandWidth(false)))
                             {
-                                inventory.Remove(inventory.bag[i]);
+                                inventory.Remove(inventory.bag.Contains[i]);
                                 i--;
                             }
 
@@ -528,11 +538,12 @@ namespace SubjectModel.Scripts
             GUILayout.EndHorizontal();
         }
 
-        private static void ManualAdjustString(string text, ref string value, string targetName, Variables target)
+        private static void ManualAdjustString(string text, ref string value, string targetName,
+            VariableDeclarations target)
         {
-            var v = target.declarations.Get<float>(targetName);
+            var v = target.Get<float>(targetName);
             ManualAdjustString(text, ref value, ref v);
-            target.declarations.Set(targetName, v);
+            target.Set(targetName, v);
         }
 
         private static void ManualAdjustString(string text, ref string value, ref float target)
@@ -545,11 +556,11 @@ namespace SubjectModel.Scripts
         }
 
         private static void ManualAdjustIntUpdating(string text, ref string value, ref bool update, string targetName,
-            Variables target)
+            VariableDeclarations target)
         {
-            var v = target.declarations.Get<int>(targetName);
+            var v = target.Get<int>(targetName);
             ManualAdjustIntUpdating(text, ref value, ref update, ref v);
-            target.declarations.Set(targetName, v);
+            target.Set(targetName, v);
         }
 
         private static void ManualAdjustIntUpdating(string text, ref string value, ref bool update, ref int target)
@@ -564,11 +575,11 @@ namespace SubjectModel.Scripts
         }
 
         private static void ManualAdjustFloatUpdating(string text, ref string value, ref bool update, string targetName,
-            Variables target)
+            VariableDeclarations target)
         {
-            var v = target.declarations.Get<float>(targetName);
+            var v = target.Get<float>(targetName);
             ManualAdjustFloatUpdating(text, ref value, ref update, ref v);
-            target.declarations.Set(targetName, v);
+            target.Set(targetName, v);
         }
 
         private static void ManualAdjustFloatUpdating(string text, ref string value, ref bool update, ref float target)
@@ -583,12 +594,12 @@ namespace SubjectModel.Scripts
         }
 
         private static void ManualAdjustSlider(string text, ref float value, ref bool update, string maxName,
-            string targetName, Variables target)
+            string targetName, VariableDeclarations target)
         {
-            var max = target.declarations.Get<float>(maxName);
-            var v = target.declarations.Get<float>(targetName);
+            var max = target.Get<float>(maxName);
+            var v = target.Get<float>(targetName);
             ManualAdjustSlider(text, ref value, ref update, max, ref v);
-            target.declarations.Set(targetName, v);
+            target.Set(targetName, v);
         }
 
         private static void ManualAdjustSlider(string text, ref float value, ref bool update, float max,

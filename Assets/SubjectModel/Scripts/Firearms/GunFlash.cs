@@ -24,7 +24,7 @@ namespace SubjectModel.Scripts.Firearms
         private void Awake()
         {
             Physics2D.queriesStartInColliders = false;
-			sight = true;
+            sight = true;
             aimPos = Vector2.zero;
         }
 
@@ -36,8 +36,8 @@ namespace SubjectModel.Scripts.Firearms
             {
                 trackTime = .0f;
                 GetComponent<LineRenderer>().enabled = sight;
-                if (sight && Camera.main != null) 
-                    DrawLine(GetComponent<Rigidbody2D>().position,aimPos, SightLineColor);
+                if (sight && Camera.main != null)
+                    DrawLine(GetComponent<Rigidbody2D>().position, aimPos, SightLineColor);
             }
         }
 

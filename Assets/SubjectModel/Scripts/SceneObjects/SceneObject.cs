@@ -3,46 +3,51 @@ using UnityEngine;
 
 namespace SubjectModel.Scripts.SceneObjects
 {
+    [RequireComponent(typeof(SpriteRenderer))]
     public abstract class SceneObject : MonoBehaviour
     {
-        private static readonly Vector2 Deviation = new Vector2(0f, 1.5f);
-        
-        public string ButtonText;
-        private bool approached;
+        private static readonly Color LowLight = new Vector4(0.9f, 0.9f, 0.9f, 1f);
+        private static readonly Color HighLight = new Vector4(1f, 1f, 1f, 1f);
+
+        private VariableDeclarations playerVariables;
         private bool drawing;
-        private Vector2 buttonSize;
+        public string buttonText;
+        public bool approached;
 
-        protected virtual void Start()
+        protected virtual void Awake()
         {
-            buttonSize = new Vector2(ButtonText.Length * 10.5f + 10f, 21f);
+            playerVariables = GameObject.FindWithTag("Player").GetComponent<Variables>().declarations;
         }
 
-        private void OnTriggerEnter(Collider other)
+        protected virtual void Update()
         {
-            if (other.gameObject.CompareTag("Player")) approached = true;
+            var color = approached && playerVariables.Get<int>("Standonly") == 0;
+            GetComponent<SpriteRenderer>().color = color ? HighLight : LowLight;
         }
 
-        private void OnTriggerExit(Collider other)
+        private void OnMouseOver()
         {
-            if (other.gameObject.CompareTag("Player")) approached = false;
+            if (!approached || playerVariables.Get<int>("Standonly") != 0) return;
+            if (Input.GetMouseButtonDown(1)) Open();
         }
 
         private void OnGUI()
         {
-            if (drawing) DrawGUI();
-            var variable = GameObject.FindWithTag("Player").GetComponent<Variables>().declarations;
-            if (variable.Get<int>("Standonly") != 0 || !approached || Camera.main == null) return;
-            var position = Camera.main.WorldToScreenPoint(Utils.Vector3To2(transform.position) + Deviation);
-            if (!GUI.Button(new Rect(position, buttonSize), ButtonText)) return;
-            drawing = true;
-            variable.Set("Standonly", variable.Get<int>("Standonly") + 1);
+            if (!drawing) return;
+            DrawGUI();
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.E)) Close();
         }
 
-        protected void OnClose()
+        private void Open()
+        {
+            drawing = true;
+            playerVariables.Set("Standonly", playerVariables.Get<int>("Standonly") + 1);
+        }
+
+        private void Close()
         {
             drawing = false;
-            var variable = GameObject.FindWithTag("Player").GetComponent<Variables>().declarations;
-            variable.Set("Standonly", variable.Get<int>("Standonly") - 1);
+            playerVariables.Set("Standonly", playerVariables.Get<int>("Standonly") - 1);
         }
 
         protected abstract void DrawGUI();
