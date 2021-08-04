@@ -51,6 +51,7 @@ namespace SubjectModel.Scripts.InventorySystem
 
         public void Add(IItemStack item)
         {
+            if (item == null) return;
             bag.Add(item);
             if (bag.Contains.Count == 1) bag.Contains[selecting].OnSelected(gameObject);
             else if (bag.Contains[selecting].SubInventory()(item)) RebuildSubInventory();

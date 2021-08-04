@@ -97,7 +97,7 @@ namespace SubjectModel.Scripts.Chemistry
                     new[] {.0f}
                 },
                 buffType = new[] {Buff.Empty, Buff.Corrosion},
-                buffParam = new[] {DefaultParam, new[] {0.25f, 400f}},
+                buffParam = new[] {DefaultParam, new[] {0.25f, 20f}},
                 state = new[]
                 {
                     new[] {Element.Gas, Element.Aqua},

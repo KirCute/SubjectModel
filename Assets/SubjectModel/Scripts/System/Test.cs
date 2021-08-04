@@ -2,6 +2,7 @@
 using SubjectModel.Scripts.Chemistry;
 using SubjectModel.Scripts.Firearms;
 using SubjectModel.Scripts.InventorySystem;
+using SubjectModel.Scripts.SceneObjects;
 using UnityEngine;
 
 namespace SubjectModel.Scripts.System
@@ -33,6 +34,7 @@ namespace SubjectModel.Scripts.System
                 new[] {MagazineTemples[0].Name, MagazineTemples[1].Name}));
             //*/
             inventory.Add(new Firearm(FirearmTemples[0]));
+            inventory.Add(new Firearm(FirearmTemples[2]));
             inventory.Add(new Sling());
             inventory.Add(new DrugStack
             (
@@ -236,6 +238,7 @@ namespace SubjectModel.Scripts.System
                 500
             )));
             inventory.Add(new Bullet(BulletTemples[2], 500));
+            inventory.Add(new Bullet(BulletTemples[4], 1000));
         }
 
         public static void GenerateChemicalEnemyInventory(Inventory inventory)
@@ -279,6 +282,7 @@ namespace SubjectModel.Scripts.System
         {
             foreach (var container in GameObject.FindGameObjectsWithTag("Container"))
             {
+                var chest = container.GetComponent<Chest>();
                 switch (container.name)
                 {
                     case "PhysicsAntiArmor":

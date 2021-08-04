@@ -16,10 +16,17 @@ namespace SubjectModel.Scripts.Task
         public float bossSpeed;
         public Vector2 bossSpawnPosition;
         public StateMacro bossAi;
+        public bool triggered;
+
+        private void Start()
+        {
+            triggered = false;
+        }
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (!other.gameObject.CompareTag("Player")) return;
+            if (triggered || !other.gameObject.CompareTag("Player")) return;
+            triggered = true;
             GetComponent<BoxCollider2D>().enabled = false;
             GetComponent<PolygonCollider2D>().enabled = true;
             GameObject.FindWithTag("Cinemachine").GetComponent<CinemachineVirtualCamera>().Follow = transform;
@@ -35,10 +42,12 @@ namespace SubjectModel.Scripts.Task
             boss.name = bossName;
             boss.tag = "Boss";
             boss.GetComponent<Rigidbody2D>().position = bossSpawnPosition;
-            boss.GetComponent<Variables>().declarations.Set("MaxHealth", bossHealth);
-            boss.GetComponent<Variables>().declarations.Set("Health", bossHealth);
-            boss.GetComponent<Variables>().declarations.Set("Defence", bossDefence);
-            boss.GetComponent<Variables>().declarations.Set("Speed", bossSpeed);
+            var variables = boss.GetComponent<Variables>().declarations;
+            variables.Set("MaxHealth", bossHealth);
+            variables.Set("Health", bossHealth);
+            variables.Set("Defence", bossDefence);
+            variables.Set("Speed", bossSpeed);
+            variables.Set("Center", this);
             if (bossAi != null)
             {
                 boss.GetComponent<StateMachine>().nest.source = GraphSource.Macro;

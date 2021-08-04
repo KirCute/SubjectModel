@@ -10,9 +10,9 @@ namespace SubjectModel.Scripts.SceneObjects
         private const float ItemWidth = 668f;
 
         private Inventory inventory;
-        private Container contains;
         private Vector2 inventoryScroll;
         private Vector2 containScroll;
+        public Container contains;
 
         protected override void Awake()
         {

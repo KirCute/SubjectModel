@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Bolt;
 using SubjectModel.Scripts.InventorySystem;
 using UnityEngine;
@@ -10,6 +9,7 @@ namespace SubjectModel.Scripts.Firearms
     public class FirearmTemple
     {
         public readonly string Name;
+        public readonly int Type;
         public readonly float Damage;
         public readonly float Reload; // 换弹匣时间
         public readonly float Loading; // 自动换弹时间
@@ -22,10 +22,12 @@ namespace SubjectModel.Scripts.Firearms
         public readonly float ReloadSpeed;
         public readonly string[] Magazine;
 
-        public FirearmTemple(string name, float damage, float reload, float loading, float weight, float depth,
-            float deviation, float maxRange, float kick, float distance, float reloadSpeed, string[] magazine)
+        public FirearmTemple(string name, int type, float damage, float reload, float loading, float weight,
+            float depth, float deviation, float maxRange, float kick, float distance, float reloadSpeed,
+            string[] magazine)
         {
             Name = name;
+            Type = type;
             Damage = damage;
             Reload = reload;
             Loading = loading;
@@ -44,110 +46,77 @@ namespace SubjectModel.Scripts.Firearms
     {
         private const float KickTime = .01f;
         private const float DeceleratePercentPerWeight = .08f;
+        public static double KickPowerForDeviation = 3.0;
 
-        private readonly FirearmTemple temple;
-        private Magazine magazine;
-        private Magazine readyMagazine;
-        private float loading;
-        private float kickingTime;
-        private float deviation;
+        public readonly FirearmTemple Temple;
+        public Magazine Magazine;
+        public IItemStack Ready;
+        public float Loading;
+        public float Deviation;
+        public bool SwitchingMagazine;
         private float weight;
-        private bool switchingMagazine;
+        private float kickingTime;
         private bool fetched;
         private bool kicking;
+        public Func<Firearm, string> Name = FirearmDictionary.DefaultName;
+        public Action<Firearm, GameObject, Vector2> ShootKeep = FirearmDictionary.NoShoot;
+        public Action<Firearm, GameObject, Vector2> ShootOnce = FirearmDictionary.NoShoot;
+        public Action<Firearm, GameObject> Reload = FirearmDictionary.NoReload;
+        public Action<Firearm, GameObject> ReloadKeep = FirearmDictionary.NoReload;
+        public Func<Firearm, Func<IItemStack, bool>> Sub = FirearmDictionary.DefaultSub;
+        public Action<Firearm, GameObject> CompleteReload = FirearmDictionary.DefaultCompleteReload;
 
         public Firearm(FirearmTemple temple)
         {
-            this.temple = temple;
-            magazine = null;
-            deviation = temple.Deviation;
+            Temple = temple;
+            Magazine = null;
+            Deviation = temple.Deviation;
             weight = temple.Weight;
             fetched = false;
+            FirearmDictionary.FirearmBuilder[temple.Type](this);
         }
 
         public string GetName()
         {
-            return magazine == null
-                ? temple.Name
-                : magazine.Containing == null
-                    ? $"{temple.Name}({magazine.Temple.Name})"
-                    : magazine.Containing.Filler == null
-                        ? $"{temple.Name}({magazine.Containing.Temple.Name} {magazine.Containing.Count}/{magazine.Temple.BulletContains})"
-                        : $"{temple.Name}({magazine.Containing.Temple.Name} {magazine.Containing.Filler.GetFillerName()} {magazine.Containing.Count}/{magazine.Temple.BulletContains})";
+            return Name(this);
         }
 
         public void OnMasterUseKeep(GameObject user, Vector2 aim)
         {
-            if (loading > .0f || magazine?.Containing == null || magazine.Containing.Count <= 0 ||
-                Camera.main == null) return;
-            var shooterPosition = user.GetComponent<Rigidbody2D>().position;
-            if (shooterPosition == aim) return;
-            aim = Utils.GetRotatedVector(aim - shooterPosition,
-                Utils.GenerateGaussian(.0f, deviation, (float) (Math.PI / temple.MaxRange))) + shooterPosition;
-
-            magazine.Containing.Count--;
-            if (magazine.Containing.Count != 0) loading = temple.Loading;
-            InvokeKick(user);
-            var collider = user.GetComponent<GunFlash>().Shoot(shooterPosition, aim);
-            if (collider != null)
-            {
-                var declarations = collider.GetComponent<Variables>().declarations;
-                var defence = declarations.IsDefined("Defence") ? declarations.Get<float>("Defence") : .0f;
-                var health = declarations.Get<float>("Health");
-                var depth = magazine.Containing.Filler == null ? temple.Depth + magazine.Containing.Temple.Depth : 0f;
-                var minDefence = magazine.Containing.Temple.MinDefence;
-                var damage = temple.Damage * magazine.Containing.Temple.BreakDamage;
-                var explode = magazine.Containing.Temple.Explode;
-                declarations.Set("Health",
-                    health - (defence > depth
-                            ? Utils.Map(.0f, defence, .0f, damage, depth) // 未击穿
-                            : depth - defence <= minDefence || minDefence < 0.000001f // 未过穿 或 不存在过穿可能
-                                ? damage + (magazine.Containing.Filler == null ? explode : .0f) // 刚好击穿
-                                : damage // 过穿
-                    )
-                );
-                if (defence <= depth)
-                    magazine.Containing.Filler?.OnBulletHit(collider.gameObject);
-            }
-
-            if (magazine.Containing.Count == 0) magazine.Containing = null;
+            ShootKeep(this, user, aim);
         }
 
-        public void OnMasterUseOnce(GameObject user, Vector2 pos)
+        public void OnMasterUseOnce(GameObject user, Vector2 aim)
         {
+            ShootOnce(this, user, aim);
         }
 
         public void OnSlaveUseKeep(GameObject user)
         {
+            ReloadKeep(this, user);
         }
 
         public void OnSlaveUseOnce(GameObject user)
         {
-            SwitchMagazine(user);
+            Reload(this, user);
         }
 
         public void Selecting(GameObject user)
         {
-            loading -= Time.deltaTime;
+            Loading -= Time.deltaTime;
             kickingTime -= Time.deltaTime;
             if (kickingTime <= .0f) CancelKick(user);
-            if (loading > .0f) return;
-            loading = .0f;
-            if (!switchingMagazine) return;
-            switchingMagazine = false;
-            magazine = readyMagazine;
-            weight += magazine.Temple.Weight;
-            ResetVelocity(user);
-            user.GetComponent<Inventory>().Remove(readyMagazine);
-            readyMagazine = null;
-            var declarations = user.GetComponent<Variables>().declarations;
-            declarations.Set("Speed", declarations.Get<float>("Speed") / temple.ReloadSpeed);
+            if (Loading > .0f) return;
+            Loading = .0f;
+            if (!SwitchingMagazine) return;
+            SwitchingMagazine = false;
+            CompleteReload(this, user);
         }
 
         public void OnSelected(GameObject user)
         {
             ResetVelocity(user);
-            user.GetComponent<GunFlash>().distance = temple.Distance;
+            user.GetComponent<GunFlash>().distance = Temple.Distance;
             user.GetComponent<GunFlash>().enabled = true;
         }
 
@@ -157,43 +126,23 @@ namespace SubjectModel.Scripts.Firearms
             CancelKick(user);
             user.GetComponent<LineRenderer>().enabled = false;
             user.GetComponent<GunFlash>().enabled = false;
-            if (!switchingMagazine) return;
-            switchingMagazine = false;
-            loading = .0f;
-            readyMagazine = null;
+            if (!SwitchingMagazine) return;
+            SwitchingMagazine = false;
+            Loading = .0f;
+            Ready = null;
             var declarations = user.GetComponent<Variables>().declarations;
-            declarations.Set("Speed", declarations.Get<float>("Speed") / temple.ReloadSpeed);
+            declarations.Set("Speed", declarations.Get<float>("Speed") / Temple.ReloadSpeed);
         }
 
         public IItemStack Fetch(int count)
         {
             if (count > 0) fetched = true;
-            return count == 0 ? new Firearm(temple) {fetched = true} : new Firearm(temple);
+            return count == 0 ? new Firearm(Temple) {fetched = true} : new Firearm(Temple);
         }
 
         public Func<IItemStack, bool> SubInventory()
         {
-            return item =>
-                item.GetType() == typeof(Magazine) && temple.Magazine.Contains(((Magazine) item).Temple.Name);
-        }
-
-        private void SwitchMagazine(GameObject user)
-        {
-            if (switchingMagazine || !user.GetComponent<Inventory>().TryGetSubItem(out var ready) ||
-                ready.GetType() != typeof(Magazine)) return;
-            readyMagazine = (Magazine) ready;
-            switchingMagazine = true;
-            loading = temple.Reload;
-            var declarations = user.GetComponent<Variables>().declarations;
-            declarations.Set("Speed", declarations.Get<float>("Speed") * temple.ReloadSpeed);
-            if (magazine != null)
-            {
-                weight -= magazine.Temple.Weight;
-                ResetVelocity(user);
-            }
-
-            user.GetComponent<Inventory>().Add(magazine);
-            magazine = null;
+            return Sub(this);
         }
 
         public int GetCount()
@@ -210,24 +159,21 @@ namespace SubjectModel.Scripts.Firearms
         {
         }
 
-        private void ResetVelocity(GameObject user)
+        public void AddWeight(GameObject user, float value)
         {
-            user.GetComponent<Variables>().declarations.Set("FirearmSpeed", 1f - weight * DeceleratePercentPerWeight);
+            CancelVelocity(user);
+            weight += value;
+            ResetVelocity(user);
         }
 
-        private void CancelVelocity(GameObject user)
+        public void InvokeKick(GameObject user)
         {
-            user.GetComponent<Variables>().declarations.Set("FirearmSpeed", 1f);
-        }
-
-        private void InvokeKick(GameObject user)
-        {
-            kickingTime = temple.Loading + KickTime;
+            kickingTime = Temple.Loading + KickTime;
             if (kicking) return;
             kicking = true;
             var speed = user.GetComponent<Variables>().declarations.Get<float>("Speed");
-            user.GetComponent<Variables>().declarations.Set("Speed", speed / temple.Kick);
-            deviation *= temple.Kick;
+            user.GetComponent<Variables>().declarations.Set("Speed", speed * Temple.Kick);
+            Deviation /= (float) Math.Pow(Temple.Kick, KickPowerForDeviation);
         }
 
         private void CancelKick(GameObject user)
@@ -236,8 +182,22 @@ namespace SubjectModel.Scripts.Firearms
             if (!kicking) return;
             kicking = false;
             var speed = user.GetComponent<Variables>().declarations.Get<float>("Speed");
-            user.GetComponent<Variables>().declarations.Set("Speed", speed * temple.Kick);
-            deviation /= temple.Kick;
+            user.GetComponent<Variables>().declarations.Set("Speed", speed / Temple.Kick);
+            Deviation *= (float) Math.Pow(Temple.Kick, KickPowerForDeviation);
+        }
+
+        private void ResetVelocity(GameObject user)
+        {
+            var speed = user.GetComponent<Variables>().declarations.Get<float>("Speed");
+            user.GetComponent<Variables>().declarations
+                .Set("Speed", speed * (1f - weight * DeceleratePercentPerWeight));
+        }
+
+        private void CancelVelocity(GameObject user)
+        {
+            var speed = user.GetComponent<Variables>().declarations.Get<float>("Speed");
+            user.GetComponent<Variables>().declarations
+                .Set("Speed", speed / (1f - weight * DeceleratePercentPerWeight));
         }
     }
 }

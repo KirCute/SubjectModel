@@ -38,13 +38,12 @@ namespace SubjectModel.Scripts
         private bool speedUpdate;
         private string defence;
         private bool defenceUpdate;
-        private string firearmSpeed;
-        private bool firearmSpeedUpdate;
 
-        private BossSpawner bossSpawner;
+        private GameObject[] bossSpawners;
         private string bossHealth;
         private string bossSpeed;
         private string bossDefence;
+        private string bossLocate;
 
         private string mdc;
         private string tdc;
@@ -60,7 +59,9 @@ namespace SubjectModel.Scripts
         private string concentration;
         private string chemicalBullet;
 
+        private string kpfd;
         private string firearmName;
+        private string firearmType;
         private string damage;
         private string reload;
         private string loading;
@@ -120,12 +121,11 @@ namespace SubjectModel.Scripts
             speedUpdate = false;
             defence = playerVariables.Get("Defence").ToString();
             defenceUpdate = false;
-            firearmSpeed = playerVariables.Get("FirearmSpeed").ToString();
-            firearmSpeedUpdate = false;
-            bossSpawner = GameObject.FindWithTag("BossSpawner").GetComponent<BossSpawner>();
-            bossHealth = $"{bossSpawner.bossHealth}";
-            bossSpeed = $"{bossSpawner.bossSpeed}";
-            bossDefence = $"{bossSpawner.bossDefence}";
+            bossSpawners = GameObject.FindGameObjectsWithTag("BossSpawner");
+            bossHealth = "200";
+            bossSpeed = "5";
+            bossDefence = "400";
+            bossLocate = "3";
             firearmScroll = Vector2.zero;
             magazineScroll = Vector2.zero;
             bulletScroll = Vector2.zero;
@@ -135,6 +135,7 @@ namespace SubjectModel.Scripts
             ions = new List<IonStack>();
             ionsScroll = Vector2.zero;
             inventoryScroll = Vector2.zero;
+            kpfd = $"{Firearm.KickPowerForDeviation}";
             standOnly = false;
             standOnlyInvoke = false;
             pause = false;
@@ -144,12 +145,10 @@ namespace SubjectModel.Scripts
 
         private void Update()
         {
-            if (float.TryParse(bossHealth, out var value)) bossSpawner.bossHealth = value;
-            if (float.TryParse(bossSpeed, out value)) bossSpawner.bossSpeed = value;
-            if (float.TryParse(bossDefence, out value)) bossSpawner.bossDefence = value;
-            if (float.TryParse(mdc, out value)) BuffRenderer.MotiveDamageCoefficient = value;
-            if (float.TryParse(tdc, out value)) BuffRenderer.ThermalDamageCoefficient = value;
-            if (float.TryParse(mdp, out value)) BuffRenderer.MinimumDamagePotential = value;
+            if (float.TryParse(mdc, out var floatValue)) BuffRenderer.MotiveDamageCoefficient = floatValue;
+            if (float.TryParse(tdc, out floatValue)) BuffRenderer.ThermalDamageCoefficient = floatValue;
+            if (float.TryParse(mdp, out floatValue)) BuffRenderer.MinimumDamagePotential = floatValue;
+            if (float.TryParse(kpfd, out var doubleValue)) Firearm.KickPowerForDeviation = doubleValue;
             if (standOnly != standOnlyInvoke)
             {
                 standOnlyInvoke = standOnly;
@@ -179,20 +178,28 @@ namespace SubjectModel.Scripts
                             playerVariables);
                         ManualAdjustFloatUpdating("移动速度", ref speed, ref speedUpdate, "Speed", playerVariables);
                         ManualAdjustFloatUpdating("防御", ref defence, ref defenceUpdate, "Defence", playerVariables);
-                        ManualAdjustFloatUpdating("生效速度百分比", ref firearmSpeed, ref firearmSpeedUpdate, "FirearmSpeed",
-                            playerVariables);
                         break;
                     case 1:
                         AutoAdjustString("血量", ref bossHealth);
                         AutoAdjustString("移动速度", ref bossSpeed);
                         AutoAdjustString("防御", ref bossDefence);
+                        AutoAdjustString("位置", ref bossLocate);
                         if (GUILayout.Button("重新生成Boss"))
                         {
                             GameObject boss;
                             if ((boss = GameObject.FindWithTag("Boss")) != null)
                                 boss.GetComponent<Variables>().declarations.Set("Health", .0f);
                             GameObject.FindWithTag("BossAssistance").GetComponent<BossAssistance>().BossDead();
-                            bossSpawner.GetComponent<BoxCollider2D>().enabled = true;
+                            var spawner = bossSpawners.Where(s => s.name == $"Boss Spawner {bossLocate}").FirstOrDefault();
+                            if (spawner != null)
+                            {
+                                var spawnerComponent = spawner.GetComponent<BossSpawner>();
+                                spawnerComponent.bossHealth = float.Parse(bossHealth);
+                                spawnerComponent.bossSpeed = float.Parse(bossSpeed);
+                                spawnerComponent.bossDefence = float.Parse(bossDefence);
+                                spawnerComponent.triggered = false;
+                                spawner.GetComponent<BoxCollider2D>().enabled = true;
+                            }
                         }
 
                         break;
@@ -203,11 +210,11 @@ namespace SubjectModel.Scripts
                         GUILayout.BeginVertical("Box");
                         GUILayout.Label("炼金术物品栏");
                         GUILayout.BeginHorizontal();
-                        GUILayout.Label("玻封    标签：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("玻封    标签", GUILayout.ExpandWidth(false));
                         drugTag = GUILayout.TextField(drugTag, GUILayout.ExpandWidth(true));
-                        GUILayout.Label("酸碱性：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("酸碱性", GUILayout.ExpandWidth(false));
                         properties = GUILayout.TextField(properties, GUILayout.ExpandWidth(true));
-                        GUILayout.Label("数量：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("数量", GUILayout.ExpandWidth(false));
                         drugCount = GUILayout.TextField(drugCount, GUILayout.ExpandWidth(true));
                         if (GUILayout.Button("+", GUILayout.ExpandWidth(false)) && ions.Count != 0)
                         {
@@ -217,7 +224,7 @@ namespace SubjectModel.Scripts
 
                         GUILayout.EndHorizontal();
                         GUILayout.BeginHorizontal();
-                        GUILayout.Label("子弹    子弹外壳ID:", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("子弹    子弹外壳ID", GUILayout.ExpandWidth(false));
                         chemicalBullet = GUILayout.TextField(chemicalBullet, GUILayout.ExpandWidth(true));
                         if (GUILayout.Button("+", GUILayout.ExpandWidth(false)) && ions.Count != 0)
                         {
@@ -228,7 +235,7 @@ namespace SubjectModel.Scripts
                         }
 
                         GUILayout.EndHorizontal();
-                        GUILayout.Label("成分：");
+                        GUILayout.Label("成分");
                         ionsScroll = GUILayout.BeginScrollView(ionsScroll, false, false, GUILayout.Height(100));
                         for (var i = 0; i < ions.Count; i++)
                         {
@@ -249,13 +256,13 @@ namespace SubjectModel.Scripts
 
                         GUILayout.EndScrollView();
                         GUILayout.BeginHorizontal("Box");
-                        GUILayout.Label("添加成分    元素：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("添加成分    元素", GUILayout.ExpandWidth(false));
                         element = GUILayout.TextField(element, GUILayout.ExpandWidth(true));
-                        GUILayout.Label("价态：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("价态", GUILayout.ExpandWidth(false));
                         valence = GUILayout.TextField(valence, GUILayout.ExpandWidth(true));
-                        GUILayout.Label("物质的量：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("物质的量", GUILayout.ExpandWidth(false));
                         amount = GUILayout.TextField(amount, GUILayout.ExpandWidth(true));
-                        GUILayout.Label("浓度：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("浓度", GUILayout.ExpandWidth(false));
                         concentration = GUILayout.TextField(concentration, GUILayout.ExpandWidth(true));
                         if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
                         {
@@ -281,7 +288,7 @@ namespace SubjectModel.Scripts
                         for (var i = 0; i < Test.FirearmTemples.Count; i++)
                         {
                             GUILayout.BeginHorizontal("Box");
-                            GUILayout.Label($"{i} - {Test.FirearmTemples[i].Name}");
+                            GUILayout.Label($"{i} - {Test.FirearmTemples[i].Name} ({FirearmDictionary.GetFirearmType(Test.FirearmTemples[i].Type)})");
                             GUILayout.Label($"{Test.FirearmTemples[i].Damage}");
                             GUILayout.Label($"{Test.FirearmTemples[i].Depth}");
                             GUILayout.Label($"{Test.FirearmTemples[i].Loading}({Test.FirearmTemples[i].Reload})");
@@ -299,40 +306,42 @@ namespace SubjectModel.Scripts
                         GUILayout.EndScrollView();
                         GUILayout.BeginVertical("Box");
                         GUILayout.BeginHorizontal();
-                        GUILayout.Label("名称：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("名称", GUILayout.ExpandWidth(false));
                         firearmName = GUILayout.TextField(firearmName);
-                        GUILayout.Label("使用弹匣id：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("类别", GUILayout.ExpandWidth(false));
+                        firearmType = GUILayout.TextField(firearmType);
+                        GUILayout.Label("使用弹匣ID", GUILayout.ExpandWidth(false));
                         magazineTemple = GUILayout.TextField(magazineTemple);
                         if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
-                            Test.FirearmTemples.Add(new FirearmTemple(firearmName, float.Parse(damage),
-                                float.Parse(reload),
+                            Test.FirearmTemples.Add(new FirearmTemple(firearmName,
+                                FirearmDictionary.TypeIndexOf(firearmType), float.Parse(damage), float.Parse(reload),
                                 float.Parse(loading), float.Parse(weight), float.Parse(depth), float.Parse(deviation),
                                 float.Parse(maxRange), float.Parse(kick), float.Parse(distance),
                                 float.Parse(reloadSpeed),
                                 SplitTempleString(magazineTemple).Select(i => Test.MagazineTemples[i].Name).ToArray()));
                         GUILayout.EndHorizontal();
                         GUILayout.BeginHorizontal();
-                        GUILayout.Label("伤害倍率：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("伤害倍率", GUILayout.ExpandWidth(false));
                         damage = GUILayout.TextField(damage, GUILayout.ExpandWidth(true));
-                        GUILayout.Label("穿深：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("穿深", GUILayout.ExpandWidth(false));
                         depth = GUILayout.TextField(depth, GUILayout.ExpandWidth(true));
-                        GUILayout.Label("换弹匣时间：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("换弹匣时间", GUILayout.ExpandWidth(false));
                         reload = GUILayout.TextField(reload, GUILayout.ExpandWidth(true));
-                        GUILayout.Label("自动换弹时间：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("自动换弹时间", GUILayout.ExpandWidth(false));
                         loading = GUILayout.TextField(loading, GUILayout.ExpandWidth(true));
-                        GUILayout.Label("重量：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("重量", GUILayout.ExpandWidth(false));
                         weight = GUILayout.TextField(weight, GUILayout.ExpandWidth(true));
                         GUILayout.EndHorizontal();
                         GUILayout.BeginHorizontal();
-                        GUILayout.Label("精度：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("精度", GUILayout.ExpandWidth(false));
                         deviation = GUILayout.TextField(deviation, GUILayout.ExpandWidth(true));
-                        GUILayout.Label("散步：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("散步", GUILayout.ExpandWidth(false));
                         maxRange = GUILayout.TextField(maxRange, GUILayout.ExpandWidth(true));
-                        GUILayout.Label("换弹匣降速：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("换弹匣降速", GUILayout.ExpandWidth(false));
                         reloadSpeed = GUILayout.TextField(reloadSpeed, GUILayout.ExpandWidth(true));
-                        GUILayout.Label("后坐力：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("后坐力", GUILayout.ExpandWidth(false));
                         kick = GUILayout.TextField(kick, GUILayout.ExpandWidth(true));
-                        GUILayout.Label("射程：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("射程", GUILayout.ExpandWidth(false));
                         distance = GUILayout.TextField(distance, GUILayout.ExpandWidth(true));
                         GUILayout.EndHorizontal();
                         GUILayout.EndVertical();
@@ -358,15 +367,15 @@ namespace SubjectModel.Scripts
 
                         GUILayout.EndScrollView();
                         GUILayout.BeginHorizontal("Box");
-                        GUILayout.Label("名称：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("名称", GUILayout.ExpandWidth(false));
                         magazineName = GUILayout.TextField(magazineName, GUILayout.ExpandWidth(true));
-                        GUILayout.Label("载弹量：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("载弹量", GUILayout.ExpandWidth(false));
                         bulletContains = GUILayout.TextField(bulletContains, GUILayout.ExpandWidth(true));
-                        GUILayout.Label("重量：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("重量", GUILayout.ExpandWidth(false));
                         magazineWeight = GUILayout.TextField(magazineWeight, GUILayout.ExpandWidth(true));
-                        GUILayout.Label("口径：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("口径", GUILayout.ExpandWidth(false));
                         magazineRadius = GUILayout.TextField(magazineRadius, GUILayout.ExpandWidth(true));
-                        GUILayout.Label("长度：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("长度", GUILayout.ExpandWidth(false));
                         magazineLength = GUILayout.TextField(magazineLength, GUILayout.ExpandWidth(true));
                         if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
                             Test.MagazineTemples.Add(new MagazineTemple(magazineName, int.Parse(bulletContains),
@@ -396,13 +405,13 @@ namespace SubjectModel.Scripts
                         GUILayout.EndScrollView();
                         GUILayout.BeginVertical("Box");
                         GUILayout.BeginHorizontal();
-                        GUILayout.Label("名称：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("名称", GUILayout.ExpandWidth(false));
                         bulletName = GUILayout.TextField(bulletName, GUILayout.ExpandWidth(true));
-                        GUILayout.Label("基础伤害：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("基础伤害", GUILayout.ExpandWidth(false));
                         bulletBreak = GUILayout.TextField(bulletBreak, GUILayout.ExpandWidth(true));
-                        GUILayout.Label("击穿伤害：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("击穿伤害", GUILayout.ExpandWidth(false));
                         bulletExplode = GUILayout.TextField(bulletExplode, GUILayout.ExpandWidth(true));
-                        GUILayout.Label("穿深：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("穿深", GUILayout.ExpandWidth(false));
                         bulletDepth = GUILayout.TextField(bulletDepth, GUILayout.ExpandWidth(true));
                         if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
                             Test.BulletTemples.Add(new BulletTemple(bulletName, float.Parse(bulletBreak),
@@ -410,24 +419,24 @@ namespace SubjectModel.Scripts
                                 float.Parse(bulletRadius), float.Parse(bulletLength)));
                         GUILayout.EndHorizontal();
                         GUILayout.BeginHorizontal();
-                        GUILayout.Label("过穿防御：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("过穿防御", GUILayout.ExpandWidth(false));
                         bulletMinDefence = GUILayout.TextField(bulletMinDefence, GUILayout.ExpandWidth(true));
-                        GUILayout.Label("口径：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("口径", GUILayout.ExpandWidth(false));
                         bulletRadius = GUILayout.TextField(bulletRadius, GUILayout.ExpandWidth(true));
-                        GUILayout.Label("长度：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("长度", GUILayout.ExpandWidth(false));
                         bulletLength = GUILayout.TextField(bulletLength, GUILayout.ExpandWidth(true));
                         GUILayout.EndHorizontal();
                         GUILayout.EndVertical();
                         GUILayout.EndVertical();
                         GUILayout.BeginVertical("Box");
                         GUILayout.BeginHorizontal();
-                        GUILayout.Label("枪械物品栏    ID：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("枪械物品栏    ID", GUILayout.ExpandWidth(false));
                         firearm = GUILayout.TextField(firearm, GUILayout.ExpandWidth(true));
                         if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
                             inventory.Add(new Firearm(Test.FirearmTemples[int.Parse(firearm)]));
                         GUILayout.EndHorizontal();
                         GUILayout.BeginHorizontal();
-                        GUILayout.Label("弹匣物品栏    ID：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("弹匣物品栏    ID", GUILayout.ExpandWidth(false));
                         magazine = GUILayout.TextField(magazine, GUILayout.ExpandWidth(true));
                         if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
                         {
@@ -437,9 +446,9 @@ namespace SubjectModel.Scripts
 
                         GUILayout.EndHorizontal();
                         GUILayout.BeginHorizontal();
-                        GUILayout.Label("子弹物品栏    ID：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("子弹物品栏    ID", GUILayout.ExpandWidth(false));
                         bullet = GUILayout.TextField(bullet);
-                        GUILayout.Label("数量：", GUILayout.ExpandWidth(false));
+                        GUILayout.Label("数量", GUILayout.ExpandWidth(false));
                         bulletCount = GUILayout.TextField(bulletCount);
                         if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
                         {
@@ -451,9 +460,8 @@ namespace SubjectModel.Scripts
                         GUILayout.EndHorizontal();
                         GUILayout.EndVertical();
                         GUILayout.BeginVertical("Box");
-                        GUILayout.BeginHorizontal();
                         if (GUILayout.Button("保存模板数据")) SaveFirearmsModel();
-                        GUILayout.EndHorizontal();
+                        AutoAdjustString("后坐力精度影响指数", ref kpfd);
                         playerFlash.sight = GUILayout.Toggle(playerFlash.sight, "使用瞄具");
                         GUILayout.EndVertical();
                         GUILayout.EndVertical();

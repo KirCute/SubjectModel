@@ -110,8 +110,8 @@ namespace SubjectModel.Scripts.Firearms
         {
             return item =>
                 item.GetType() == typeof(Bullet) &&
-                Math.Abs(((Bullet) item).Temple.Length - Temple.Length) < 0.000001f &&
-                Math.Abs(((Bullet) item).Temple.Radius - Temple.Radius) < 0.000001f;
+                Math.Abs(((Bullet) item).Temple.Length - Temple.Length) < 0.001f &&
+                Math.Abs(((Bullet) item).Temple.Radius - Temple.Radius) < 0.001f;
         }
     }
 }

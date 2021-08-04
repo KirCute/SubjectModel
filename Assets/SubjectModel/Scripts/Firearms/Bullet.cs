@@ -72,5 +72,10 @@ namespace SubjectModel.Scripts.Firearms
             Count -= count;
             return new Bullet(Temple, count, Filler);
         }
+
+        public bool Is(Bullet bullet)
+        {
+            return bullet.Temple == Temple && (Filler?.Equals(bullet.Filler) ?? bullet.Filler == null);
+        }
     }
 }

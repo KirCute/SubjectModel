@@ -2,6 +2,7 @@
 	"firearmTemples":[
 		{
 			"Name":"模板0",
+			"Type":1,
 			"Damage":2.0,
 			"Reload":0.75,
 			"Loading":0.2,
@@ -9,12 +10,46 @@
 			"Depth":50.0,
 			"Deviation":0.025,
 			"MaxRange":6.0,
-			"Kick":2.0,
+			"Kick":0.92,
 			"Distance":20.0,
 			"ReloadSpeed":0.5,
 			"Magazine":[
 				"弹匣0",
 				"弹匣1"
+			]
+		},
+		{
+			"Name":"GIS36",
+			"Type":1,
+			"Damage":1.05,
+			"Reload":3.5,
+			"Loading":0.075,
+			"Weight":3.5,
+			"Depth":5.0,
+			"Deviation":0.025,
+			"MaxRange":6.0,
+			"Kick":0.92,
+			"Distance":20.0,
+			"ReloadSpeed":0.7,
+			"Magazine":[
+				"弹匣A"
+			]
+		},
+		{
+			"Name":"模板B",
+			"Type":2,
+			"Damage":1.5,
+			"Reload":1.0,
+			"Loading":2.0,
+			"Weight":4.0,
+			"Depth":10.0,
+			"Deviation":0.01,
+			"MaxRange":8.0,
+			"Kick":0.85,
+			"Distance":20.0,
+			"ReloadSpeed":0.5,
+			"Magazine":[
+				"模板B_桥架"
 			]
 		}
 	],
@@ -32,6 +67,20 @@
 			"Weight":3.0,
 			"Radius":1.0,
 			"Length":1.0
+		},
+		{
+			"Name":"弹匣A",
+			"BulletContains":30,
+			"Weight":0.6,
+			"Radius":6.35,
+			"Length":45.0
+		},
+		{
+			"Name":"模板B_桥架",
+			"BulletContains":5,
+			"Weight":0.0,
+			"Radius":8.3,
+			"Length":51.0
 		}
 	],
 	"bulletTemples":[
@@ -61,6 +110,24 @@
 			"MinDefence":0.0,
 			"Radius":1.0,
 			"Length":1.0
+		},
+		{
+			"Name":"子弹A",
+			"BreakDamage":10.0,
+			"Explode":40.0,
+			"Depth":14.0,
+			"MinDefence":4.0,
+			"Radius":8.3,
+			"Length":51.0
+		},
+		{
+			"Name":"子弹B",
+			"BreakDamage":10.0,
+			"Explode":45.0,
+			"Depth":14.0,
+			"MinDefence":4.0,
+			"Radius":8.3,
+			"Length":51.0
 		}
 	]
 }
