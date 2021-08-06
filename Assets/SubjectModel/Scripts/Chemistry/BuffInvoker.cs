@@ -12,7 +12,7 @@ namespace SubjectModel.Scripts.Chemistry
         private const float StartColorAlpha = 0.5f;
         private const float DefaultKeepTime = 0.2f;
         private const float MaxDistance = 3f;
-        private static readonly LayerMask DrugMask = 1 << 3 | 1 << 6;
+        private static readonly LayerMask DrugMask = 1 << 3 | 1 << 6 | 1 << 8;
 
         private float aliveTime;
         private DrugStack stack;

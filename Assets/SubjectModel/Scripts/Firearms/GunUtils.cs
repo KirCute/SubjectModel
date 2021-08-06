@@ -3,13 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using Bolt;
 using SubjectModel.Scripts.InventorySystem;
-using SubjectModel.Scripts.System;
 using UnityEngine;
 
 namespace SubjectModel.Scripts.Firearms
 {
     public static class FirearmDictionary
     {
+        public static List<FirearmTemple> FirearmTemples; // = new List<FirearmTemple>();
+
+        public static List<MagazineTemple> MagazineTemples; /* = new List<MagazineTemple>
+        {
+            new MagazineTemple("弹匣0", 20, 1f, 1f, 1f),
+            new MagazineTemple("弹匣1", 100, 3f, 1f, 1f)
+        };
+        //*/
+
+        public static List<BulletTemple> BulletTemples; /* = new List<BulletTemple>
+        {
+            new BulletTemple("子弹0", 37.5f, 0f, 50f, 0f, 1f, 1f),
+            new BulletTemple("子弹1", 6.25f, 87.5f, 200f, 120f, 1f, 1f),
+            new BulletTemple("子弹2", 10f, 0f, 100f, 0f, 1f, 1f)
+        };
+        //*/
+
         public static readonly Func<Firearm, string> DefaultName = firearm => firearm.Magazine == null
             ? $"{firearm.Temple.Name}{(firearm.Loading > .0f ? "(装填中)" : "")}"
             : firearm.Magazine.Containing == null
@@ -60,14 +76,18 @@ namespace SubjectModel.Scripts.Firearms
 
         public static readonly Action<Firearm, GameObject> DefaultReload = (firearm, user) =>
         {
-            if (firearm.SwitchingMagazine || !user.GetComponent<Inventory>().TryGetSubItem(out var ready)) return;
-            firearm.Ready = ready;
-            firearm.SwitchingMagazine = true;
-            firearm.Loading = firearm.Temple.Reload;
-            var declarations = user.GetComponent<Variables>().declarations;
-            declarations.Set("Speed", declarations.Get<float>("Speed") * firearm.Temple.ReloadSpeed);
-            if (firearm.Magazine != null) firearm.AddWeight(user, -firearm.Magazine.Temple.Weight);
+            if (firearm.SwitchingMagazine) return;
+            var ret = user.GetComponent<Inventory>().TryGetSubItem(out var ready);
+            if (ret)
+            {
+                firearm.Ready = ready;
+                firearm.SwitchingMagazine = true;
+                firearm.Loading = firearm.Temple.Reload;
+                var declarations = user.GetComponent<Variables>().declarations;
+                declarations.Set("Speed", declarations.Get<float>("Speed") * firearm.Temple.ReloadSpeed);
+            }
 
+            if (firearm.Magazine != null) firearm.AddWeight(user, -firearm.Magazine.Temple.Weight);
             user.GetComponent<Inventory>().Add(firearm.Magazine);
             firearm.Magazine = null;
         };
@@ -95,13 +115,14 @@ namespace SubjectModel.Scripts.Firearms
         public static readonly Action<Firearm>[] FirearmBuilder =
         {
             firearm => { },
-            firearm => {
+            firearm =>
+            {
                 firearm.ShootKeep = DefaultShoot;
                 firearm.Reload = DefaultReload;
             },
             firearm =>
             {
-                firearm.Magazine = new Magazine(Test.MagazineTemples
+                firearm.Magazine = new Magazine(MagazineTemples
                     .Where(item => item.Name == firearm.Temple.Magazine[0]).FirstOrDefault());
                 firearm.Name = gun => gun.Magazine.Containing == null
                     ? $"{gun.Temple.Name}{(firearm.Loading > .0f ? "(装填中)" : "")}"
@@ -112,9 +133,14 @@ namespace SubjectModel.Scripts.Firearms
                 firearm.Sub = gun => gun.Magazine.SubInventory();
                 firearm.Reload = (gun, user) =>
                 {
-                    if (gun.SwitchingMagazine || !user.GetComponent<Inventory>().TryGetSubItem(out var ready)) return;
-                    var bullet = (Bullet) ready;
-                    if (gun.Magazine.Containing == null || gun.Magazine.Containing.Is(bullet)) return;
+                    if (gun.SwitchingMagazine) return;
+                    var ret = user.GetComponent<Inventory>().TryGetSubItem(out var ready);
+                    if (ret)
+                    {
+                        var bullet = (Bullet) ready;
+                        if (gun.Magazine.Containing == null || gun.Magazine.Containing.Is(bullet)) return;
+                    }
+
                     user.GetComponent<Inventory>().Add(gun.Magazine.Containing);
                     gun.Magazine.Containing = null;
                 };
@@ -123,7 +149,8 @@ namespace SubjectModel.Scripts.Firearms
                     if (gun.SwitchingMagazine || !user.GetComponent<Inventory>().TryGetSubItem(out var ready)) return;
                     var bullet = (Bullet) ready;
                     if (gun.Magazine.Containing != null && (!gun.Magazine.Containing.Is(bullet) ||
-                            gun.Magazine.Containing.Count >= gun.Magazine.Temple.BulletContains)) return;
+                                                            gun.Magazine.Containing.Count >=
+                                                            gun.Magazine.Temple.BulletContains)) return;
                     gun.Ready = bullet;
                     gun.SwitchingMagazine = true;
                     gun.Loading = gun.Temple.Reload;

@@ -1,7 +1,10 @@
+using SubjectModel.Scripts.Development;
 using UnityEngine;
 
 namespace SubjectModel.Scripts.Firearms
 {
+    [RequireComponent(typeof(Rigidbody2D))]
+    [RequireComponent(typeof(LineRenderer))]
     public class GunFlash : MonoBehaviour
     {
         private const float StartRange = 0.18f;
@@ -19,13 +22,11 @@ namespace SubjectModel.Scripts.Firearms
         private float trackTime;
         public float distance;
         public bool sight;
-        public Vector2 aimPos;
+        public Vector2 aimPos = Vector2.zero;
 
         private void Awake()
         {
             Physics2D.queriesStartInColliders = false;
-            sight = true;
-            aimPos = Vector2.zero;
         }
 
         private void Update()

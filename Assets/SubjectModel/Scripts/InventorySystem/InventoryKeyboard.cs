@@ -1,5 +1,4 @@
 using Bolt;
-using SubjectModel.Scripts.System;
 using UnityEngine;
 
 namespace SubjectModel.Scripts.InventorySystem
@@ -10,10 +9,9 @@ namespace SubjectModel.Scripts.InventorySystem
     {
         private Inventory inventory;
 
-        private void Start()
+        private void Awake()
         {
             inventory = GetComponent<Inventory>();
-            Test.GeneratePlayerInventory(inventory);
         }
 
         private void Update()

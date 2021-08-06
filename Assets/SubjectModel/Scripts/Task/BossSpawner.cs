@@ -1,6 +1,7 @@
 using Bolt;
 using Cinemachine;
 using Ludiq;
+using SubjectModel.Scripts.System;
 using UnityEngine;
 
 namespace SubjectModel.Scripts.Task
@@ -18,11 +19,6 @@ namespace SubjectModel.Scripts.Task
         public StateMacro bossAi;
         public bool triggered;
 
-        private void Start()
-        {
-            triggered = false;
-        }
-
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (triggered || !other.gameObject.CompareTag("Player")) return;
@@ -38,20 +34,21 @@ namespace SubjectModel.Scripts.Task
                     other.gameObject.transform;
             }
 
-            var boss = (GameObject) GameObject.Instantiate(Resources.Load(bossResource));
+            var boss = (GameObject) Instantiate(Resources.Load(bossResource), transform);
+            boss.GetComponent<Rigidbody2D>().position = bossSpawnPosition;
             boss.name = bossName;
             boss.tag = "Boss";
-            boss.GetComponent<Rigidbody2D>().position = bossSpawnPosition;
             var variables = boss.GetComponent<Variables>().declarations;
             variables.Set("MaxHealth", bossHealth);
             variables.Set("Health", bossHealth);
             variables.Set("Defence", bossDefence);
             variables.Set("Speed", bossSpeed);
-            variables.Set("Center", this);
             if (bossAi != null)
             {
-                boss.GetComponent<StateMachine>().nest.source = GraphSource.Macro;
-                boss.GetComponent<StateMachine>().nest.macro = bossAi;
+                var machine = boss.GetComponent<StateMachine>();
+                machine.nest.source = GraphSource.Macro;
+                machine.nest.macro = bossAi;
+                machine.enabled = true;
             }
 
             GameObject.FindWithTag("BossAssistance").GetComponent<BossAssistance>().StartBossFight(boss, Raf);

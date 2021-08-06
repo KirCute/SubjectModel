@@ -14,6 +14,8 @@ TagManager:
   - GUI
   - BossSpawner
   - Container
+  - EnemyReminder
+  - EnemiesStateBar
   layers:
   - Default
   - TransparentFX

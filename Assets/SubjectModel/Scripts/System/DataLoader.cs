@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using Newtonsoft.Json;
 using SubjectModel.Scripts.Chemistry;
+using SubjectModel.Scripts.Development;
 using SubjectModel.Scripts.Firearms;
 using UnityEngine;
 
@@ -28,9 +29,9 @@ namespace SubjectModel.Scripts.System
             origin.Replace("\n", "");
             origin.Replace("\t", "");
             var data = JsonConvert.DeserializeObject<GunData>(origin.ToString());
-            Test.FirearmTemples = data == null ? new List<FirearmTemple>() : data.firearmTemples;
-            Test.MagazineTemples = data == null ? new List<MagazineTemple>() : data.magazineTemples;
-            Test.BulletTemples = data == null ? new List<BulletTemple>() : data.bulletTemples;
+            FirearmDictionary.FirearmTemples = data == null ? new List<FirearmTemple>() : data.firearmTemples;
+            FirearmDictionary.MagazineTemples = data == null ? new List<MagazineTemple>() : data.magazineTemples;
+            FirearmDictionary.BulletTemples = data == null ? new List<BulletTemple>() : data.bulletTemples;
         }
 
         private static void LoadElementsModel()
