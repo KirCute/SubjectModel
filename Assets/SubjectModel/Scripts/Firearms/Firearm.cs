@@ -42,7 +42,7 @@ namespace SubjectModel.Scripts.Firearms
         }
     }
 
-    public class Firearm : IItemStack
+    public class Firearm : Weapon
     {
         private const float KickTime = .01f;
         private const float DeceleratePercentPerWeight = .08f;
@@ -56,7 +56,6 @@ namespace SubjectModel.Scripts.Firearms
         public bool SwitchingMagazine;
         private float weight;
         private float kickingTime;
-        private bool fetched;
         private bool kicking;
         public Func<Firearm, string> Name = FirearmDictionary.DefaultName;
         public Action<Firearm, GameObject, Vector2> ShootKeep = FirearmDictionary.NoShoot;
@@ -72,36 +71,35 @@ namespace SubjectModel.Scripts.Firearms
             Magazine = null;
             Deviation = temple.Deviation;
             weight = temple.Weight;
-            fetched = false;
             FirearmDictionary.FirearmBuilder[temple.Type](this);
         }
 
-        public string GetName()
+        public override string GetName()
         {
             return Name(this);
         }
 
-        public void OnMasterUseKeep(GameObject user, Vector2 aim)
+        public override void OnMasterUseKeep(GameObject user, Vector2 aim)
         {
             ShootKeep(this, user, aim);
         }
 
-        public void OnMasterUseOnce(GameObject user, Vector2 aim)
+        public override void OnMasterUseOnce(GameObject user, Vector2 aim)
         {
             ShootOnce(this, user, aim);
         }
 
-        public void OnSlaveUseKeep(GameObject user)
+        public override void OnSlaveUseKeep(GameObject user)
         {
             ReloadKeep(this, user);
         }
 
-        public void OnSlaveUseOnce(GameObject user)
+        public override void OnSlaveUseOnce(GameObject user)
         {
             Reload(this, user);
         }
 
-        public void Selecting(GameObject user)
+        public override void Selecting(GameObject user)
         {
             Loading -= Time.deltaTime;
             kickingTime -= Time.deltaTime;
@@ -113,14 +111,14 @@ namespace SubjectModel.Scripts.Firearms
             CompleteReload(this, user);
         }
 
-        public void OnSelected(GameObject user)
+        public override void OnSelected(GameObject user)
         {
             ResetVelocity(user);
             user.GetComponent<GunFlash>().distance = Temple.Distance;
             user.GetComponent<GunFlash>().enabled = true;
         }
 
-        public void LoseSelected(GameObject user)
+        public override void LoseSelected(GameObject user)
         {
             CancelVelocity(user);
             CancelKick(user);
@@ -134,29 +132,15 @@ namespace SubjectModel.Scripts.Firearms
             declarations.Set("Speed", declarations.Get<float>("Speed") / Temple.ReloadSpeed);
         }
 
-        public IItemStack Fetch(int count)
+        public override IItemStack Fetch(int count)
         {
-            if (count > 0) fetched = true;
-            return count == 0 ? new Firearm(Temple) {fetched = true} : new Firearm(Temple);
+            base.Fetch(count);
+            return new Firearm(Temple);
         }
 
-        public Func<IItemStack, bool> SubInventory()
+        public override Func<IItemStack, bool> SubInventory()
         {
             return Sub(this);
-        }
-
-        public int GetCount()
-        {
-            return fetched ? 0 : 1;
-        }
-
-        public bool CanMerge(IItemStack item)
-        {
-            return false;
-        }
-
-        public void Merge(IItemStack item)
-        {
         }
 
         public void AddWeight(GameObject user, float value)

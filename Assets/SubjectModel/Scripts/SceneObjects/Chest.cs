@@ -18,7 +18,7 @@ namespace SubjectModel.Scripts.SceneObjects
         {
             base.Awake();
             inventory = GameObject.FindWithTag("Player").GetComponent<Inventory>();
-            contains = new Container(new List<IItemStack>());
+            contains = new Container();
             inventoryScroll = Vector2.zero;
             containScroll = Vector2.zero;
         }
@@ -29,8 +29,7 @@ namespace SubjectModel.Scripts.SceneObjects
             {
                 GUILayout.BeginHorizontal();
                 GUILayout.BeginVertical("Box");
-                containScroll =
-                    GUILayout.BeginScrollView(containScroll, false, false, GUILayout.Width(ItemWidth));
+                containScroll = GUILayout.BeginScrollView(containScroll, false, false, GUILayout.Width(ItemWidth));
                 for (var i = 0; i < contains.Contains.Count; i++)
                 {
                     GUILayout.BeginHorizontal();
@@ -73,47 +72,52 @@ namespace SubjectModel.Scripts.SceneObjects
                 GUILayout.EndScrollView();
                 GUILayout.EndVertical();
                 GUILayout.BeginVertical("Box");
-                inventoryScroll =
-                    GUILayout.BeginScrollView(inventoryScroll, false, false, GUILayout.Width(ItemWidth));
-                for (var i = 0; i < inventory.bag.Contains.Count; i++)
+                inventoryScroll = GUILayout.BeginScrollView(inventoryScroll, false, false, GUILayout.Width(ItemWidth));
+                for (var i = 0; i < inventory.Contains.Count; i++)
                 {
                     GUILayout.BeginHorizontal();
                     if (GUILayout.Button("←←", GUILayout.ExpandWidth(false)))
                     {
-                        contains.Add(inventory.bag.Contains[i]);
-                        inventory.Remove(inventory.bag.Contains[i]);
+                        contains.Add(inventory.Contains[i]);
+                        inventory.Remove(inventory.Contains[i]);
                         i--;
                     }
                     else if (GUILayout.Button("←", GUILayout.ExpandWidth(false)))
                     {
-                        contains.Add(inventory.bag.Contains[i].Fetch(1));
+                        contains.Add(inventory.Contains[i].Fetch(1));
                     }
-                    else GUILayout.Label($"{i} - {inventory.bag.Contains[i].GetName()}", GUILayout.ExpandWidth(true));
+                    else GUILayout.Label($"{i} - {inventory.Contains[i].GetName()}", GUILayout.ExpandWidth(true));
 
                     if (i != 0 && GUILayout.Button("↑", GUILayout.ExpandWidth(false)))
                     {
-                        var front = inventory.bag.Contains[i - 1];
-                        var behind = inventory.bag.Contains[i];
-                        if (inventory.selecting == i) behind.LoseSelected(inventory.gameObject);
+                        var front = inventory.Contains[i - 1];
+                        var behind = inventory.Contains[i];
+                        if (inventory.selecting == i) inventory.selecting--;
+                        else if (inventory.selecting == i - 1) inventory.selecting++;
+                        /*    behind.LoseSelected(inventory.gameObject);
                         else if (inventory.selecting == i - 1) front.LoseSelected(inventory.gameObject);
-                        inventory.bag.Contains[i - 1] = behind;
-                        inventory.bag.Contains[i] = front;
                         inventory.RebuildSubInventory();
                         if (inventory.selecting == i) front.OnSelected(inventory.gameObject);
                         else if (inventory.selecting == i - 1) behind.OnSelected(inventory.gameObject);
+                        */
+                        inventory.Contains[i - 1] = behind;
+                        inventory.Contains[i] = front;
                     }
-                    else if (i != inventory.bag.Contains.Count - 1 &&
+                    else if (i != inventory.Contains.Count - 1 &&
                              GUILayout.Button("↓", GUILayout.ExpandWidth(false)))
                     {
-                        var front = inventory.bag.Contains[i];
-                        var behind = inventory.bag.Contains[i + 1];
-                        if (inventory.selecting == i + 1) behind.LoseSelected(inventory.gameObject);
+                        var front = inventory.Contains[i];
+                        var behind = inventory.Contains[i + 1];
+                        if (inventory.selecting == i + 1) inventory.selecting--;
+                        else if (inventory.selecting == i) inventory.selecting++;
+                        /*    behind.LoseSelected(inventory.gameObject);
                         else if (inventory.selecting == i) front.LoseSelected(inventory.gameObject);
-                        inventory.bag.Contains[i] = behind;
-                        inventory.bag.Contains[i + 1] = front;
                         inventory.RebuildSubInventory();
                         if (inventory.selecting == i + 1) front.OnSelected(inventory.gameObject);
                         else if (inventory.selecting == i) behind.OnSelected(inventory.gameObject);
+                        */
+                        inventory.Contains[i] = behind;
+                        inventory.Contains[i + 1] = front;
                     }
 
                     GUILayout.EndHorizontal();

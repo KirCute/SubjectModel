@@ -12,23 +12,29 @@ namespace SubjectModel.Scripts.InventorySystem
             Contains = contains;
         }
 
+        public Container()
+        {
+            Contains = new List<IItemStack>();
+        }
+
         public bool Remove(IItemStack item)
         {
             if (item == null) return true;
             return Contains.Contains(item) && Contains.Remove(item);
         }
 
-        public void Add(IItemStack item)
+        public T Add<T>(T item) where T : IItemStack
         {
-            if (item == null) return;
+            if (item == null) return default;
             foreach (var i in Contains)
             {
                 if (!i.CanMerge(item)) continue;
                 i.Merge(item);
-                return;
+                return default;
             }
 
             Contains.Add(item);
+            return item;
         }
 
         public void Cleanup()

@@ -48,7 +48,7 @@ namespace SubjectModel.Scripts.Chemistry
         }
     }
 
-    public class DrugStack : IItemStack, IFiller
+    public class DrugStack : IThrowable, IFiller
     {
         public readonly string Tag;
         public readonly IList<IonStack> Ions;
@@ -90,7 +90,7 @@ namespace SubjectModel.Scripts.Chemistry
 
         public bool CanMerge(IItemStack item)
         {
-            if (item.GetType() != typeof(DrugStack)) return false;
+            if (!(item is DrugStack)) return false;
             var drug = (DrugStack) item;
             if (drug.Ions.Count != Ions.Count || drug.Tag != Tag || drug.Properties != Properties) return false;
             return Ions.All(ion => drug.Ions.Any(i =>
@@ -103,42 +103,17 @@ namespace SubjectModel.Scripts.Chemistry
             return $"{Tag}({count})";
         }
 
-        public void OnMasterUseKeep(GameObject user, Vector2 pos)
-        {
-        }
-
-        public void OnMasterUseOnce(GameObject user, Vector2 pos)
+        public void OnMasterThrow(GameObject user, Vector2 pos)
         {
             if (Camera.main == null) return;
             BuffInvoker.InvokeByThrower(this, pos, user.GetComponent<Rigidbody2D>().position);
         }
 
-        public void OnSlaveUseKeep(GameObject user)
-        {
-        }
-
-        public void OnSlaveUseOnce(GameObject user)
+        public void OnSlaveThrow(GameObject user)
         {
             if (Camera.main == null) return;
             BuffInvoker.InvokeByThrower(this, user.GetComponent<Rigidbody2D>().position,
                 user.GetComponent<Rigidbody2D>().position);
-        }
-
-        public void Selecting(GameObject user)
-        {
-        }
-
-        public void OnSelected(GameObject user)
-        {
-        }
-
-        public void LoseSelected(GameObject user)
-        {
-        }
-
-        public Func<IItemStack, bool> SubInventory()
-        {
-            return item => false;
         }
 
         public void OnBulletHit(GameObject target)
@@ -154,7 +129,7 @@ namespace SubjectModel.Scripts.Chemistry
 
         public bool Equals(IFiller other)
         {
-            return other != null && other.GetType() == typeof(DrugStack) && CanMerge((DrugStack) other);
+            return other is DrugStack o && CanMerge(o);
         }
     }
 }

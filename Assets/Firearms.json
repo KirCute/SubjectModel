@@ -3,7 +3,7 @@
 		{
 			"Name":"模板0",
 			"Type":1,
-			"Damage":2.0,
+			"Damage":1.0,
 			"Reload":0.75,
 			"Loading":0.2,
 			"Weight":2.0,
@@ -86,7 +86,7 @@
 	"bulletTemples":[
 		{
 			"Name":"子弹0",
-			"BreakDamage":37.5,
+			"BreakDamage":8,
 			"Explode":0.0,
 			"Depth":50.0,
 			"MinDefence":0.0,
@@ -116,7 +116,7 @@
 			"BreakDamage":10.0,
 			"Explode":40.0,
 			"Depth":14.0,
-			"MinDefence":4.0,
+			"MinDefence":19.0,
 			"Radius":8.3,
 			"Length":51.0
 		},
@@ -125,7 +125,7 @@
 			"BreakDamage":10.0,
 			"Explode":45.0,
 			"Depth":14.0,
-			"MinDefence":4.0,
+			"MinDefence":19.0,
 			"Radius":8.3,
 			"Length":51.0
 		}

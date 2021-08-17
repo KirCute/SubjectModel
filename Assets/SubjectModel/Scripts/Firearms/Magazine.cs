@@ -1,6 +1,5 @@
 ﻿using System;
 using SubjectModel.Scripts.InventorySystem;
-using UnityEngine;
 
 namespace SubjectModel.Scripts.Firearms
 {
@@ -23,20 +22,18 @@ namespace SubjectModel.Scripts.Firearms
         }
     }
 
-    public class Magazine : IItemStack
+    public class Magazine : Unstackable
     {
         public readonly MagazineTemple Temple;
         public Bullet Containing;
-        private bool fetched;
 
         public Magazine(MagazineTemple temple)
         {
             Temple = temple;
             Containing = null;
-            fetched = false;
         }
 
-        public string GetName()
+        public override string GetName()
         {
             return Containing == null
                 ? Temple.Name
@@ -45,73 +42,41 @@ namespace SubjectModel.Scripts.Firearms
                     : $"{Temple.Name}({Containing.Temple.Name} {Containing.Filler.GetFillerName()} {Containing.Count}/{Temple.BulletContains})";
         }
 
-        public void OnMasterUseKeep(GameObject user, Vector2 pos)
+        public void Release(Inventory inv)
         {
-        }
-
-        public void OnMasterUseOnce(GameObject user, Vector2 pos)
-        {
-            user.GetComponent<Inventory>().Add(Containing);
+            inv.Add(Containing);
             Containing = null;
         }
 
-        public void OnSlaveUseKeep(GameObject user)
+        public void Load(Inventory inv, Bullet bullet)
         {
-        }
-
-        public void OnSlaveUseOnce(GameObject user)
-        {
-            if (!user.GetComponent<Inventory>().TryGetSubItem(out var item)) return;
-            var bullet = (Bullet) item;
-            user.GetComponent<Inventory>().Add(Containing);
+            inv.Add(Containing);
             if (bullet.Count > Temple.BulletContains) Containing = (Bullet) bullet.Fetch(Temple.BulletContains);
             else
             {
                 Containing = bullet;
-                user.GetComponent<Inventory>().Remove(bullet);
+                inv.Remove(bullet);
             }
         }
 
-        public void Selecting(GameObject user)
+        public Bullet Load(Bullet bullet)
         {
+            var ret = Containing;
+            Containing = bullet;
+            return ret;
+        }
+        
+        public override IItemStack Fetch(int count)
+        {
+            return new Magazine(Temple) {Containing = Containing};
         }
 
-        public void OnSelected(GameObject user)
-        {
-        }
-
-        public void LoseSelected(GameObject user)
-        {
-        }
-
-        public int GetCount()
-        {
-            return fetched ? 0 : 1;
-        }
-
-        public bool CanMerge(IItemStack item)
-        {
-            return false;
-        }
-
-        public void Merge(IItemStack item)
-        {
-        }
-
-        public IItemStack Fetch(int count)
-        {
-            if (count > 0) fetched = true;
-            return count == 0
-                ? new Magazine(Temple) {Containing = Containing, fetched = true}
-                : new Magazine(Temple) {Containing = Containing};
-        }
-
-        public Func<IItemStack, bool> SubInventory()
+        public Func<IItemStack, bool> AppropriateBullet()
         {
             return item =>
-                item.GetType() == typeof(Bullet) &&
-                Math.Abs(((Bullet) item).Temple.Length - Temple.Length) < 0.001f &&
-                Math.Abs(((Bullet) item).Temple.Radius - Temple.Radius) < 0.001f;
+                item is Bullet bullet &&
+                Math.Abs(bullet.Temple.Length - Temple.Length) < 0.001f &&
+                Math.Abs(bullet.Temple.Radius - Temple.Radius) < 0.001f;
         }
     }
 }

@@ -6,59 +6,59 @@ namespace SubjectModel.Scripts.InventorySystem
     public interface IItemStack
     {
         public string GetName();
-        public void OnMasterUseKeep(GameObject user, Vector2 pos);
-        public void OnMasterUseOnce(GameObject user, Vector2 pos);
-        public void OnSlaveUseKeep(GameObject user);
-        public void OnSlaveUseOnce(GameObject user);
-        public void Selecting(GameObject user);
-        public void OnSelected(GameObject user);
-        public void LoseSelected(GameObject user);
         public int GetCount();
         public bool CanMerge(IItemStack item);
         public void Merge(IItemStack item);
         public IItemStack Fetch(int count);
-        public Func<IItemStack, bool> SubInventory();
     }
 
-    public abstract class Material : IItemStack
+    public abstract class Weapon : Unstackable
     {
+        public abstract void OnMasterUseKeep(GameObject user, Vector2 pos);
+        public abstract void OnMasterUseOnce(GameObject user, Vector2 pos);
+        public abstract void OnSlaveUseKeep(GameObject user);
+        public abstract void OnSlaveUseOnce(GameObject user);
+        public abstract void Selecting(GameObject user);
+        public abstract void OnSelected(GameObject user);
+        public abstract void LoseSelected(GameObject user);
+        public abstract Func<IItemStack, bool> SubInventory();
+
+        public void OnMasterUse(GameObject user, Vector2 pos)
+        {
+            OnMasterUseOnce(user, pos);
+            OnMasterUseKeep(user, pos);
+        }
+
+        public void OnSlaveUse(GameObject user)
+        {
+            OnSlaveUseOnce(user);
+            OnSlaveUseKeep(user);
+        }
+    }
+
+    public abstract class Unstackable : IItemStack
+    {
+        private bool fetched;
         public abstract string GetName();
-        public abstract int GetCount();
-        public abstract IItemStack Fetch(int count);
-        public abstract bool CanMerge(IItemStack item);
-        public abstract void Merge(IItemStack item);
 
-        public void OnMasterUseKeep(GameObject user, Vector2 pos)
+        public int GetCount()
+        {
+            return fetched ? 0 : 1;
+        }
+
+        public bool CanMerge(IItemStack item)
+        {
+            return false;
+        }
+
+        public void Merge(IItemStack item)
         {
         }
 
-        public void OnMasterUseOnce(GameObject user, Vector2 pos)
+        public virtual IItemStack Fetch(int count)
         {
-        }
-
-        public void OnSlaveUseKeep(GameObject user)
-        {
-        }
-
-        public void OnSlaveUseOnce(GameObject user)
-        {
-        }
-
-        public void Selecting(GameObject user)
-        {
-        }
-
-        public void OnSelected(GameObject user)
-        {
-        }
-
-        public void LoseSelected(GameObject user)
-        {
-        }
-
-        public Func<IItemStack, bool> SubInventory()
-        {
-            return item => false;
+            if (count > 0) fetched = true;
+            return this;
         }
     }
 }

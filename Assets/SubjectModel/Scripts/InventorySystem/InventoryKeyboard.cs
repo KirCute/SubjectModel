@@ -1,3 +1,4 @@
+using System;
 using Bolt;
 using UnityEngine;
 
@@ -22,9 +23,10 @@ namespace SubjectModel.Scripts.InventorySystem
             if (Input.GetMouseButton(0)) inventory.MasterUseKeep(GetMousePosition());
             if (Input.GetKey(KeyCode.R)) inventory.SlaveUseKeep();
             var alpha = GetAlphaDown();
-            if (alpha != -1 && inventory.sub.Contains.Count > alpha) inventory.subSelecting = alpha;
-            var mouseAxis = (int) (Input.GetAxisRaw("Mouse ScrollWheel") * 10);
-            inventory.SwitchTo(inventory.selecting - mouseAxis);
+            if (alpha == -1) alpha = inventory.subSelecting + (int) (Input.GetAxisRaw("Mouse ScrollWheel") * 10);
+            //inventory.SwitchTo(inventory.selecting + mouseAxis);
+            if (alpha >= 0 && Math.Min(inventory.SubContains.Count, Inventory.PlayerMaxSubCount) > alpha)
+                inventory.subSelecting = alpha;
         }
 
         private static Vector2 GetMousePosition()

@@ -68,7 +68,7 @@ namespace SubjectModel.Scripts.Firearms
                                 : damage // 过穿
                     )
                 );
-                if (defence <= depth) firearm.Magazine.Containing.Filler?.OnBulletHit(collider.gameObject);
+                /*if (defence <= depth) */firearm.Magazine.Containing.Filler?.OnBulletHit(collider.gameObject);
             }
 
             if (firearm.Magazine.Containing.Count == 0) firearm.Magazine.Containing = null;
@@ -93,7 +93,7 @@ namespace SubjectModel.Scripts.Firearms
         };
 
         public static readonly Func<Firearm, Func<IItemStack, bool>> DefaultSub = firearm => item =>
-            item.GetType() == typeof(Magazine) && firearm.Temple.Magazine.Contains(((Magazine) item).Temple.Name);
+            item is Magazine m && firearm.Temple.Magazine.Contains(m.Temple.Name);
 
         public static readonly Action<Firearm, GameObject> DefaultCompleteReload = (firearm, user) =>
         {
@@ -130,7 +130,7 @@ namespace SubjectModel.Scripts.Firearms
                         ? $"{gun.Temple.Name}({gun.Magazine.Containing.Temple.Name} {gun.Magazine.Containing.Count}/{gun.Magazine.Temple.BulletContains}{(firearm.Loading > .0f ? " 装填中" : "")})"
                         : $"{gun.Temple.Name}({gun.Magazine.Containing.Temple.Name} {gun.Magazine.Containing.Filler.GetFillerName()} {gun.Magazine.Containing.Count}/{gun.Magazine.Temple.BulletContains}{(firearm.Loading > .0f ? " 装填中" : "")})";
                 firearm.ShootOnce = DefaultShoot;
-                firearm.Sub = gun => gun.Magazine.SubInventory();
+                firearm.Sub = gun => gun.Magazine.AppropriateBullet();
                 firearm.Reload = (gun, user) =>
                 {
                     if (gun.SwitchingMagazine) return;

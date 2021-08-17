@@ -27,7 +27,7 @@ namespace SubjectModel.Scripts.Firearms
         }
     }
 
-    public class Bullet : Material
+    public class Bullet : IItemStack
     {
         public readonly BulletTemple Temple;
         public readonly IFiller Filler;
@@ -40,33 +40,32 @@ namespace SubjectModel.Scripts.Firearms
             Filler = filler;
         }
 
-        public override string GetName()
+        public string GetName()
         {
             return Filler == null
                 ? $"{Temple.Name}({Count})"
                 : $"{Temple.Name}({Filler.GetFillerName()})({Count})";
         }
 
-        public override int GetCount()
+        public int GetCount()
         {
             return Count;
         }
 
-        public override bool CanMerge(IItemStack item)
+        public bool CanMerge(IItemStack item)
         {
-            if (item.GetType() != typeof(Bullet) || ((Bullet) item).Temple != Temple) return false;
-            var bullet = (Bullet) item;
+            if (!(item is Bullet bullet) || bullet.Temple != Temple) return false;
             if (Filler == null) return bullet.Filler == null;
             return Filler.Equals(bullet.Filler);
         }
 
-        public override void Merge(IItemStack item)
+        public void Merge(IItemStack item)
         {
             Count += ((Bullet) item).Count;
             Filler?.CountAppend(((Bullet) item).Filler.GetCount());
         }
 
-        public override IItemStack Fetch(int count)
+        public IItemStack Fetch(int count)
         {
             if (count > Count) count = Count;
             Count -= count;

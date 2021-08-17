@@ -4,79 +4,54 @@ using UnityEngine;
 
 namespace SubjectModel.Scripts.Chemistry
 {
-    public class Sling : IItemStack
+    public interface IThrowable : IItemStack
     {
-        private bool fetched;
+        public void OnMasterThrow(GameObject user, Vector2 aim);
+        public void OnSlaveThrow(GameObject user);
+    }
 
-        public Sling()
-        {
-            fetched = false;
-        }
-
-        public string GetName()
+    public class Sling : Weapon
+    {
+        public override string GetName()
         {
             return "弹弓";
         }
 
-        public void OnMasterUseKeep(GameObject user, Vector2 pos)
+        public override void OnMasterUseKeep(GameObject user, Vector2 pos)
+        {
+        }
+
+        public override void OnMasterUseOnce(GameObject user, Vector2 pos)
         {
             if (!user.GetComponent<Inventory>().TryGetSubItem(out var stone)) return;
-            stone.OnMasterUseKeep(user, pos);
+            ((IThrowable) stone).OnMasterThrow(user, pos);
         }
 
-        public void OnMasterUseOnce(GameObject user, Vector2 pos)
+        public override void OnSlaveUseKeep(GameObject user)
+        {
+        }
+
+        public override void OnSlaveUseOnce(GameObject user)
         {
             if (!user.GetComponent<Inventory>().TryGetSubItem(out var stone)) return;
-            stone.OnMasterUseOnce(user, pos);
+            ((IThrowable) stone).OnSlaveThrow(user);
         }
 
-        public void OnSlaveUseKeep(GameObject user)
-        {
-            if (!user.GetComponent<Inventory>().TryGetSubItem(out var stone)) return;
-            stone.OnSlaveUseKeep(user);
-        }
-
-        public void OnSlaveUseOnce(GameObject user)
-        {
-            if (!user.GetComponent<Inventory>().TryGetSubItem(out var stone)) return;
-            stone.OnSlaveUseOnce(user);
-        }
-
-        public void Selecting(GameObject user)
+        public override void Selecting(GameObject user)
         {
         }
 
-        public void OnSelected(GameObject user)
+        public override void OnSelected(GameObject user)
         {
         }
 
-        public void LoseSelected(GameObject user)
+        public override void LoseSelected(GameObject user)
         {
         }
 
-        public int GetCount()
+        public override Func<IItemStack, bool> SubInventory()
         {
-            return fetched ? 0 : 1;
-        }
-
-        public bool CanMerge(IItemStack item)
-        {
-            return false;
-        }
-
-        public void Merge(IItemStack item)
-        {
-        }
-
-        public IItemStack Fetch(int count)
-        {
-            if (count > 0) fetched = true;
-            return count == 0 ? new Sling {fetched = true} : new Sling();
-        }
-
-        public Func<IItemStack, bool> SubInventory()
-        {
-            return item => item.GetType() == typeof(DrugStack);
+            return item => item is IThrowable;
         }
     }
 }

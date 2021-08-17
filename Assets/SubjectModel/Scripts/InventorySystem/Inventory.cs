@@ -8,23 +8,29 @@ namespace SubjectModel.Scripts.InventorySystem
     [RequireComponent(typeof(Variables))]
     public class Inventory : MonoBehaviour
     {
-        public Container bag;
-        public Container sub;
+        public const int PlayerMaxSubCount = 20;
+        
+        private Container bag;
+        private Container sub;
         public int selecting;
         public int subSelecting;
 
+        public IList<IItemStack> Contains => bag.Contains;
+        public IList<IItemStack> SubContains => sub.Contains;
+
         private void Awake()
         {
-            bag = new Container(new List<IItemStack>());
-            sub = new Container(new List<IItemStack>());
-            selecting = 0;
+            bag = new Container();
+            sub = new Container();
+            selecting = -1;
             subSelecting = 0;
         }
 
         private void Update()
         {
             bag.Cleanup(item => Remove(item));
-            if (selecting < bag.Contains.Count) bag.Contains[selecting].Selecting(gameObject);
+            if (selecting >= 0 && selecting < bag.Contains.Count && bag.Contains[selecting] is Weapon tool)
+                tool.Selecting(gameObject);
         }
 
         public bool Remove(IItemStack item)
@@ -38,10 +44,8 @@ namespace SubjectModel.Scripts.InventorySystem
             if (index == selecting)
             {
                 subSelecting = 0;
-                item.LoseSelected(gameObject);
-                if (selecting == bag.Contains.Count) selecting--;
-                if (selecting != -1) bag.Contains[selecting].OnSelected(gameObject);
-                else selecting = 0;
+                selecting = -1;
+                if (item is Weapon tool) tool.LoseSelected(gameObject);
             }
             else if (index < selecting) selecting--;
 
@@ -49,12 +53,14 @@ namespace SubjectModel.Scripts.InventorySystem
             return true;
         }
 
-        public void Add(IItemStack item)
+        public T Add<T>(T item) where T : IItemStack
         {
-            if (item == null) return;
+            if (item == null) return default;
             bag.Add(item);
-            if (bag.Contains.Count == 1) bag.Contains[selecting].OnSelected(gameObject);
-            else if (bag.Contains[selecting].SubInventory()(item)) RebuildSubInventory();
+            //if (bag.Contains.Count == 1) bag.Contains[selecting].OnSelected(gameObject);
+            //else
+            if (selecting >= 0 && ((Weapon) bag.Contains[selecting]).SubInventory()(item)) RebuildSubInventory();
+            return item;
         }
 
         public bool TryGetSubItem(out IItemStack item)
@@ -67,43 +73,45 @@ namespace SubjectModel.Scripts.InventorySystem
 
         public void SwitchTo(int target)
         {
-            if (target == selecting || target < 0 || target >= bag.Contains.Count) return;
-            bag.Contains[selecting].LoseSelected(gameObject);
+            if (target == selecting || target >= bag.Contains.Count || !(bag.Contains[target] is Weapon targetTool))
+                return;
+            if (selecting >= 0 && selecting < bag.Contains.Count)
+                ((Weapon) bag.Contains[selecting]).LoseSelected(gameObject);
             selecting = target;
             subSelecting = 0;
             RebuildSubInventory();
-            bag.Contains[target].OnSelected(gameObject);
+            if (target >= 0) targetTool.OnSelected(gameObject);
         }
 
         public void MasterUseKeep(Vector2 pos)
         {
-            if (selecting >= bag.Contains.Count) return;
-            bag.Contains[selecting].OnMasterUseKeep(gameObject, pos);
+            if (selecting < 0 || selecting >= bag.Contains.Count || !(bag.Contains[selecting] is Weapon tool)) return;
+            tool.OnMasterUseKeep(gameObject, pos);
         }
 
         public void MasterUseOnce(Vector2 pos)
         {
-            if (selecting >= bag.Contains.Count) return;
-            bag.Contains[selecting].OnMasterUseOnce(gameObject, pos);
+            if (selecting < 0 || selecting >= bag.Contains.Count || !(bag.Contains[selecting] is Weapon tool)) return;
+            tool.OnMasterUseOnce(gameObject, pos);
         }
 
         public void SlaveUseKeep()
         {
-            if (selecting >= bag.Contains.Count) return;
-            bag.Contains[selecting].OnSlaveUseKeep(gameObject);
+            if (selecting < 0 || selecting >= bag.Contains.Count || !(bag.Contains[selecting] is Weapon tool)) return;
+            tool.OnSlaveUseKeep(gameObject);
         }
 
         public void SlaveUseOnce()
         {
-            if (selecting >= bag.Contains.Count) return;
-            bag.Contains[selecting].OnSlaveUseOnce(gameObject);
+            if (selecting < 0 || selecting >= bag.Contains.Count || !(bag.Contains[selecting] is Weapon tool)) return;
+            tool.OnSlaveUseOnce(gameObject);
         }
 
-        public void RebuildSubInventory()
+        private void RebuildSubInventory()
         {
-            if (selecting >= bag.Contains.Count) return;
             sub.Contains.Clear();
-            foreach (var item in bag.Contains.Where(bag.Contains[selecting].SubInventory())) sub.Add(item);
+            if (selecting < 0 || selecting >= bag.Contains.Count) return;
+            foreach (var item in bag.Contains.Where(((Weapon) bag.Contains[selecting]).SubInventory())) sub.Add(item);
         }
     }
 }

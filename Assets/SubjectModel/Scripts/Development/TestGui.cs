@@ -478,48 +478,51 @@ namespace SubjectModel.Scripts.Development
                     case 4:
                         inventoryScroll =
                             GUILayout.BeginScrollView(inventoryScroll, false, false, GUILayout.Height(600));
-                        for (var i = 0; i < inventory.bag.Contains.Count; i++)
+                        for (var i = 0; i < inventory.Contains.Count; i++)
                         {
                             GUILayout.BeginHorizontal();
-                            if (GUILayout.Button("·", GUILayout.ExpandWidth(false)))
-                            {
-                                inventory.selecting = i;
-                                inventory.subSelecting = 0;
-                                inventory.RebuildSubInventory();
-                            }
 
-                            GUILayout.Label($"{i} - {inventory.bag.Contains[i].GetName()}",
+                            GUILayout.Label($"{i} - {inventory.Contains[i].GetName()}",
                                 GUILayout.ExpandWidth(true));
+                            if (inventory.Contains[i] is Weapon &&
+                                GUILayout.Button("·", GUILayout.ExpandWidth(false))) inventory.SwitchTo(i);
+
                             if (i != 0 && GUILayout.Button("↑", GUILayout.ExpandWidth(false)))
                             {
-                                var front = inventory.bag.Contains[i - 1];
-                                var behind = inventory.bag.Contains[i];
-                                if (inventory.selecting == i) behind.LoseSelected(inventory.gameObject);
+                                var front = inventory.Contains[i - 1];
+                                var behind = inventory.Contains[i];
+                                if (inventory.selecting == i) inventory.selecting--;
+                                else if (inventory.selecting == i - 1) inventory.selecting++;
+                                /*    behind.LoseSelected(inventory.gameObject);
                                 else if (inventory.selecting == i - 1) front.LoseSelected(inventory.gameObject);
-                                inventory.bag.Contains[i - 1] = behind;
-                                inventory.bag.Contains[i] = front;
                                 inventory.RebuildSubInventory();
                                 if (inventory.selecting == i) front.OnSelected(inventory.gameObject);
                                 else if (inventory.selecting == i - 1) behind.OnSelected(inventory.gameObject);
+                                */
+                                inventory.Contains[i - 1] = behind;
+                                inventory.Contains[i] = front;
                             }
 
-                            if (i != inventory.bag.Contains.Count - 1 &&
+                            if (i != inventory.Contains.Count - 1 &&
                                 GUILayout.Button("↓", GUILayout.ExpandWidth(false)))
                             {
-                                var front = inventory.bag.Contains[i];
-                                var behind = inventory.bag.Contains[i + 1];
-                                if (inventory.selecting == i + 1) behind.LoseSelected(inventory.gameObject);
+                                var front = inventory.Contains[i];
+                                var behind = inventory.Contains[i + 1];
+                                if (inventory.selecting == i + 1) inventory.selecting--;
+                                else if (inventory.selecting == i) inventory.selecting++;
+                                /*    behind.LoseSelected(inventory.gameObject);
                                 else if (inventory.selecting == i) front.LoseSelected(inventory.gameObject);
-                                inventory.bag.Contains[i] = behind;
-                                inventory.bag.Contains[i + 1] = front;
                                 inventory.RebuildSubInventory();
                                 if (inventory.selecting == i + 1) front.OnSelected(inventory.gameObject);
                                 else if (inventory.selecting == i) behind.OnSelected(inventory.gameObject);
+                                */
+                                inventory.Contains[i] = behind;
+                                inventory.Contains[i + 1] = front;
                             }
 
                             if (GUILayout.Button("-", GUILayout.ExpandWidth(false)))
                             {
-                                inventory.Remove(inventory.bag.Contains[i]);
+                                inventory.Remove(inventory.Contains[i]);
                                 i--;
                             }
 

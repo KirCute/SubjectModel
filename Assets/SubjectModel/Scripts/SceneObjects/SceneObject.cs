@@ -4,6 +4,7 @@ using UnityEngine;
 namespace SubjectModel.Scripts.SceneObjects
 {
     [RequireComponent(typeof(SpriteRenderer))]
+    [RequireComponent(typeof(BoxCollider2D))]
     public abstract class SceneObject : MonoBehaviour
     {
         private static readonly Color LowLight = new Vector4(0.9f, 0.9f, 0.9f, 1f);
@@ -25,7 +26,7 @@ namespace SubjectModel.Scripts.SceneObjects
             GetComponent<SpriteRenderer>().color = color ? HighLight : LowLight;
         }
 
-        private void OnMouseOver()
+        protected virtual void OnMouseOver()
         {
             if (!approached || playerVariables.Get<int>("Standonly") != 0) return;
             if (Input.GetMouseButtonDown(1)) Open();
@@ -38,13 +39,13 @@ namespace SubjectModel.Scripts.SceneObjects
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.E)) Close();
         }
 
-        private void Open()
+        protected virtual void Open()
         {
             drawing = true;
             playerVariables.Set("Standonly", playerVariables.Get<int>("Standonly") + 1);
         }
 
-        private void Close()
+        protected virtual void Close()
         {
             drawing = false;
             playerVariables.Set("Standonly", playerVariables.Get<int>("Standonly") - 1);

@@ -31,7 +31,7 @@ namespace SubjectModel.Scripts.Task
 
         private void OnDestroy()
         {
-            if (cameraLock && GameObject.FindWithTag("Player") != null)
+            if (cameraLock && GameObject.FindWithTag("Player") != null && GameObject.FindWithTag("Cinemachine") != null)
                 GameObject.FindWithTag("Cinemachine").GetComponent<CinemachineVirtualCamera>().Follow =
                     GameObject.FindWithTag("Player").transform;
         }
