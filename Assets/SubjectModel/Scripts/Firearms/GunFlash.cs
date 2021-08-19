@@ -3,6 +3,14 @@ using UnityEngine;
 
 namespace SubjectModel.Scripts.Firearms
 {
+    /**
+     * <summary>
+     * 枪械系统的附属脚本
+     * 主要用来处理枪械在射击时的闪光效果和瞄准线的渲染。
+     * 此外，它负责处理在射击时寻找被击中的物体，这意味着必须挂载这个脚本才可以使用枪支。
+     * 尽管不是所有作战单位都会使用枪，但还是建议所有作战单位都挂载此脚本。
+     * </summary>
+     */
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(LineRenderer))]
     public class GunFlash : MonoBehaviour

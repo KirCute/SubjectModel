@@ -5,6 +5,24 @@ using UnityEngine;
 
 namespace SubjectModel.Scripts.Chemistry
 {
+    /**
+     * <summary>效果的枚举</summary>
+     */
+    public enum Buff
+    {
+        Empty,
+        Slowness,
+        Poison,
+        Curing,
+        Ghost,
+        Corrosion,
+        Rapid,
+        Immune
+    }
+
+    /**
+     * <summary>用于储存，发放效果有关信息的工具类</summary>
+     */
     public static class DrugDictionary
     {
         private static readonly Dictionary<Buff, Type> BuffDictionary = new Dictionary<Buff, Type>();
@@ -14,12 +32,13 @@ namespace SubjectModel.Scripts.Chemistry
         public static Type GetTypeOfBuff(Buff buff)
         {
             if (BuffDictionary.Count != 0) return BuffDictionary[buff];
-            BuffDictionary.Add(Buff.Slowness, typeof(DrugEffect.IIIFe));
-            BuffDictionary.Add(Buff.Poison, typeof(DrugEffect.IICu));
-            BuffDictionary.Add(Buff.Curing, typeof(DrugEffect.IICo));
-            BuffDictionary.Add(Buff.Ghost, typeof(DrugEffect.PIII));
-            BuffDictionary.Add(Buff.Corrosion, typeof(DrugEffect.H));
-            BuffDictionary.Add(Buff.Rapid, typeof(DrugEffect.IIFe));
+            BuffDictionary.Add(Buff.Slowness, typeof(DrugEffect.Slowness));
+            BuffDictionary.Add(Buff.Poison, typeof(DrugEffect.Poison));
+            BuffDictionary.Add(Buff.Curing, typeof(DrugEffect.Curing));
+            BuffDictionary.Add(Buff.Ghost, typeof(DrugEffect.Ghost));
+            BuffDictionary.Add(Buff.Corrosion, typeof(DrugEffect.Corrosion));
+            BuffDictionary.Add(Buff.Rapid, typeof(DrugEffect.Rapid));
+            BuffDictionary.Add(Buff.Immune, typeof(DrugEffect.Immune));
             return BuffDictionary[buff];
         }
 
@@ -33,12 +52,8 @@ namespace SubjectModel.Scripts.Chemistry
             BuffName.Add(Buff.Ghost, "P(III)");
             BuffName.Add(Buff.Corrosion, "腐蚀");
             BuffName.Add(Buff.Rapid, "急速");
+            BuffName.Add(Buff.Immune, "免疫");
             return BuffName[buff];
-        }
-
-        public static string GetName(IonStack stack)
-        {
-            return GetName(stack.Element.buffType[stack.Index]);
         }
 
         public static Vector3 GetColor(Buff buff)
@@ -51,6 +66,7 @@ namespace SubjectModel.Scripts.Chemistry
             BuffColor.Add(Buff.Ghost, new Vector3(0.25f, 0.75f, 0.375f));
             BuffColor.Add(Buff.Corrosion, new Vector3(1.0f, 0.875f, 0.0f));
             BuffColor.Add(Buff.Rapid, new Vector3(0.75f, 0.75f, 0.75f));
+            BuffColor.Add(Buff.Immune, new Vector3(1f, 1f, 1f));
             return BuffColor[buff];
         }
 
@@ -59,8 +75,10 @@ namespace SubjectModel.Scripts.Chemistry
             return GetColor(stack.Element.buffType[stack.Index]);
         }
     }
-
-
+    
+    /**
+     * <summary>储存Element实例对象的工具类</summary>
+     */
     public static class Elements
     {
         //private static readonly float[] DefaultParam = {1f, 1f};
@@ -267,6 +285,13 @@ namespace SubjectModel.Scripts.Chemistry
         };
         //*/
 
+        /**
+         * <summary>
+         * 用于通过元素符号得到对应的元素实例
+         * <param name="symbol">元素符号，区分大小写</param>
+         * <returns>对应元素的实例</returns>
+         * </summary>
+         */
         public static Element Get(string symbol)
         {
             return Dic.FirstOrDefault(e => e.symbol == symbol);

@@ -26,13 +26,24 @@ namespace SubjectModel.Scripts.Firearms
         };
         //*/
 
-        public static readonly Func<Firearm, string> DefaultName = firearm => firearm.Magazine == null
-            ? $"{firearm.Temple.Name}{(firearm.Loading > .0f ? "(装填中)" : "")}"
-            : firearm.Magazine.Containing == null
-                ? $"{firearm.Temple.Name}({firearm.Magazine.Temple.Name})"
-                : firearm.Magazine.Containing.Filler == null
-                    ? $"{firearm.Temple.Name}({firearm.Magazine.Containing.Temple.Name} {firearm.Magazine.Containing.Count}/{firearm.Magazine.Temple.BulletContains}{(firearm.Loading > .0f ? " 装填中" : "")})"
-                    : $"{firearm.Temple.Name}({firearm.Magazine.Containing.Temple.Name} {firearm.Magazine.Containing.Filler.GetFillerName()} {firearm.Magazine.Containing.Count}/{firearm.Magazine.Temple.BulletContains}{(firearm.Loading > .0f ? " 装填中" : "")})";
+        public static readonly Func<Firearm, string> DefaultName = firearm =>
+        {
+            var fn = firearm.Temple.Name;
+            var l = firearm.Loading;
+            var m = firearm.Magazine;
+            var b = m?.Containing;
+            var bn = b?.Temple.Name;
+            var bf = b?.Filler;
+            var bc = m?.Containing.Count;
+            var mc = m?.Temple.BulletContains;
+            return m == null
+                ? $"{fn}{(l > .0f ? "(装填中)" : "")}"
+                : b == null
+                    ? $"{fn}({m.Temple.Name})"
+                    : bf == null
+                        ? $"{fn}({bn} {bc}/{mc}{(l > .0f ? " 装填中" : "")})"
+                        : $"{fn}({bn} {bf.GetFillerName()} {bc}/{mc}{(l > .0f ? " 装填中" : "")})";
+        };
 
         private static readonly Action<Firearm, GameObject, Vector2> DefaultShoot = (firearm, user, aim) =>
         {
@@ -68,7 +79,8 @@ namespace SubjectModel.Scripts.Firearms
                                 : damage // 过穿
                     )
                 );
-                /*if (defence <= depth) */firearm.Magazine.Containing.Filler?.OnBulletHit(collider.gameObject);
+                /*if (defence <= depth) */
+                firearm.Magazine.Containing.Filler?.OnBulletHit(collider.gameObject);
             }
 
             if (firearm.Magazine.Containing.Count == 0) firearm.Magazine.Containing = null;
@@ -124,11 +136,21 @@ namespace SubjectModel.Scripts.Firearms
             {
                 firearm.Magazine = new Magazine(MagazineTemples
                     .Where(item => item.Name == firearm.Temple.Magazine[0]).FirstOrDefault());
-                firearm.Name = gun => gun.Magazine.Containing == null
-                    ? $"{gun.Temple.Name}{(firearm.Loading > .0f ? "(装填中)" : "")}"
-                    : gun.Magazine.Containing.Filler == null
-                        ? $"{gun.Temple.Name}({gun.Magazine.Containing.Temple.Name} {gun.Magazine.Containing.Count}/{gun.Magazine.Temple.BulletContains}{(firearm.Loading > .0f ? " 装填中" : "")})"
-                        : $"{gun.Temple.Name}({gun.Magazine.Containing.Temple.Name} {gun.Magazine.Containing.Filler.GetFillerName()} {gun.Magazine.Containing.Count}/{gun.Magazine.Temple.BulletContains}{(firearm.Loading > .0f ? " 装填中" : "")})";
+                firearm.Name = gun =>
+                {
+                    var fn = gun.Temple.Name;
+                    var l = gun.Loading;
+                    var b = gun.Magazine.Containing;
+                    var bn = b?.Temple.Name;
+                    var bf = b?.Filler;
+                    var bc = b?.Count;
+                    var mc = gun.Magazine.Temple.BulletContains;
+                    return b == null
+                        ? $"{fn}{(l > .0f ? "(装填中)" : "")}"
+                        : bf == null
+                            ? $"{fn}({bn} {bc}/{mc}{(l > .0f ? " 装填中" : "")})"
+                            : $"{fn}({bn} {bf.GetFillerName()} {bc}/{mc}{(l > .0f ? " 装填中" : "")})";
+                };
                 firearm.ShootOnce = DefaultShoot;
                 firearm.Sub = gun => gun.Magazine.AppropriateBullet();
                 firearm.Reload = (gun, user) =>

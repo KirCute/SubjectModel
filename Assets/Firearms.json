@@ -39,7 +39,7 @@
 			"Name":"模板B",
 			"Type":2,
 			"Damage":1.5,
-			"Reload":1.0,
+			"Reload":0.5,
 			"Loading":2.0,
 			"Weight":4.0,
 			"Depth":10.0,

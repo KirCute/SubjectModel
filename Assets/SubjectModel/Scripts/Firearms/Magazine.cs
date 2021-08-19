@@ -50,7 +50,8 @@ namespace SubjectModel.Scripts.Firearms
 
         public void Load(Inventory inv, Bullet bullet)
         {
-            inv.Add(Containing);
+            Release(inv);
+            if (!AppropriateBullet()(bullet)) return;
             if (bullet.Count > Temple.BulletContains) Containing = (Bullet) bullet.Fetch(Temple.BulletContains);
             else
             {
@@ -59,10 +60,12 @@ namespace SubjectModel.Scripts.Firearms
             }
         }
 
-        public Bullet Load(Bullet bullet)
+        public bool Load(Bullet bullet, out Bullet containing)
         {
-            var ret = Containing;
-            Containing = bullet;
+            containing = Containing;
+            Containing = null;
+            var ret = AppropriateBullet()(bullet);
+            if (ret) Containing = bullet;
             return ret;
         }
         

@@ -3,6 +3,13 @@ using System.Collections.Generic;
 
 namespace SubjectModel.Scripts.InventorySystem
 {
+    /**
+     * <summary>
+     * 广义容器
+     * 用于管理任何可以存放IItemStack的东西，例如物品栏，箱子。
+     * 相比List&lt;IItemStack&gt;，它最大的优点是可以自动实现物品的堆叠，详见Add&lt;T&gt;(T)。
+     * </summary>
+     */
     public class Container
     {
         public readonly IList<IItemStack> Contains;
@@ -12,9 +19,8 @@ namespace SubjectModel.Scripts.InventorySystem
             Contains = contains;
         }
 
-        public Container()
+        public Container() : this(new List<IItemStack>())
         {
-            Contains = new List<IItemStack>();
         }
 
         public bool Remove(IItemStack item)

@@ -45,6 +45,7 @@ namespace SubjectModel.Scripts.Development
         private string bossDefence;
         private string bossLocate;
 
+        private string st;
         private string mdc;
         private string tdc;
         private string mdp;
@@ -129,6 +130,7 @@ namespace SubjectModel.Scripts.Development
             firearmScroll = Vector2.zero;
             magazineScroll = Vector2.zero;
             bulletScroll = Vector2.zero;
+            st = $"{BuffRenderer.StainTime}";
             mdc = $"{BuffRenderer.MotiveDamageCoefficient}";
             tdc = $"{BuffRenderer.ThermalDamageCoefficient}";
             mdp = $"{BuffRenderer.MinimumDamagePotential}";
@@ -145,7 +147,8 @@ namespace SubjectModel.Scripts.Development
 
         private void Update()
         {
-            if (float.TryParse(mdc, out var floatValue)) BuffRenderer.MotiveDamageCoefficient = floatValue;
+            if (float.TryParse(st, out var floatValue)) BuffRenderer.StainTime = floatValue;
+            if (float.TryParse(mdc, out floatValue)) BuffRenderer.MotiveDamageCoefficient = floatValue;
             if (float.TryParse(tdc, out floatValue)) BuffRenderer.ThermalDamageCoefficient = floatValue;
             if (float.TryParse(mdp, out floatValue)) BuffRenderer.MinimumDamagePotential = floatValue;
             if (float.TryParse(kpfd, out var doubleValue)) Firearm.KickPowerForDeviation = doubleValue;
@@ -205,6 +208,7 @@ namespace SubjectModel.Scripts.Development
 
                         break;
                     case 2:
+                        AutoAdjustString("沾染时间", ref st);
                         AutoAdjustString("动力伤害系数", ref mdc);
                         AutoAdjustString("热力伤害系数", ref tdc);
                         AutoAdjustString("最小热力伤害电势差", ref mdp);

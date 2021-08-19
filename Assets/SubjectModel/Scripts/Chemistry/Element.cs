@@ -3,6 +3,14 @@ using System.Linq;
 
 namespace SubjectModel.Scripts.Chemistry
 {
+    /**
+     * <summary>
+     * 元素
+     * 此类的每一个实例代表一种元素。
+     * 原则上该类的实例只能从Elements.json中读取，由资源加载器创建。
+     * 禁止在游戏运行过程中创建该类的实例对象，或改变已有实例对象的成员变量值。
+     * </summary>
+     */
     [Serializable]
     public class Element
     {
@@ -19,11 +27,6 @@ namespace SubjectModel.Scripts.Chemistry
         public Buff[] buffType;
         public float[][] buffParam;
         public int[][] state;
-
-        public Element(string symbol)
-        {
-            this.symbol = symbol;
-        }
 
         public bool HasValence(int valence)
         {

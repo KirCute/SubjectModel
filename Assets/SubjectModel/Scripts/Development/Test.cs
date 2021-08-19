@@ -236,7 +236,7 @@ namespace SubjectModel.Scripts.Development
                         chest.contains.Add(new Firearm(FirearmDictionary.FirearmTemples[0]));
                         for (var i = 0; i < 5; i++)
                             chest.contains.Add(new Magazine(FirearmDictionary.MagazineTemples[0]))
-                                .Load(new Bullet(FirearmDictionary.BulletTemples[0], 20));
+                                .Load(new Bullet(FirearmDictionary.BulletTemples[0], 20), out _);
                         break;
                     case "PhysicsAntiBody":
                         chest.contains.Add(new Firearm(FirearmDictionary.FirearmTemples[2]));

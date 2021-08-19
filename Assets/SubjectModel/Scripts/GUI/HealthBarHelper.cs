@@ -1,9 +1,13 @@
-using System;
 using Bolt;
 using UnityEngine;
 
 namespace SubjectModel.Scripts.GUI
 {
+    /**
+     * <summary>
+     * 更新一般敌人状态条GUI的脚本
+     * </summary>
+     */
     [RequireComponent(typeof(Variables))]
     public class HealthBarHelper : MonoBehaviour
     {

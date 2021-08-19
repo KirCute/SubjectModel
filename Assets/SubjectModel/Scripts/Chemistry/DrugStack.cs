@@ -7,16 +7,22 @@ using UnityEngine;
 
 namespace SubjectModel.Scripts.Chemistry
 {
+    /**
+     * <summary>粒子堆，用于描述一个DrugStack内全部同种粒子（同元素的同价态）的信息</summary>
+     */
     public class IonStack
     {
-        private const int MaxPartner = 10;
+        private const int MaxPartner = 10; //中心原子的最大氧（氢）结合量
 
-        public Element Element;
-        public int Index;
-        public float Amount;
-        public float Concentration;
-        public float DropTime;
+        public Element Element; //中心原子的元素
+        public int Index; //中心原子化合价序号
+        public float Amount; //物质的量
+        public float Concentration; //浓度
+        public float DropTime; //剩余沾染时间
 
+        /**
+         * <summary>得到粒子的化学符号</summary>
+         */
         public string GetSymbol(int properties)
         {
             if (Element.valences[Index] == 0)
@@ -39,15 +45,25 @@ namespace SubjectModel.Scripts.Chemistry
                     : $"{Element.symbol}{partner}H{combination} {chargeStr}";
         }
 
+        /**
+         * <summary>
+         * 计算中心原子数量的方法
+         * <param name="num">中心原子氧（氢）结合数</param>
+         * <returns>中心原子数</returns>
+         * </summary>
+         */
         private static int FindPartner(float num)
         {
-            for (var i = 1; i < MaxPartner; i++)
+            for (var i = 1; i < MaxPartner; i++) //其实就是寻找最小公倍数
                 if (Utils.IsInteger(num * i))
                     return i;
             return 1;
         }
     }
 
+    /**
+     * <summary>试剂堆，用于描述玻封药品，子弹或其它炼金术容器内的全部内容物</summary>
+     */
     public class DrugStack : IThrowable, IFiller
     {
         public readonly string Tag;

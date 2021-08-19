@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Bolt;
 using Cinemachine;
 using UnityEngine;

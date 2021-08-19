@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using SubjectModel.Scripts.InventorySystem;
 using UnityEngine;
 
