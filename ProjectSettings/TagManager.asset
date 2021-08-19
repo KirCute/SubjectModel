@@ -16,6 +16,7 @@ TagManager:
   - Container
   - EnemyReminder
   - EnemiesStateBar
+  - InventoryGUI
   layers:
   - Default
   - TransparentFX

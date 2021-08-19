@@ -5,26 +5,25 @@ using UnityEngine;
 
 namespace SubjectModel.Scripts.InventorySystem
 {
+    /**
+     * <summary>
+     * 物品栏
+     * 所有作战单位都必须挂载物品栏
+     * 物品栏含有一个容器和一个武器选定项，只有武器被物品栏选定时才可以使用
+     * </summary>
+     */
     [RequireComponent(typeof(Variables))]
     public class Inventory : MonoBehaviour
     {
-        public const int PlayerMaxSubCount = 20;
-        
-        private Container bag;
-        private Container sub;
-        public int selecting;
-        public int subSelecting;
+        public const int PlayerMaxSubCount = 20; //玩家物品栏的最大子物品数
+
+        private readonly Container bag = new Container(); //物品栏的容器
+        private readonly Container sub = new Container(); //武器的子物品候选格，是假容器，随时更新
+        public int selecting = -1; //被选定的物品，未选定时为-1
+        public int subSelecting; //被选定的子物品
 
         public IList<IItemStack> Contains => bag.Contains;
         public IList<IItemStack> SubContains => sub.Contains;
-
-        private void Awake()
-        {
-            bag = new Container();
-            sub = new Container();
-            selecting = -1;
-            subSelecting = 0;
-        }
 
         private void Update()
         {
@@ -33,6 +32,13 @@ namespace SubjectModel.Scripts.InventorySystem
                 tool.Selecting(gameObject);
         }
 
+        /**
+         * <summary>
+         * 从物品栏中删除一个物品
+         * <param name="item">要删除的物品</param>
+         * <returns>成功与否</returns>
+         * </summary>
+         */
         public bool Remove(IItemStack item)
         {
             if (item == null) return true;
@@ -53,6 +59,13 @@ namespace SubjectModel.Scripts.InventorySystem
             return true;
         }
 
+        /**
+         * <summary>
+         * 向物品栏中添加物品
+         * <param name="item">要添加的物品</param>
+         * <returns>该物品</returns>
+         * </summary>
+         */
         public T Add<T>(T item) where T : IItemStack
         {
             if (item == null) return default;
@@ -63,6 +76,13 @@ namespace SubjectModel.Scripts.InventorySystem
             return item;
         }
 
+        /**
+         * <summary>
+         * 得到当前选定的子物品
+         * <param name="item">输出，当前选定的子物品</param>
+         * <returns>成功与否</returns>
+         * </summary>
+         */
         public bool TryGetSubItem(out IItemStack item)
         {
             item = null;
@@ -71,6 +91,12 @@ namespace SubjectModel.Scripts.InventorySystem
             return true;
         }
 
+        /**
+         * <summary>
+         * 切换武器
+         * <param name="target">目标武器所在格索引</param>
+         * </summary>
+         */
         public void SwitchTo(int target)
         {
             if (target == selecting || target >= bag.Contains.Count || !(bag.Contains[target] is Weapon targetTool))
@@ -83,30 +109,77 @@ namespace SubjectModel.Scripts.InventorySystem
             if (target >= 0) targetTool.OnSelected(gameObject);
         }
 
+        /**
+         * <summary>
+         * 武器主使用（持续）
+         * <param name="pos">瞄准位置（玩家鼠标世界位置）</param>
+         * </summary>
+         */
         public void MasterUseKeep(Vector2 pos)
         {
             if (selecting < 0 || selecting >= bag.Contains.Count || !(bag.Contains[selecting] is Weapon tool)) return;
             tool.OnMasterUseKeep(gameObject, pos);
         }
 
+        /**
+         * <summary>
+         * 武器主使用（单次）
+         * <param name="pos">瞄准位置（玩家鼠标世界位置）</param>
+         * </summary>
+         */
         public void MasterUseOnce(Vector2 pos)
         {
             if (selecting < 0 || selecting >= bag.Contains.Count || !(bag.Contains[selecting] is Weapon tool)) return;
             tool.OnMasterUseOnce(gameObject, pos);
         }
 
+        /**
+         * <summary>
+         * 武器主使用（由AI调用，单次）
+         * <param name="pos">瞄准位置</param>
+         * </summary>
+         */
+        public void MasterUse(Vector2 pos)
+        {
+            if (selecting < 0 || selecting >= bag.Contains.Count || !(bag.Contains[selecting] is Weapon tool)) return;
+            tool.OnMasterUseOnce(gameObject, pos);
+            tool.OnMasterUseKeep(gameObject, pos);
+        }
+
+        /**
+         * <summary>武器副使用（持续）</summary>
+         */
         public void SlaveUseKeep()
         {
             if (selecting < 0 || selecting >= bag.Contains.Count || !(bag.Contains[selecting] is Weapon tool)) return;
             tool.OnSlaveUseKeep(gameObject);
         }
 
+        /**
+         * <summary>武器副使用（单次）</summary>
+         */
         public void SlaveUseOnce()
         {
             if (selecting < 0 || selecting >= bag.Contains.Count || !(bag.Contains[selecting] is Weapon tool)) return;
             tool.OnSlaveUseOnce(gameObject);
         }
 
+        /**
+         * <summary>武器副使用（由AI调用，单次）</summary>
+         */
+        public void SlaveUse()
+        {
+            if (selecting < 0 || selecting >= bag.Contains.Count || !(bag.Contains[selecting] is Weapon tool)) return;
+            tool.OnSlaveUseOnce(gameObject);
+            tool.OnSlaveUseKeep(gameObject);
+        }
+
+        /**
+         * <summary>
+         * 重构子物品栏
+         * 应在切换武器或物品栏内容物改变时调用
+         * </summary>
+         */
         private void RebuildSubInventory()
         {
             sub.Contains.Clear();

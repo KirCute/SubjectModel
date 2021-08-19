@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace SubjectModel.Scripts.SceneObjects
 {
+    /**
+     * <summary>枪械整备台</summary>
+     */
     public class FirearmTable : SceneObject
     {
         private static readonly Rect WindowRect = new Rect(280f, 156f, 1360f, 768f);

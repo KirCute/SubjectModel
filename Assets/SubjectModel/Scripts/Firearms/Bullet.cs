@@ -3,6 +3,12 @@ using SubjectModel.Scripts.InventorySystem;
 
 namespace SubjectModel.Scripts.Firearms
 {
+    /**
+     * <summary>
+     * 子弹的模板
+     * 可序列化，在子弹实例创建时作为参数。
+     * </summary>
+     */
     [Serializable]
     public class BulletTemple
     {
@@ -27,11 +33,14 @@ namespace SubjectModel.Scripts.Firearms
         }
     }
 
+    /**
+     * <summary>子弹</summary>
+     */
     public class Bullet : IItemStack
     {
-        public readonly BulletTemple Temple;
-        public readonly IFiller Filler;
-        public int Count;
+        public readonly BulletTemple Temple; //模板
+        public readonly IFiller Filler; //内容物，在击中时沾染在目标上
+        public int Count; //数量
 
         public Bullet(BulletTemple temple, int count, IFiller filler = null)
         {

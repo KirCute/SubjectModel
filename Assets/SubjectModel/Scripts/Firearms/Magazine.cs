@@ -68,7 +68,7 @@ namespace SubjectModel.Scripts.Firearms
             if (ret) Containing = bullet;
             return ret;
         }
-        
+
         public override IItemStack Fetch(int count)
         {
             return new Magazine(Temple) {Containing = Containing};

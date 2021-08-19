@@ -4,6 +4,12 @@ using UnityEngine;
 
 namespace SubjectModel.Scripts.InventorySystem
 {
+    /**
+     * <summary>
+     * 键鼠操作物品栏脚本
+     * 与物品栏挂在同一物体下时，该物品栏可用键鼠操作
+     * </summary>
+     */
     [RequireComponent(typeof(Inventory))]
     [RequireComponent(typeof(Variables))]
     public class InventoryKeyboard : MonoBehaviour

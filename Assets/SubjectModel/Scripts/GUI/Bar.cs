@@ -4,9 +4,7 @@ using UnityEngine;
 namespace SubjectModel.Scripts.GUI
 {
     /**
-     * <summary>
-     * 更新血条，体力条等条状GUI的脚本
-     * </summary>
+     * <summary>更新血条，体力条等条状GUI的脚本</summary>
      */
     [RequireComponent(typeof(RectTransform))]
     public class Bar : MonoBehaviour

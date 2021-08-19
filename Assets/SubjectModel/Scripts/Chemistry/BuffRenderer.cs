@@ -19,11 +19,16 @@ namespace SubjectModel.Scripts.Chemistry
     {
         public static float StainTime = 10.0f; //沾染粒子保持沾染的时间
         public static float MotiveDamageCoefficient = 30.0f; //动力伤害系数，反应生成气体时与气体量相乘作为动力伤害，最终伤害由气体动力伤害与防御相间得出
-        public static float ThermalDamageCoefficient = 50.0f; //热力伤害系数，氧化还原反应大于MinimumDamagePotential的部分与之相成作为热力伤害，最终伤害等于热力伤害
+
+        public static float
+            ThermalDamageCoefficient = 50.0f; //热力伤害系数，氧化还原反应大于MinimumDamagePotential的部分与之相成作为热力伤害，最终伤害等于热力伤害
+
         public static float MinimumDamagePotential = .4f; //造成热力伤害的最小电势差
         public readonly List<IBuff> Buffs = new List<IBuff>(); //正在作用于作战单位的效果
         public readonly IList<IonStack> Stain = new List<IonStack>(); //正沾染于作战单位的粒子
-        public bool immune; /// <value>是否免疫效果</value>
+        public bool immune;
+
+        /// <value>是否免疫效果</value>
         private void Update()
         {
             for (var i = 0; i < Buffs.Count; i++)
@@ -128,7 +133,8 @@ namespace SubjectModel.Scripts.Chemistry
                             DrugDictionary.GetTypeOfBuff(stack.Element.buffType[stack.Index]),
                             stack.Amount * stack.Element.buffParam[stack.Index][0],
                             stack.Concentration * stack.Element.buffParam[stack.Index][1])); //添加物质所带效果
-                    foreach (var ion in Stain.Where(ion => ion.Element == stack.Element && ion.Index == stack.Index)) //寻找相同粒子进行堆叠，理论上只会执行1次或0次
+                    foreach (var ion in Stain.Where(ion => ion.Element == stack.Element && ion.Index == stack.Index)
+                    ) //寻找相同粒子进行堆叠，理论上只会执行1次或0次
                     {
                         ion.Amount += stack.Amount;
                         ion.DropTime = StainTime; //更新脱落时间
@@ -189,7 +195,7 @@ namespace SubjectModel.Scripts.Chemistry
         {
             React(properties, new List<IonStack>());
         }
-        
+
         /**
          * 反应递归方法
          * 禁止React(int)以外的方法调用。
@@ -275,7 +281,8 @@ namespace SubjectModel.Scripts.Chemistry
                     Element = oxidizer.Element, Amount = oxidizer.Amount,
                     Index = oxidizer.Index - 1, Concentration = 1f
                 }, properties); //沾染还原产物
-                reactionAmount = (maxPotential - minPotential) * (oxidizer.Amount + oxidizer.Amount / n * m) / 2f; //计算反应量
+                reactionAmount =
+                    (maxPotential - minPotential) * (oxidizer.Amount + oxidizer.Amount / n * m) / 2f; //计算反应量
                 reducer.Amount -= oxidizer.Amount / n * m; //还原剂消耗
                 oxidizer.Amount = .0f; //氧化剂消耗（殆尽）
             }

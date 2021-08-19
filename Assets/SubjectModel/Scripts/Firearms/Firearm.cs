@@ -5,6 +5,12 @@ using UnityEngine;
 
 namespace SubjectModel.Scripts.Firearms
 {
+    /**
+     * <summary>
+     * 枪支的模板
+     * 可序列化，在枪支实例创建时作为参数。
+     * </summary>
+     */
     [Serializable]
     public class FirearmTemple
     {
@@ -42,6 +48,12 @@ namespace SubjectModel.Scripts.Firearms
         }
     }
 
+    /**
+     * <summary>
+     * 枪支
+     * 使用函数式编程思想，添加用法不同于AR的枪支，需在GunUtils中修改有关内容
+     * </summary>
+     */
     public class Firearm : Weapon
     {
         private const float KickTime = .01f;
@@ -103,6 +115,7 @@ namespace SubjectModel.Scripts.Firearms
         {
             Loading -= Time.deltaTime;
             kickingTime -= Time.deltaTime;
+            user.GetComponent<GunFlash>().shootAble = Loading <= .0f && Magazine?.Containing != null;
             if (kickingTime <= .0f) CancelKick(user);
             if (Loading > .0f) return;
             Loading = .0f;

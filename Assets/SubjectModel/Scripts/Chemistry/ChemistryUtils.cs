@@ -75,7 +75,7 @@ namespace SubjectModel.Scripts.Chemistry
             return GetColor(stack.Element.buffType[stack.Index]);
         }
     }
-    
+
     /**
      * <summary>储存Element实例对象的工具类</summary>
      */

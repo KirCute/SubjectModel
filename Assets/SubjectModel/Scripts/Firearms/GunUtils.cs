@@ -34,7 +34,7 @@ namespace SubjectModel.Scripts.Firearms
             var b = m?.Containing;
             var bn = b?.Temple.Name;
             var bf = b?.Filler;
-            var bc = m?.Containing.Count;
+            var bc = b?.Count;
             var mc = m?.Temple.BulletContains;
             return m == null
                 ? $"{fn}{(l > .0f ? "(装填中)" : "")}"
@@ -47,9 +47,7 @@ namespace SubjectModel.Scripts.Firearms
 
         private static readonly Action<Firearm, GameObject, Vector2> DefaultShoot = (firearm, user, aim) =>
         {
-            if (firearm.Loading > .0f || firearm.Magazine?.Containing == null ||
-                firearm.Magazine.Containing.Count <= 0 ||
-                Camera.main == null) return;
+            if (firearm.Loading > .0f || firearm.Magazine?.Containing == null || Camera.main == null) return;
             var shooterPosition = user.GetComponent<Rigidbody2D>().position;
             if (shooterPosition == aim) return;
             aim = Utils.GetRotatedVector(aim - shooterPosition,

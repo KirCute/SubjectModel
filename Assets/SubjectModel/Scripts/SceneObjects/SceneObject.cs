@@ -27,13 +27,13 @@ namespace SubjectModel.Scripts.SceneObjects
 
         protected virtual void Update()
         {
-            var color = approached && playerVariables.Get<int>("Standonly") == 0;
+            var color = approached && playerVariables.Get<int>("Standonly") == 0; //只有玩家在可移动状态可以与场景物品交互
             GetComponent<SpriteRenderer>().color = color ? HighLight : LowLight;
         }
 
         protected virtual void OnMouseOver()
         {
-            if (!approached || playerVariables.Get<int>("Standonly") != 0) return;
+            if (!approached || playerVariables.Get<int>("Standonly") != 0) return; //只有玩家在可移动状态可以与场景物品交互
             if (Input.GetMouseButtonDown(1)) Open();
         }
 
@@ -47,13 +47,13 @@ namespace SubjectModel.Scripts.SceneObjects
         protected virtual void Open()
         {
             drawing = true;
-            playerVariables.Set("Standonly", playerVariables.Get<int>("Standonly") + 1);
+            playerVariables.Set("Standonly", playerVariables.Get<int>("Standonly") + 1); //使玩家进入不可以动状态
         }
 
         protected virtual void Close()
         {
             drawing = false;
-            playerVariables.Set("Standonly", playerVariables.Get<int>("Standonly") - 1);
+            playerVariables.Set("Standonly", playerVariables.Get<int>("Standonly") - 1); //使玩家回到可移动状态
         }
 
         protected abstract void DrawGUI();

@@ -341,6 +341,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 862196d02ef02e04d99b713bd18bd0c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  immune: 0
 --- !u!114 &3751485004116039209
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -353,7 +354,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dda043e3bbf8af640b4bdef4e7b0454a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selecting: 0
+  selecting: -1
   subSelecting: 0
 --- !u!114 &-13836612440790149
 MonoBehaviour:

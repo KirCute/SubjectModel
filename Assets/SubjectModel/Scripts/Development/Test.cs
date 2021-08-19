@@ -233,15 +233,15 @@ namespace SubjectModel.Scripts.Development
                 switch (container.name)
                 {
                     case "PhysicsAntiArmor":
-                        chest.contains.Add(new Firearm(FirearmDictionary.FirearmTemples[0]));
+                        chest.Contains.Add(new Firearm(FirearmDictionary.FirearmTemples[0]));
                         for (var i = 0; i < 5; i++)
-                            chest.contains.Add(new Magazine(FirearmDictionary.MagazineTemples[0]))
+                            chest.Contains.Add(new Magazine(FirearmDictionary.MagazineTemples[0]))
                                 .Load(new Bullet(FirearmDictionary.BulletTemples[0], 20), out _);
                         break;
                     case "PhysicsAntiBody":
-                        chest.contains.Add(new Firearm(FirearmDictionary.FirearmTemples[2]));
-                        chest.contains.Add(new Bullet(FirearmDictionary.BulletTemples[4], 100));
-                        chest.contains.Add(new Bullet(FirearmDictionary.BulletTemples[4], 20, new DrugStack(
+                        chest.Contains.Add(new Firearm(FirearmDictionary.FirearmTemples[2]));
+                        chest.Contains.Add(new Bullet(FirearmDictionary.BulletTemples[4], 100));
+                        chest.Contains.Add(new Bullet(FirearmDictionary.BulletTemples[4], 20, new DrugStack(
                             "H2SO4",
                             new List<IonStack>
                             {
@@ -256,8 +256,8 @@ namespace SubjectModel.Scripts.Development
                         )));
                         break;
                     case "Poison":
-                        chest.contains.Add(new Sling());
-                        chest.contains.Add(new DrugStack
+                        chest.Contains.Add(new Sling());
+                        chest.Contains.Add(new DrugStack
                         (
                             "CuSO4",
                             new List<IonStack>
@@ -271,7 +271,7 @@ namespace SubjectModel.Scripts.Development
                             Element.Acid,
                             100
                         ));
-                        chest.contains.Add(new DrugStack
+                        chest.Contains.Add(new DrugStack
                         (
                             "FeCl3",
                             new List<IonStack>
@@ -290,7 +290,7 @@ namespace SubjectModel.Scripts.Development
                             Element.Acid,
                             50
                         ));
-                        chest.contains.Add(new DrugStack
+                        chest.Contains.Add(new DrugStack
                         (
                             "FeSO4",
                             new List<IonStack>
@@ -304,7 +304,7 @@ namespace SubjectModel.Scripts.Development
                             Element.Acid,
                             50
                         ));
-                        chest.contains.Add(new DrugStack
+                        chest.Contains.Add(new DrugStack
                         (
                             "CoSO4",
                             new List<IonStack>
@@ -320,8 +320,8 @@ namespace SubjectModel.Scripts.Development
                         ));
                         break;
                     case "Reaction":
-                        chest.contains.Add(new Sling());
-                        chest.contains.Add(new DrugStack
+                        chest.Contains.Add(new Sling());
+                        chest.Contains.Add(new DrugStack
                         (
                             "H2O2",
                             new List<IonStack>
@@ -335,7 +335,7 @@ namespace SubjectModel.Scripts.Development
                             Element.Acid,
                             75
                         ));
-                        chest.contains.Add(new DrugStack
+                        chest.Contains.Add(new DrugStack
                         (
                             "KMnO4",
                             new List<IonStack>

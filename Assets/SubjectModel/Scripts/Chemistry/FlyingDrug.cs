@@ -44,7 +44,8 @@ namespace SubjectModel.Scripts.Chemistry
         private void Update()
         {
             var position = GetComponent<Rigidbody2D>().position;
-            if (Utils.GetMagnitudeSquare2D(position, origin) >= distanceSquare) Invoke(); //若移动距离达到目标值则落地，不用target来判断是因为误差过大很可能导致最终不落地
+            if (Utils.GetMagnitudeSquare2D(position, origin) >= distanceSquare)
+                Invoke(); //若移动距离达到目标值则落地，不用target来判断是因为误差过大很可能导致最终不落地
         }
 
         /**

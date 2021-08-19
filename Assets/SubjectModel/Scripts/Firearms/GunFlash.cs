@@ -30,6 +30,7 @@ namespace SubjectModel.Scripts.Firearms
         private float trackTime;
         public float distance;
         public bool sight;
+        public bool shootAble;
         public Vector2 aimPos = Vector2.zero;
 
         private void Awake()
@@ -44,8 +45,8 @@ namespace SubjectModel.Scripts.Firearms
             else
             {
                 trackTime = .0f;
-                GetComponent<LineRenderer>().enabled = sight;
-                if (sight && Camera.main != null)
+                GetComponent<LineRenderer>().enabled = shootAble && sight;
+                if (shootAble && sight && Camera.main != null)
                     DrawLine(GetComponent<Rigidbody2D>().position, aimPos, SightLineColor);
             }
         }

@@ -179,6 +179,7 @@ namespace SubjectModel.Scripts.Chemistry
 
             public override void Update(GameObject host)
             {
+                base.Update(host);
                 Invoke(variable, host, GetLevel());
             }
 
