@@ -1,6 +1,6 @@
-using System;
 using System.Linq;
 using System.Text;
+using SubjectModel.Scripts.Event;
 using SubjectModel.Scripts.InventorySystem;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,6 +19,11 @@ namespace SubjectModel.Scripts.GUI
         public Inventory inventory;
         private Text selected;
         private Text sub;
+
+        private void Awake()
+        {
+            EventDispatchers.OteDispatcher.AddEventListener(OnOperationTransfer);
+        }
 
         private void Start()
         {
@@ -54,6 +59,16 @@ namespace SubjectModel.Scripts.GUI
         {
             selected.text = "";
             sub.text = "";
+        }
+        
+        private void OnOperationTransfer(GameObject newObject)
+        {
+            if (newObject.TryGetComponent<Inventory>(out var inv))
+            {
+                inventory = inv;
+                enabled = true;
+            }
+            else enabled = false;
         }
     }
 }

@@ -1,5 +1,6 @@
 using System.Linq;
 using Bolt;
+using SubjectModel.Scripts.Event;
 using SubjectModel.Scripts.Task;
 using UnityEngine;
 
@@ -25,6 +26,7 @@ namespace SubjectModel.Scripts.System
             foreach (var reminder in GameObject.FindGameObjectsWithTag("EnemyReminder")
                 .Where(r => r.GetComponent<EnemyReminder>().triggered)) Destroy(reminder);
             GetComponent<Rigidbody2D>().position = respawnPoint;
+            EventDispatchers.OteDispatcher.DispatchEvent(gameObject);
         }
     }
 }

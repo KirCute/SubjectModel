@@ -17,6 +17,7 @@ TagManager:
   - EnemyReminder
   - EnemiesStateBar
   - InventoryGUI
+  - Friends
   layers:
   - Default
   - TransparentFX
