@@ -5,6 +5,12 @@ using UnityEngine;
 
 namespace SubjectModel.Scripts.System
 {
+    /**
+     * <summary>
+     * 负责处理玩家死亡自动复活的脚本
+     * 需要挂在玩家物体上
+     * </summary>
+     */
     [RequireComponent(typeof(Variables))]
     [RequireComponent(typeof(Rigidbody2D))]
     public class PlayerRespawner : MonoBehaviour

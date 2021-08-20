@@ -26,7 +26,7 @@ namespace SubjectModel.Scripts.Chemistry
         public static float MinimumDamagePotential = .4f; //造成热力伤害的最小电势差
         public readonly List<IBuff> Buffs = new List<IBuff>(); //正在作用于作战单位的效果
         public readonly IList<IonStack> Stain = new List<IonStack>(); //正沾染于作战单位的粒子
-        public bool immune;
+        public bool immune; //是否免疫效果
 
         /// <value>是否免疫效果</value>
         private void Update()
@@ -133,8 +133,8 @@ namespace SubjectModel.Scripts.Chemistry
                             DrugDictionary.GetTypeOfBuff(stack.Element.buffType[stack.Index]),
                             stack.Amount * stack.Element.buffParam[stack.Index][0],
                             stack.Concentration * stack.Element.buffParam[stack.Index][1])); //添加物质所带效果
-                    foreach (var ion in Stain.Where(ion => ion.Element == stack.Element && ion.Index == stack.Index)
-                    ) //寻找相同粒子进行堆叠，理论上只会执行1次或0次
+                    foreach (var ion in Stain.Where(ion =>
+                        ion.Element == stack.Element && ion.Index == stack.Index)) //寻找相同粒子进行堆叠，理论上只会执行1次或0次
                     {
                         ion.Amount += stack.Amount;
                         ion.DropTime = StainTime; //更新脱落时间
@@ -204,6 +204,7 @@ namespace SubjectModel.Scripts.Chemistry
          */
         private void React(int properties, ICollection<IonStack> ignore)
         {
+            //φ(氧化剂/还原产物) > φ(还原剂/还原产物)，反应可以发生
             //找到氧化性最强且没有被忽略的粒子
             var maxPotential = float.NegativeInfinity;
             IonStack oxidizer = null;
@@ -331,6 +332,30 @@ namespace SubjectModel.Scripts.Chemistry
                 React(drug.Properties); //氧化还原
                 DoubleReplace(drug.Properties); //复分解
                 Cleanup(); //清理无效粒子
+            }
+        }
+
+        /**
+         * <summary>
+         * 得到沾染粒子中氧化性（还原性）最强的氧化剂（还原剂）的氧化电势（还原电势）
+         * <param name="o">氧化电势</param>
+         * <param name="r">还原电势</param>
+         * </summary>
+         */
+        public void GetReactPotential(out float o, out float r)
+        {
+            o = float.NegativeInfinity;
+            foreach (var ion in Stain)
+            {
+                if (ion.Element.GetReducedPotential(ion.Index, Element.Acid, out var v) && v > o) o = v;
+                if (ion.Element.GetReducedPotential(ion.Index, Element.Bases, out v) && v > o) o = v;
+            }
+
+            r = float.PositiveInfinity;
+            foreach (var ion in Stain)
+            {
+                if (ion.Element.GetOxidizedPotential(ion.Index, Element.Acid, out var v) && v < r) r = v;
+                if (ion.Element.GetOxidizedPotential(ion.Index, Element.Bases, out v) && v < r) r = v;
             }
         }
     }

@@ -1,10 +1,14 @@
 using Bolt;
+using SubjectModel.Scripts.Chemistry;
 using UnityEngine;
 
 namespace SubjectModel.Scripts.GUI
 {
     /**
-     * <summary>更新一般敌人状态条GUI的脚本</summary>
+     * <summary>
+     * 更新一般敌人状态条GUI的脚本
+     * 需要挂载在作战单位上
+     * </summary>
      */
     [RequireComponent(typeof(Variables))]
     public class HealthBarHelper : MonoBehaviour
@@ -20,7 +24,10 @@ namespace SubjectModel.Scripts.GUI
                 switch (bar.name)
                 {
                     case "Health Bar":
-                        bar.GetComponent<Bar>().sourceObject = gameObject;
+                        bar.GetComponent<Bar>().sourceVariables = gameObject.GetComponent<Variables>();
+                        break;
+                    case "Stain":
+                        bar.GetComponent<StainGui>().buffRenderer = gameObject.GetComponent<BuffRenderer>();
                         break;
                 }
         }

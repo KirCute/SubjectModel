@@ -1,3 +1,5 @@
+using Bolt;
+using SubjectModel.Scripts.Chemistry;
 using SubjectModel.Scripts.GUI;
 using UnityEngine;
 
@@ -5,13 +7,13 @@ namespace SubjectModel.Scripts.System
 {
     public delegate void RecoverAfterFight();
 
-    [RequireComponent(typeof(Bar))]
     public class BossAssistance : MonoBehaviour
     {
         private bool fighting;
         private GameObject boss;
         private RecoverAfterFight raf;
 
+        /*
         private void Reset()
         {
             var bar = GetComponent<Bar>();
@@ -20,6 +22,7 @@ namespace SubjectModel.Scripts.System
             bar.targetEnd = 1800f;
             bar.enabled = false;
         }
+        */
 
         private void Update()
         {
@@ -30,8 +33,24 @@ namespace SubjectModel.Scripts.System
         {
             boss = theBoss;
             boss.GetComponent<HealthBarHelper>().enabled = false;
-            GetComponent<Bar>().sourceObject = theBoss;
-            GetComponent<Bar>().enabled = true;
+
+            foreach (var bar in GetComponentsInChildren<Transform>())
+                switch (bar.name)
+                {
+                    case "Health Bar":
+                        bar.GetComponent<Bar>().sourceVariables = theBoss.GetComponent<Variables>();
+                        bar.GetComponent<Bar>().enabled = true;
+                        break;
+                    case "Stain":
+                        if (theBoss.TryGetComponent<BuffRenderer>(out var br))
+                        {
+                            bar.GetComponent<StainGui>().buffRenderer = br;
+                            bar.GetComponent<StainGui>().enabled = true;
+                        }
+
+                        break;
+                }
+
             raf += itsRaf;
             fighting = true;
         }
@@ -44,8 +63,19 @@ namespace SubjectModel.Scripts.System
                 raf = null;
             }
 
-            GetComponent<Bar>().sourceObject = null;
-            GetComponent<Bar>().enabled = false;
+            foreach (var bar in GetComponentsInChildren<Transform>())
+                switch (bar.name)
+                {
+                    case "Health Bar":
+                        bar.GetComponent<Bar>().sourceVariables = null;
+                        bar.GetComponent<Bar>().enabled = false;
+                        break;
+                    case "Stain":
+                        bar.GetComponent<StainGui>().buffRenderer = null;
+                        bar.GetComponent<StainGui>().enabled = false;
+                        break;
+                }
+
             fighting = false;
         }
 

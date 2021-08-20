@@ -9,7 +9,23 @@ namespace SubjectModel.Scripts.Chemistry
      */
     public interface IThrowable : IItemStack
     {
+        /**
+         * <summary>
+         * 弹弓主使用（玩家在手持弹弓选定此物品时按左键触发）
+         * 原则上只能由Sling调用
+         * <param name="user">使用弹弓者的GameObject</param>
+         * <param name="aim">使用时瞄准的位置（玩家鼠标的世界位置）</param>
+         * </summary>
+         */
         public void OnMasterThrow(GameObject user, Vector2 aim);
+
+        /**
+         * <summary>
+         * 弹弓副使用（玩家在手持弹弓选定此物品时按R触发）
+         * 原则上只能由Sling调用
+         * <param name="user">使用弹弓者的GameObject</param>
+         * </summary>
+         */
         public void OnSlaveThrow(GameObject user);
     }
 

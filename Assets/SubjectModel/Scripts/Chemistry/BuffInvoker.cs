@@ -109,7 +109,7 @@ namespace SubjectModel.Scripts.Chemistry
          * <summary>
          * 药品落地时构造BuffInvoker的方法。
          * 原则上只由FlyingDrug落地时和InvokeByThrower在无FlyingDrug的情况下（比如作战单位对自身原地投掷药品）调用。
-         * 如果要实现类似场景固有毒气的效果则不属于原则的情况。
+         * 如果要实现类似场景固有毒气的效果则不属于上述的情况。
          * <param name="drug">要沾染的药品</param>
          * <param name="position">BuffInvoker的出现位置（FlyingDrug的落地位置或作战单位自身的位置）</param>
          * <param name="keepTime">存在总时长，通常情况下不提供，如果要实现MC中滞留药水的效果可以提供一个较大数字</param>
