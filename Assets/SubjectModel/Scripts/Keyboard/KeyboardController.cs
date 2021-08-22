@@ -22,16 +22,19 @@ namespace SubjectModel.Scripts.Keyboard
         private void Update()
         {
             var dec = operated.GetComponent<Variables>().declarations;
-            var runSpeed = dec.IsDefined("RunSpeed") ? dec.Get<float>("RunSpeed") : 1.0f;
-            var running = Input.GetKey(KeyCode.LeftShift);
-            dec.Set("Running", running);
-            var run = running ? runSpeed : 1.0f;
             var speed = dec.Get<float>("Speed");
+            if (dec.IsDefined("Running"))
+            {
+                var running = Input.GetKey(KeyCode.LeftShift);
+                dec.Set("Running", running);
+                speed *= running ? dec.Get<float>("RunSpeed") : 1.0f;
+            }
+
             operated.GetComponent<Rigidbody2D>().velocity = dec.Get<int>("Standonly") > 0
                 ? Vector2.zero
                 : new Vector2(
-                    Input.GetAxisRaw("Horizontal") * speed * run,
-                    Input.GetAxisRaw("Vertical") * speed * run
+                    Input.GetAxisRaw("Horizontal") * speed,
+                    Input.GetAxisRaw("Vertical") * speed
                 );
         }
 

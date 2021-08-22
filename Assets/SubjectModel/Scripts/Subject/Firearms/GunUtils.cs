@@ -5,7 +5,7 @@ using Bolt;
 using SubjectModel.Scripts.InventorySystem;
 using UnityEngine;
 
-namespace SubjectModel.Scripts.Firearms
+namespace SubjectModel.Scripts.Subject.Firearms
 {
     public static class FirearmDictionary
     {

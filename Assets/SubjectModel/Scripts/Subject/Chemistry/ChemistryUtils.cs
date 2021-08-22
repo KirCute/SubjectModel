@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SubjectModel.Scripts.Chemistry
+namespace SubjectModel.Scripts.Subject.Chemistry
 {
     /**
      * <summary>效果的枚举</summary>

@@ -1,7 +1,7 @@
 ﻿using System;
 using SubjectModel.Scripts.InventorySystem;
 
-namespace SubjectModel.Scripts.Firearms
+namespace SubjectModel.Scripts.Subject.Firearms
 {
     [Serializable]
     public class MagazineTemple

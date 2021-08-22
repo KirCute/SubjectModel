@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using SubjectModel.Scripts.Chemistry;
-using SubjectModel.Scripts.Firearms;
 using SubjectModel.Scripts.InventorySystem;
 using SubjectModel.Scripts.SceneObjects;
+using SubjectModel.Scripts.Subject.Chemistry;
+using SubjectModel.Scripts.Subject.Firearms;
 using UnityEngine;
 
 namespace SubjectModel.Scripts.Development

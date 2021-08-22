@@ -4,7 +4,7 @@ using System.Linq;
 using Bolt;
 using UnityEngine;
 
-namespace SubjectModel.Scripts.Chemistry
+namespace SubjectModel.Scripts.Subject.Chemistry
 {
     /**
      * <summary>

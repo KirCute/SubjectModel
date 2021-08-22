@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using Bolt;
 using Newtonsoft.Json;
-using SubjectModel.Scripts.Chemistry;
-using SubjectModel.Scripts.Firearms;
 using SubjectModel.Scripts.InventorySystem;
+using SubjectModel.Scripts.Subject.Chemistry;
+using SubjectModel.Scripts.Subject.Firearms;
 using UnityEditor;
 using UnityEngine;
 

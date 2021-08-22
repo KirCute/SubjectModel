@@ -1,7 +1,7 @@
 using Bolt;
 using UnityEngine;
 
-namespace SubjectModel.Scripts.Chemistry
+namespace SubjectModel.Scripts.Subject.Chemistry
 {
     /**
       * <summary>所有效果的接口</summary>

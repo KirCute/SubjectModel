@@ -2,7 +2,7 @@
 using SubjectModel.Scripts.InventorySystem;
 using UnityEngine;
 
-namespace SubjectModel.Scripts.Chemistry
+namespace SubjectModel.Scripts.Subject.Chemistry
 {
     /**
      * <summary>所有弹弓的子弹需要实现的接口</summary>

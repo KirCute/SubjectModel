@@ -12,18 +12,19 @@ namespace SubjectModel.Scripts.System
         private const float RecoverSpeed = 30f;
         private const float CostWhenRunning = 50f;
         private const float RunnableStrength = 20f;
+        private VariableDeclarations dec;
         private float runSpeed;
         private bool dying;
         public bool removeAfterDead;
 
         private void Start()
         {
-            runSpeed = GetComponent<Variables>().declarations.Get<float>("RunSpeed");
+            dec = GetComponent<Variables>().declarations;
+            runSpeed = dec.IsDefined("RunSpeed") ? dec.Get<float>("RunSpeed") : 1.0f;
         }
 
         private void Update()
         {
-            var dec = GetComponent<Variables>().declarations;
             if (dec.Get<float>("Health") <= 0f || dec.Get<float>("Energy") <= 0f)
             {
                 if (!dying)
@@ -41,10 +42,14 @@ namespace SubjectModel.Scripts.System
             var strength = dec.Get<float>("Strength");
             var max = dec.Get<float>("Energy");
             strength += RecoverSpeed * Time.deltaTime;
-            var speed = strength >= RunnableStrength ? runSpeed : 1.0f;
-            dec.Set("RunSpeed", speed);
-            if (dec.Get<bool>("Running") && speed > 1.0f &&
-                GetComponent<Rigidbody2D>().velocity != Vector2.zero) strength -= CostWhenRunning * Time.deltaTime;
+            if (dec.IsDefined("Running"))
+            {
+                var speed = strength >= RunnableStrength ? runSpeed : 1.0f;
+                dec.Set("RunSpeed", speed);
+                if (dec.Get<bool>("Running") && speed > 1.0f &&
+                    GetComponent<Rigidbody2D>().velocity != Vector2.zero) strength -= CostWhenRunning * Time.deltaTime;
+            }
+
             if (strength > max) strength = max;
             dec.Set("Strength", strength);
         }

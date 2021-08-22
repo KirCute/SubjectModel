@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using SubjectModel.Scripts.Chemistry;
+using SubjectModel.Scripts.Subject.Chemistry;
 using UnityEngine;
 using UnityEngine.UI;
 

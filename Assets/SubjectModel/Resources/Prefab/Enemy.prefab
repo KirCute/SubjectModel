@@ -261,7 +261,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _data:
-    _json: '{"declarations":{"collection":{"$content":[{"name":"Health","value":{"$content":140.0,"$type":"System.Single"},"$version":"A"},{"name":"MaxHealth","value":{"$content":140.0,"$type":"System.Single"},"$version":"A"},{"name":"Defence","value":{"$content":10.0,"$type":"System.Single"},"$version":"A"},{"name":"Speed","value":{"$content":3.0,"$type":"System.Single"},"$version":"A"},{"name":"MaxStrength","value":{"$content":200.0,"$type":"System.Single"},"$version":"A"},{"name":"Energy","value":{"$content":200.0,"$type":"System.Single"},"$version":"A"},{"name":"Strength","value":{"$content":200.0,"$type":"System.Single"},"$version":"A"},{"name":"RunSpeed","value":{"$content":1.0,"$type":"System.Single"},"$version":"A"},{"name":"Running","value":{"$content":false,"$type":"System.Boolean"},"$version":"A"}],"$version":"A"},"$version":"A"}}'
+    _json: '{"declarations":{"collection":{"$content":[{"name":"Health","value":{"$content":140.0,"$type":"System.Single"},"$version":"A"},{"name":"MaxHealth","value":{"$content":140.0,"$type":"System.Single"},"$version":"A"},{"name":"Defence","value":{"$content":10.0,"$type":"System.Single"},"$version":"A"},{"name":"Speed","value":{"$content":3.0,"$type":"System.Single"},"$version":"A"},{"name":"MaxStrength","value":{"$content":200.0,"$type":"System.Single"},"$version":"A"},{"name":"Energy","value":{"$content":200.0,"$type":"System.Single"},"$version":"A"},{"name":"Strength","value":{"$content":200.0,"$type":"System.Single"},"$version":"A"}],"$version":"A"},"$version":"A"}}'
     _objectReferences: []
 --- !u!114 &3783856003099380856
 MonoBehaviour:

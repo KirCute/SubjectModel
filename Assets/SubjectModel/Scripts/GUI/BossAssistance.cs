@@ -1,10 +1,9 @@
 using Bolt;
-using SubjectModel.Scripts.Chemistry;
 using SubjectModel.Scripts.Event;
-using SubjectModel.Scripts.GUI;
+using SubjectModel.Scripts.Subject.Chemistry;
 using UnityEngine;
 
-namespace SubjectModel.Scripts.System
+namespace SubjectModel.Scripts.GUI
 {
     public class BossAssistance : MonoBehaviour
     {
@@ -62,33 +61,5 @@ namespace SubjectModel.Scripts.System
         {
             EventDispatchers.BossDispatcher.RemoveEventListener(OnBossFightStart);
         }
-
-        /*
-        private void Update()
-        {
-            if (boss == null && fighting) BossDead();
-        }
-
-        public void StartBossFight(GameObject theBoss, int next)
-        {
-            nextMission = next;
-            boss = theBoss;
-        }
-
-        public void BossDead()
-        {
-            EventDispatchers.EeDispatcher.DispatchEvent(nextMission);
-
-            fighting = false;
-        }
-        
-        public void InterruptFighting()
-        {
-            if (!fighting) return;
-            fighting = false;
-            Destroy(boss);
-            BossDead();
-        }
-        */
     }
 }

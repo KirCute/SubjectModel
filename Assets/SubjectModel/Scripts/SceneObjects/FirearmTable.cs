@@ -1,6 +1,6 @@
 ﻿using System.Linq;
-using SubjectModel.Scripts.Firearms;
 using SubjectModel.Scripts.InventorySystem;
+using SubjectModel.Scripts.Subject.Firearms;
 using UnityEngine;
 
 namespace SubjectModel.Scripts.SceneObjects
@@ -10,7 +10,7 @@ namespace SubjectModel.Scripts.SceneObjects
      */
     public class FirearmTable : SceneObject
     {
-        private static readonly Rect WindowRect = new Rect(280f, 156f, 1360f, 768f);
+        private static readonly Rect WindowRect = new Rect(280f, 156f, 1366f, 768f);
         private const float ItemWidth = 668f;
 
         private Vector2 magazineScroll = Vector2.zero;

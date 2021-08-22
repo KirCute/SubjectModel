@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SubjectModel.Scripts.Chemistry
+namespace SubjectModel.Scripts.Subject.Chemistry
 {
     /**
      * <summary>

@@ -1,7 +1,7 @@
 using SubjectModel.Scripts.Development;
 using UnityEngine;
 
-namespace SubjectModel.Scripts.Firearms
+namespace SubjectModel.Scripts.Subject.Firearms
 {
     /**
      * <summary>

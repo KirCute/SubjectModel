@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace SubjectModel.Scripts.Chemistry
+namespace SubjectModel.Scripts.Subject.Chemistry
 {
     /**
      * <summary>

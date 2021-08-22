@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Newtonsoft.Json;
-using SubjectModel.Scripts.Chemistry;
 using SubjectModel.Scripts.Development;
-using SubjectModel.Scripts.Firearms;
+using SubjectModel.Scripts.Subject.Chemistry;
+using SubjectModel.Scripts.Subject.Firearms;
 using UnityEngine;
 
 namespace SubjectModel.Scripts.System

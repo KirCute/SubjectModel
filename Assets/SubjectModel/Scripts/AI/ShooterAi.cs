@@ -1,5 +1,5 @@
-﻿using SubjectModel.Scripts.Firearms;
-using SubjectModel.Scripts.InventorySystem;
+﻿using SubjectModel.Scripts.InventorySystem;
+using SubjectModel.Scripts.Subject.Firearms;
 using UnityEngine;
 
 namespace SubjectModel.Scripts.AI

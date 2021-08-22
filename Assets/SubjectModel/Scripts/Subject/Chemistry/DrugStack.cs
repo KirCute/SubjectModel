@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SubjectModel.Scripts.Firearms;
 using SubjectModel.Scripts.InventorySystem;
+using SubjectModel.Scripts.Subject.Firearms;
 using UnityEngine;
 
-namespace SubjectModel.Scripts.Chemistry
+namespace SubjectModel.Scripts.Subject.Chemistry
 {
     /**
      * <summary>粒子堆，用于描述一个DrugStack内全部同种粒子（同元素的同价态）的信息</summary>

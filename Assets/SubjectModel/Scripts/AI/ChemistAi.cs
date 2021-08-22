@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using SubjectModel.Scripts.Chemistry;
 using SubjectModel.Scripts.InventorySystem;
+using SubjectModel.Scripts.Subject.Chemistry;
 using UnityEngine;
 
 namespace SubjectModel.Scripts.AI

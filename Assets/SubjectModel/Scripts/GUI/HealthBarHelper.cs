@@ -1,5 +1,5 @@
 using Bolt;
-using SubjectModel.Scripts.Chemistry;
+using SubjectModel.Scripts.Subject.Chemistry;
 using UnityEngine;
 
 namespace SubjectModel.Scripts.GUI

@@ -8,7 +8,7 @@ namespace SubjectModel.Scripts.SceneObjects
      */
     public class Chest : SceneObject
     {
-        private static readonly Rect WindowRect = new Rect(280f, 156f, 1360f, 768f);
+        private static readonly Rect WindowRect = new Rect(280f, 156f, 1366f, 768f);
         private const float ItemWidth = 668f;
 
         private Inventory inventory;
