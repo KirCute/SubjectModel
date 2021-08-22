@@ -1,7 +1,4 @@
-using System.Linq;
-using Bolt;
 using SubjectModel.Scripts.Event;
-using SubjectModel.Scripts.Task;
 using UnityEngine;
 
 namespace SubjectModel.Scripts.System
@@ -12,21 +9,25 @@ namespace SubjectModel.Scripts.System
      * 需要挂在玩家物体上
      * </summary>
      */
-    [RequireComponent(typeof(Variables))]
     [RequireComponent(typeof(Rigidbody2D))]
     public class PlayerRespawner : MonoBehaviour
     {
         public Vector2 respawnPoint = Vector2.zero;
 
-        private void Update()
+        private void OnEnable()
         {
-            var dec = GetComponent<Variables>().declarations;
-            if (!(dec.Get<float>("Health") <= 0f) && !(dec.Get<float>("Energy") <= 0)) return;
-            GameObject.FindWithTag("BossAssistance").GetComponent<BossAssistance>().InterruptFighting();
-            foreach (var reminder in GameObject.FindGameObjectsWithTag("EnemyReminder")
-                .Where(r => r.GetComponent<EnemyReminder>().triggered)) Destroy(reminder);
+            EventDispatchers.EdeDispatcher.AddEventListener(Respawn, gameObject);
+        }
+
+        private void Respawn()
+        {
             GetComponent<Rigidbody2D>().position = respawnPoint;
             EventDispatchers.OteDispatcher.DispatchEvent(gameObject);
+        }
+
+        private void OnDisable()
+        {
+            EventDispatchers.EdeDispatcher.RemoveEventListener(Respawn, gameObject);
         }
     }
 }

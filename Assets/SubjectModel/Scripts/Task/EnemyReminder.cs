@@ -1,37 +1,42 @@
 using Bolt;
-using Cinemachine;
+using SubjectModel.Scripts.Event;
+using SubjectModel.Scripts.System;
 using UnityEngine;
 
 namespace SubjectModel.Scripts.Task
 {
-    [RequireComponent(typeof(BoxCollider2D))]
-    public class EnemyReminder : MonoBehaviour
+    public class EnemyReminder : MissionObject
     {
+        public GameObject boss;
         public bool cameraLock;
-        public bool triggered;
-
+        
         private void Update()
         {
-            if (!triggered || GetComponentsInChildren<Transform>().Length > 1) return;
-            Destroy(gameObject);
+            if (GetComponentsInChildren<StateMachine>().Length > 0) return;
+            EventDispatchers.EeDispatcher.DispatchEvent(completeIndex);
         }
 
-        private void OnTriggerEnter2D(Collider2D other)
+        protected override void Encounter()
         {
-            if (triggered || !other.gameObject.CompareTag("Player")) return;
-            triggered = true;
-            GetComponent<BoxCollider2D>().enabled = false;
-            if (TryGetComponent<PolygonCollider2D>(out var wall)) wall.enabled = true;
-            foreach (var enemy in GetComponentsInChildren<StateMachine>()) enemy.enabled = true;
-            if (cameraLock)
-                GameObject.FindWithTag("Cinemachine").GetComponent<CinemachineVirtualCamera>().Follow = transform;
+            foreach (var enemy in GetComponentsInChildren<StateMachine>())
+            {
+                enemy.gameObject.GetComponent<SpriteRenderer>().enabled = true;
+                enemy.enabled = true;
+                if (enemy.gameObject == boss) EventDispatchers.BossDispatcher.DispatchEvent(boss);
+            }
+            if (cameraLock) EventDispatchers.CteDispatcher.DispatchEvent(CameraManager.LayerScroll, transform);
         }
 
-        private void OnDestroy()
+        protected override void Failed()
         {
-            if (cameraLock && GameObject.FindWithTag("Player") != null && GameObject.FindWithTag("Cinemachine") != null)
-                GameObject.FindWithTag("Cinemachine").GetComponent<CinemachineVirtualCamera>().Follow =
-                    GameObject.FindWithTag("Player").transform;
+            foreach (var enemy in GetComponentsInChildren<StateMachine>()) enemy.enabled = false;
+            if (cameraLock) EventDispatchers.CteDispatcher.DispatchEvent(CameraManager.LayerScroll, null);
+        }
+
+        protected override void Defeated()
+        {
+            if (cameraLock) EventDispatchers.CteDispatcher.DispatchEvent(CameraManager.LayerScroll, null);
+            // TODO: 生成掉落物
         }
     }
 }

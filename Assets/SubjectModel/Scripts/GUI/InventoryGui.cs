@@ -20,7 +20,7 @@ namespace SubjectModel.Scripts.GUI
         private Text selected;
         private Text sub;
 
-        private void Awake()
+        private void OnEnable()
         {
             EventDispatchers.OteDispatcher.AddEventListener(OnOperationTransfer);
         }
@@ -57,6 +57,7 @@ namespace SubjectModel.Scripts.GUI
 
         private void OnDisable()
         {
+            EventDispatchers.OteDispatcher.RemoveEventListener(OnOperationTransfer);
             selected.text = "";
             sub.text = "";
         }

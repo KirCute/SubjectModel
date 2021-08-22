@@ -23,7 +23,9 @@ namespace SubjectModel.Scripts.Keyboard
         {
             var dec = operated.GetComponent<Variables>().declarations;
             var runSpeed = dec.IsDefined("RunSpeed") ? dec.Get<float>("RunSpeed") : 1.0f;
-            var run = UnityEngine.Input.GetKey(KeyCode.LeftShift) ? runSpeed : 1.0f;
+            var running = Input.GetKey(KeyCode.LeftShift);
+            dec.Set("Running", running);
+            var run = running ? runSpeed : 1.0f;
             var speed = dec.Get<float>("Speed");
             operated.GetComponent<Rigidbody2D>().velocity = dec.Get<int>("Standonly") > 0
                 ? Vector2.zero

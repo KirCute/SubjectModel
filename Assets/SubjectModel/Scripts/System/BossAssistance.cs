@@ -1,48 +1,35 @@
 using Bolt;
 using SubjectModel.Scripts.Chemistry;
+using SubjectModel.Scripts.Event;
 using SubjectModel.Scripts.GUI;
 using UnityEngine;
 
 namespace SubjectModel.Scripts.System
 {
-    public delegate void RecoverAfterFight();
-
     public class BossAssistance : MonoBehaviour
     {
-        private bool fighting;
         private GameObject boss;
-        private RecoverAfterFight raf;
 
-        /*
-        private void Reset()
+        private void OnEnable()
         {
-            var bar = GetComponent<Bar>();
-            bar.source = "Health";
-            bar.sourceEnd = "MaxHealth";
-            bar.targetEnd = 1800f;
-            bar.enabled = false;
-        }
-        */
-
-        private void Update()
-        {
-            if (boss == null && fighting) BossDead();
+            EventDispatchers.BossDispatcher.AddEventListener(OnBossFightStart);
         }
 
-        public void StartBossFight(GameObject theBoss, RecoverAfterFight itsRaf)
+        private void OnBossFightStart(GameObject entity)
         {
-            boss = theBoss;
+            boss = entity;
+            EventDispatchers.EdeDispatcher.AddEventListener(OnBossFightEnd, boss);
+            EventDispatchers.EdeDispatcher.AddEventListener(OnBossFightEnd, GameObject.FindWithTag("Player"));
             boss.GetComponent<HealthBarHelper>().enabled = false;
-
             foreach (var bar in GetComponentsInChildren<Transform>())
                 switch (bar.name)
                 {
                     case "Health Bar":
-                        bar.GetComponent<Bar>().sourceVariables = theBoss.GetComponent<Variables>();
+                        bar.GetComponent<Bar>().sourceVariables = boss.GetComponent<Variables>();
                         bar.GetComponent<Bar>().enabled = true;
                         break;
                     case "Stain":
-                        if (theBoss.TryGetComponent<BuffRenderer>(out var br))
+                        if (boss.TryGetComponent<BuffRenderer>(out var br))
                         {
                             bar.GetComponent<StainGui>().buffRenderer = br;
                             bar.GetComponent<StainGui>().enabled = true;
@@ -50,19 +37,13 @@ namespace SubjectModel.Scripts.System
 
                         break;
                 }
-
-            raf += itsRaf;
-            fighting = true;
         }
 
-        public void BossDead()
+        private void OnBossFightEnd()
         {
-            if (raf != null)
-            {
-                raf();
-                raf = null;
-            }
-
+            EventDispatchers.EdeDispatcher.RemoveEventListener(OnBossFightEnd, boss);
+            EventDispatchers.EdeDispatcher.RemoveEventListener(OnBossFightEnd, GameObject.FindWithTag("Player"));
+            boss.GetComponent<HealthBarHelper>().enabled = false;
             foreach (var bar in GetComponentsInChildren<Transform>())
                 switch (bar.name)
                 {
@@ -75,10 +56,32 @@ namespace SubjectModel.Scripts.System
                         bar.GetComponent<StainGui>().enabled = false;
                         break;
                 }
+        }
+
+        private void OnDisable()
+        {
+            EventDispatchers.BossDispatcher.RemoveEventListener(OnBossFightStart);
+        }
+
+        /*
+        private void Update()
+        {
+            if (boss == null && fighting) BossDead();
+        }
+
+        public void StartBossFight(GameObject theBoss, int next)
+        {
+            nextMission = next;
+            boss = theBoss;
+        }
+
+        public void BossDead()
+        {
+            EventDispatchers.EeDispatcher.DispatchEvent(nextMission);
 
             fighting = false;
         }
-
+        
         public void InterruptFighting()
         {
             if (!fighting) return;
@@ -86,5 +89,6 @@ namespace SubjectModel.Scripts.System
             Destroy(boss);
             BossDead();
         }
+        */
     }
 }

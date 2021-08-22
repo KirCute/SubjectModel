@@ -76,13 +76,11 @@ GameObject:
   - component: {fileID: 5931172819479419872}
   - component: {fileID: 5931172819479419873}
   - component: {fileID: 5931172819479419876}
-  - component: {fileID: 5931172819479419881}
-  - component: {fileID: 5931172819479419885}
   - component: {fileID: 5931172819479419667}
   - component: {fileID: 5931172819479419664}
+  - component: {fileID: 4000431377295946005}
   - component: {fileID: 2858680425647421196}
   - component: {fileID: 5931172819479419900}
-  - component: {fileID: 5931172819479419880}
   - component: {fileID: 5931172819479419887}
   - component: {fileID: 5931172819479419875}
   m_Layer: 6
@@ -325,7 +323,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _data:
-    _json: '{"declarations":{"collection":{"$content":[{"name":"Speed","value":{"$content":3.0,"$type":"System.Single"},"$version":"A"},{"name":"MaxHealth","value":{"$content":140.0,"$type":"System.Single"},"$version":"A"},{"name":"Health","value":{"$content":140.0,"$type":"System.Single"},"$version":"A"},{"name":"Strength","value":{"$content":200.0,"$type":"System.Single"},"$version":"A"},{"name":"Energy","value":{"$content":200.0,"$type":"System.Single"},"$version":"A"},{"name":"MaxStrength","value":{"$content":200.0,"$type":"System.Single"},"$version":"A"},{"name":"RunSpeed","value":{"$content":2.5,"$type":"System.Single"},"$version":"A"},{"name":"RunnableStrength","value":{"$content":20.0,"$type":"System.Single"},"$version":"A"},{"name":"Running","value":{"$content":false,"$type":"System.Boolean"},"$version":"A"},{"name":"Standonly","value":{"$content":0,"$type":"System.Int32"},"$version":"A"},{"name":"Defence","value":{"$content":10.0,"$type":"System.Single"},"$version":"A"}],"$version":"A"},"$version":"A"}}'
+    _json: '{"declarations":{"collection":{"$content":[{"name":"MaxHealth","value":{"$content":140.0,"$type":"System.Single"},"$version":"A"},{"name":"Health","value":{"$content":140.0,"$type":"System.Single"},"$version":"A"},{"name":"Defence","value":{"$content":10.0,"$type":"System.Single"},"$version":"A"},{"name":"Speed","value":{"$content":3.0,"$type":"System.Single"},"$version":"A"},{"name":"Strength","value":{"$content":200.0,"$type":"System.Single"},"$version":"A"},{"name":"Energy","value":{"$content":200.0,"$type":"System.Single"},"$version":"A"},{"name":"MaxStrength","value":{"$content":200.0,"$type":"System.Single"},"$version":"A"},{"name":"RunSpeed","value":{"$content":2.5,"$type":"System.Single"},"$version":"A"},{"name":"Running","value":{"$content":false,"$type":"System.Boolean"},"$version":"A"},{"name":"Standonly","value":{"$content":0,"$type":"System.Int32"},"$version":"A"}],"$version":"A"},"$version":"A"}}'
     _objectReferences: []
 --- !u!114 &5931172819479419876
 MonoBehaviour:
@@ -343,38 +341,6 @@ MonoBehaviour:
     _json: '{"nest":{"source":"Macro","macro":0,"embed":null}}'
     _objectReferences:
     - {fileID: 11400000, guid: 2124022eea8816145af093a70885169d, type: 2}
---- !u!114 &5931172819479419881
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5931172819479419901}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -57143145, guid: a040fb66244a7f54289914d98ea4ef7d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _data:
-    _json: '{"nest":{"source":"Macro","macro":0,"embed":null}}'
-    _objectReferences:
-    - {fileID: 11400000, guid: 656a30f02f5065f48bb866c5ffeee35e, type: 2}
---- !u!114 &5931172819479419885
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5931172819479419901}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -57143145, guid: a040fb66244a7f54289914d98ea4ef7d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _data:
-    _json: '{"nest":{"source":"Macro","macro":0,"embed":null}}'
-    _objectReferences:
-    - {fileID: 11400000, guid: 30afacfbf8c02af44a88c748449d95d0, type: 2}
 --- !u!114 &5931172819479419667
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -407,6 +373,19 @@ MonoBehaviour:
     _json: '{"nest":{"source":"Embed","macro":null,"embed":{"variables":{"collection":{"$content":[],"$version":"A"},"$version":"A"},"controlInputDefinitions":[],"controlOutputDefinitions":[],"valueInputDefinitions":[],"valueOutputDefinitions":[],"title":"Inventory
       Initialize","summary":"Test","pan":{"x":0.0,"y":0.0},"zoom":1.0,"elements":[{"coroutine":false,"defaultValues":{},"position":{"x":-204.0,"y":-144.0},"guid":"7a9ac87f-65ed-4278-94ce-91c29f4131f6","$version":"A","$type":"Bolt.Start","$id":"10"},{"chainable":false,"member":{"name":"GeneratePlayerInventory","parameterTypes":["SubjectModel.Scripts.InventorySystem.Inventory"],"targetType":"SubjectModel.Scripts.Development.Test","targetTypeName":"SubjectModel.Scripts.Development.Test","$version":"A"},"defaultValues":{"%inventory":null},"position":{"x":-22.0,"y":-92.0},"guid":"edf3b56e-02d4-4585-833f-bfc32028058f","$version":"A","$type":"Bolt.InvokeMember","$id":"12"},{"chainable":false,"member":{"name":"GetComponent","parameterTypes":["System.Type"],"targetType":"UnityEngine.Component","targetTypeName":"UnityEngine.Component","$version":"A"},"defaultValues":{"target":null,"%type":{"$content":"SubjectModel.Scripts.InventorySystem.Inventory","$type":"System.RuntimeType"}},"position":{"x":-405.0,"y":-44.0},"guid":"bc946449-a4da-4332-b556-76506ae2dccd","$version":"A","$type":"Bolt.InvokeMember","$id":"15"},{"sourceUnit":{"$ref":"10"},"sourceKey":"trigger","destinationUnit":{"$ref":"12"},"destinationKey":"enter","guid":"ba27eb92-25b6-4013-9331-e267497fd193","$type":"Bolt.ControlConnection"},{"sourceUnit":{"$ref":"15"},"sourceKey":"result","destinationUnit":{"$ref":"12"},"destinationKey":"%inventory","guid":"3326a272-0bbb-4f41-a9aa-e1cec7468013","$type":"Bolt.ValueConnection"}],"$version":"A"}}}'
     _objectReferences: []
+--- !u!114 &4000431377295946005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5931172819479419901}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d31729a4d874c3588114cc595414859, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  removeAfterDead: 0
 --- !u!114 &2858680425647421196
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -433,18 +412,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   immune: 0
---- !u!114 &5931172819479419880
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5931172819479419901}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c78902fe8dde9548811e402bfc4cafb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &5931172819479419887
 MonoBehaviour:
   m_ObjectHideFlags: 0

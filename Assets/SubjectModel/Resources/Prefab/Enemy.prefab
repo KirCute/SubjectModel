@@ -15,10 +15,8 @@ GameObject:
   - component: {fileID: -100802708464695792}
   - component: {fileID: 414931163832227253}
   - component: {fileID: 510462755288934979}
-  - component: {fileID: 8447671915212957988}
-  - component: {fileID: -3625144484042481032}
-  - component: {fileID: 2645565174689144944}
   - component: {fileID: 3783856003099380856}
+  - component: {fileID: 3249040559321142554}
   - component: {fileID: 7834381494281578483}
   - component: {fileID: 3751485004116039209}
   - component: {fileID: -13836612440790149}
@@ -263,56 +261,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _data:
-    _json: '{"declarations":{"collection":{"$content":[{"name":"Speed","value":{"$content":3.0,"$type":"System.Single"},"$version":"A"},{"name":"Health","value":{"$content":140.0,"$type":"System.Single"},"$version":"A"},{"name":"MaxHealth","value":{"$content":140.0,"$type":"System.Single"},"$version":"A"},{"name":"Defence","value":{"$content":10.0,"$type":"System.Single"},"$version":"A"}],"$version":"A"},"$version":"A"}}'
+    _json: '{"declarations":{"collection":{"$content":[{"name":"Health","value":{"$content":140.0,"$type":"System.Single"},"$version":"A"},{"name":"MaxHealth","value":{"$content":140.0,"$type":"System.Single"},"$version":"A"},{"name":"Defence","value":{"$content":10.0,"$type":"System.Single"},"$version":"A"},{"name":"Speed","value":{"$content":3.0,"$type":"System.Single"},"$version":"A"},{"name":"MaxStrength","value":{"$content":200.0,"$type":"System.Single"},"$version":"A"},{"name":"Energy","value":{"$content":200.0,"$type":"System.Single"},"$version":"A"},{"name":"Strength","value":{"$content":200.0,"$type":"System.Single"},"$version":"A"},{"name":"RunSpeed","value":{"$content":1.0,"$type":"System.Single"},"$version":"A"},{"name":"Running","value":{"$content":false,"$type":"System.Boolean"},"$version":"A"}],"$version":"A"},"$version":"A"}}'
     _objectReferences: []
---- !u!114 &8447671915212957988
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9204706058163521875}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -57143145, guid: a040fb66244a7f54289914d98ea4ef7d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _data:
-    _json: '{"nest":{"source":"Macro","macro":0,"embed":null}}'
-    _objectReferences:
-    - {fileID: 11400000, guid: 14311cb04b4e81d4a9ae60a4d8b6bc51, type: 2}
---- !u!114 &-3625144484042481032
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9204706058163521875}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -57143145, guid: a040fb66244a7f54289914d98ea4ef7d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _data:
-    _json: '{"nest":{"source":"Macro","macro":0,"embed":null}}'
-    _objectReferences:
-    - {fileID: 11400000, guid: 656a30f02f5065f48bb866c5ffeee35e, type: 2}
---- !u!114 &2645565174689144944
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9204706058163521875}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -57143145, guid: a040fb66244a7f54289914d98ea4ef7d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _data:
-    _json: '{"nest":{"source":"Macro","macro":0,"embed":null}}'
-    _objectReferences:
-    - {fileID: 11400000, guid: 30afacfbf8c02af44a88c748449d95d0, type: 2}
 --- !u!114 &3783856003099380856
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -329,6 +279,19 @@ MonoBehaviour:
     _json: '{"nest":{"source":"Macro","macro":0,"embed":null}}'
     _objectReferences:
     - {fileID: 11400000, guid: 2124022eea8816145af093a70885169d, type: 2}
+--- !u!114 &3249040559321142554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9204706058163521875}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d31729a4d874c3588114cc595414859, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  removeAfterDead: 1
 --- !u!114 &7834381494281578483
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -370,6 +333,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   distance: 0
   sight: 0
+  shootAble: 0
   aimPos: {x: 0, y: 0}
 --- !u!114 &2369498155757039341
 MonoBehaviour:

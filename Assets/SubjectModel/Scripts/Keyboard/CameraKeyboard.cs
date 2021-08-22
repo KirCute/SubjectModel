@@ -1,20 +1,23 @@
-﻿using Cinemachine;
-using SubjectModel.Scripts.Event;
+﻿using SubjectModel.Scripts.Event;
+using SubjectModel.Scripts.Event.OperationTransferEvent;
+using SubjectModel.Scripts.System;
 using UnityEngine;
 
 namespace SubjectModel.Scripts.Keyboard
 {
-    [RequireComponent(typeof(CinemachineVirtualCamera))]
     public class CameraKeyboard : MonoBehaviour
     {
-        private void Awake()
+        private static readonly OperationTransferEventListener.EventListenerDelegate Listener = obj =>
+            EventDispatchers.CteDispatcher.DispatchEvent(CameraManager.LayerPlayer, obj.transform);
+
+        private void OnEnable()
         {
-            EventDispatchers.OteDispatcher.AddEventListener(OnOperationTransfer);
+            EventDispatchers.OteDispatcher.AddEventListener(Listener);
         }
 
-        private void OnOperationTransfer(GameObject newObject)
+        private void OnDisable()
         {
-            GetComponent<CinemachineVirtualCamera>().Follow = newObject.transform;
+           EventDispatchers.OteDispatcher.RemoveEventListener(Listener);
         }
     }
 }

@@ -4,20 +4,12 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Cinemachine
-  - ScriptContainer
-  - DrugCollider
-  - FlyingDrug
   - BossAssistance
-  - Enemy
-  - Boss
   - GUI
-  - BossSpawner
   - Container
-  - EnemyReminder
   - EnemiesStateBar
-  - InventoryGUI
   - Friends
+  - Enemies
   layers:
   - Default
   - TransparentFX

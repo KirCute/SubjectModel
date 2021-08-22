@@ -8,8 +8,6 @@ using Newtonsoft.Json;
 using SubjectModel.Scripts.Chemistry;
 using SubjectModel.Scripts.Firearms;
 using SubjectModel.Scripts.InventorySystem;
-using SubjectModel.Scripts.System;
-using SubjectModel.Scripts.Task;
 using UnityEditor;
 using UnityEngine;
 
@@ -39,7 +37,6 @@ namespace SubjectModel.Scripts.Development
         private string defence;
         private bool defenceUpdate;
 
-        private GameObject[] bossSpawners;
         private string bossHealth;
         private string bossSpeed;
         private string bossDefence;
@@ -122,7 +119,6 @@ namespace SubjectModel.Scripts.Development
             speedUpdate = false;
             defence = playerVariables.Get("Defence").ToString();
             defenceUpdate = false;
-            bossSpawners = GameObject.FindGameObjectsWithTag("BossSpawner");
             bossHealth = "200";
             bossSpeed = "5";
             bossDefence = "400";
@@ -187,25 +183,6 @@ namespace SubjectModel.Scripts.Development
                         AutoAdjustString("移动速度", ref bossSpeed);
                         AutoAdjustString("防御", ref bossDefence);
                         AutoAdjustString("位置", ref bossLocate);
-                        if (GUILayout.Button("重新生成Boss"))
-                        {
-                            GameObject boss;
-                            if ((boss = GameObject.FindWithTag("Boss")) != null)
-                                boss.GetComponent<Variables>().declarations.Set("Health", .0f);
-                            GameObject.FindWithTag("BossAssistance").GetComponent<BossAssistance>().BossDead();
-                            var spawner = bossSpawners.Where(s => s.name == $"Boss Spawner {bossLocate}")
-                                .FirstOrDefault();
-                            if (spawner != null)
-                            {
-                                var spawnerComponent = spawner.GetComponent<BossSpawner>();
-                                spawnerComponent.bossHealth = float.Parse(bossHealth);
-                                spawnerComponent.bossSpeed = float.Parse(bossSpeed);
-                                spawnerComponent.bossDefence = float.Parse(bossDefence);
-                                spawnerComponent.triggered = false;
-                                spawner.GetComponent<BoxCollider2D>().enabled = true;
-                            }
-                        }
-
                         break;
                     case 2:
                         AutoAdjustString("沾染时间", ref st);
@@ -497,12 +474,6 @@ namespace SubjectModel.Scripts.Development
                                 var behind = inventory.Contains[i];
                                 if (inventory.selecting == i) inventory.selecting--;
                                 else if (inventory.selecting == i - 1) inventory.selecting++;
-                                /*    behind.LoseSelected(inventory.gameObject);
-                                else if (inventory.selecting == i - 1) front.LoseSelected(inventory.gameObject);
-                                inventory.RebuildSubInventory();
-                                if (inventory.selecting == i) front.OnSelected(inventory.gameObject);
-                                else if (inventory.selecting == i - 1) behind.OnSelected(inventory.gameObject);
-                                */
                                 inventory.Contains[i - 1] = behind;
                                 inventory.Contains[i] = front;
                             }
@@ -514,12 +485,6 @@ namespace SubjectModel.Scripts.Development
                                 var behind = inventory.Contains[i + 1];
                                 if (inventory.selecting == i + 1) inventory.selecting--;
                                 else if (inventory.selecting == i) inventory.selecting++;
-                                /*    behind.LoseSelected(inventory.gameObject);
-                                else if (inventory.selecting == i) front.LoseSelected(inventory.gameObject);
-                                inventory.RebuildSubInventory();
-                                if (inventory.selecting == i + 1) front.OnSelected(inventory.gameObject);
-                                else if (inventory.selecting == i) behind.OnSelected(inventory.gameObject);
-                                */
                                 inventory.Contains[i] = behind;
                                 inventory.Contains[i + 1] = front;
                             }
