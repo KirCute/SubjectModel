@@ -32,7 +32,7 @@ namespace SubjectModel.Scripts.SceneObjects
                 for (var i = 0; i < Contains.Contains.Count; i++)
                 {
                     GUILayout.BeginHorizontal();
-                    GUILayout.Label($"{i} - {Contains.Contains[i].GetName()}", GUILayout.ExpandWidth(true));
+                    GUILayout.Label($"{i} - {Contains.Contains[i].Name}", GUILayout.ExpandWidth(true));
                     if (i != 0 && GUILayout.Button("↑", GUILayout.ExpandWidth(false)))
                     {
                         var front = Contains.Contains[i - 1];
@@ -85,7 +85,7 @@ namespace SubjectModel.Scripts.SceneObjects
                     {
                         Contains.Add(inventory.Contains[i].Fetch(1));
                     }
-                    else GUILayout.Label($"{i} - {inventory.Contains[i].GetName()}", GUILayout.ExpandWidth(true));
+                    else GUILayout.Label($"{i} - {inventory.Contains[i].Name}", GUILayout.ExpandWidth(true));
 
                     if (i != 0 && GUILayout.Button("↑", GUILayout.ExpandWidth(false)))
                     {

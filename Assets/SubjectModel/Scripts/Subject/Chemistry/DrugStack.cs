@@ -69,39 +69,36 @@ namespace SubjectModel.Scripts.Subject.Chemistry
         public readonly string Tag;
         public readonly IList<IonStack> Ions;
         public readonly int Properties;
-        private int count;
+        public string Name => $"{Tag}({Count})";
+        public string FillerName => Tag;
+        public int Count { get; private set; }
 
         public DrugStack(string tag, IList<IonStack> ions, int properties, int count)
         {
             Tag = tag;
             Ions = ions;
             Properties = properties;
-            this.count = count;
+            Count = count;
         }
 
         public void Merge(IItemStack item)
         {
-            count += ((DrugStack) item).count;
+            Count += ((DrugStack) item).Count;
         }
 
         public IItemStack Fetch(int c)
         {
-            if (c > count) c = count;
+            if (c > Count) c = Count;
             var ions = Ions.Select(ion => new IonStack
                     {Element = ion.Element, Index = ion.Index, Amount = ion.Amount, Concentration = ion.Concentration})
                 .ToList();
-            count -= c;
+            Count -= c;
             return new DrugStack(Tag, ions, Properties, c);
-        }
-
-        public int GetCount()
-        {
-            return count;
         }
 
         public void CountAppend(int c)
         {
-            count += c;
+            Count += c;
         }
 
         public bool CanMerge(IItemStack item)
@@ -112,11 +109,6 @@ namespace SubjectModel.Scripts.Subject.Chemistry
             return Ions.All(ion => drug.Ions.Any(i =>
                 ion.Element == i.Element && ion.Index == i.Index && Math.Abs(ion.Amount - i.Amount) < 0.000001f &&
                 Math.Abs(ion.Concentration - i.Concentration) < 0.000001f));
-        }
-
-        public string GetName()
-        {
-            return $"{Tag}({count})";
         }
 
         public void OnMasterThrow(GameObject user, Vector2 pos)
@@ -136,11 +128,6 @@ namespace SubjectModel.Scripts.Subject.Chemistry
         {
             if (!target.TryGetComponent<BuffRenderer>(out var br)) return;
             br.Register((DrugStack) Fetch(1));
-        }
-
-        public string GetFillerName()
-        {
-            return Tag;
         }
 
         public bool Equals(IFiller other)

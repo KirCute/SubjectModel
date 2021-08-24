@@ -27,19 +27,16 @@ namespace SubjectModel.Scripts.Subject.Firearms
         public readonly MagazineTemple Temple;
         public Bullet Containing;
 
+        public override string Name => Containing == null
+            ? Temple.Name
+            : Containing.Filler == null
+                ? $"{Temple.Name}({Containing.Temple.Name} {Containing.Count}/{Temple.BulletContains})"
+                : $"{Temple.Name}({Containing.Temple.Name} {Containing.Filler.FillerName} {Containing.Count}/{Temple.BulletContains})";
+
         public Magazine(MagazineTemple temple)
         {
             Temple = temple;
             Containing = null;
-        }
-
-        public override string GetName()
-        {
-            return Containing == null
-                ? Temple.Name
-                : Containing.Filler == null
-                    ? $"{Temple.Name}({Containing.Temple.Name} {Containing.Count}/{Temple.BulletContains})"
-                    : $"{Temple.Name}({Containing.Temple.Name} {Containing.Filler.GetFillerName()} {Containing.Count}/{Temple.BulletContains})";
         }
 
         public void Release(Inventory inv)

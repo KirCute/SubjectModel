@@ -40,25 +40,16 @@ namespace SubjectModel.Scripts.Subject.Firearms
     {
         public readonly BulletTemple Temple; //模板
         public readonly IFiller Filler; //内容物，在击中时沾染在目标上
-        public int Count; //数量
+        public int Count { get; set; } //数量
+
+        public string Name =>
+            Filler == null ? $"{Temple.Name}({Count})" : $"{Temple.Name}({Filler.FillerName})({Count})";
 
         public Bullet(BulletTemple temple, int count, IFiller filler = null)
         {
             Temple = temple;
             Count = count;
             Filler = filler;
-        }
-
-        public string GetName()
-        {
-            return Filler == null
-                ? $"{Temple.Name}({Count})"
-                : $"{Temple.Name}({Filler.GetFillerName()})({Count})";
-        }
-
-        public int GetCount()
-        {
-            return Count;
         }
 
         public bool CanMerge(IItemStack item)
@@ -71,7 +62,7 @@ namespace SubjectModel.Scripts.Subject.Firearms
         public void Merge(IItemStack item)
         {
             Count += ((Bullet) item).Count;
-            Filler?.CountAppend(((Bullet) item).Filler.GetCount());
+            Filler?.CountAppend(((Bullet) item).Filler.Count);
         }
 
         public IItemStack Fetch(int count)

@@ -14,12 +14,12 @@ namespace SubjectModel.Scripts.InventorySystem
         /**
          * <summary>得到物品在物品栏中显示的名称</summary>
          */
-        public string GetName();
+        public string Name { get; }
 
         /**
          * <summary>得到物品的数量</summary>
          */
-        public int GetCount();
+        public int Count { get; }
 
         /**
          * <summary>
@@ -55,12 +55,8 @@ namespace SubjectModel.Scripts.InventorySystem
     public abstract class Unstackable : IItemStack
     {
         private bool fetched;
-        public abstract string GetName();
-
-        public int GetCount()
-        {
-            return fetched ? 0 : 1;
-        }
+        public abstract string Name { get; }
+        public int Count => fetched ? 0 : 1;
 
         public bool CanMerge(IItemStack item)
         {

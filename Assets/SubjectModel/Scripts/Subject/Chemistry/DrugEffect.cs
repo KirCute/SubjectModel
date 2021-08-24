@@ -10,6 +10,28 @@ namespace SubjectModel.Scripts.Subject.Chemistry
     {
         /**
          * <summary>
+         * 效果等级
+         * </summary>
+         */
+        float Level { get; }
+
+        /**
+         * <summary>
+         * 效果已经历时间
+         * </summary>
+         */
+        float RemainedTime { get; }
+
+        /**
+         * <summary>
+         * 效果总时间
+         * 更改会重置已经历时间
+         * </summary>
+         */
+        float TotalTime { get; set; }
+
+        /**
+         * <summary>
          * 效果在被添加时被调用
          * <param name="host">效果的宿主</param>
          * </summary>
@@ -43,39 +65,6 @@ namespace SubjectModel.Scripts.Subject.Chemistry
 
         /**
          * <summary>
-         * 得到效果等级的方法
-         * <returns>效果等级</returns>
-         * </summary>
-         */
-        float GetLevel();
-
-        /**
-         * <summary>
-         * 得到效果已经历时间的方法
-         * <returns>效果已经历时间</returns>
-         * </summary>
-         */
-        float GetRemainedTime();
-
-        /**
-         * <summary>
-         * 得到效果总时间的方法
-         * <returns>效果总时间</returns>
-         * </summary>
-         */
-        float GetTotalTime();
-
-        /**
-         * <summary>
-         * 更改效果总时间的方法
-         * 该方法会使已持续时间重新计算。
-         * <param name="time">新的效果总时间</param>
-         * </summary>
-         */
-        void Append(float time);
-
-        /**
-         * <summary>
          * 更改效果等级的方法
          * 对于在起始和结束时改变宿主状态的效果（如缓慢），应当重写此方法以重新计算其对宿主的影响。
          * <param name="newLevel">新的效果等级</param>
@@ -98,9 +87,19 @@ namespace SubjectModel.Scripts.Subject.Chemistry
          */
         public class RemainingBuff : IBuff
         {
-            private float remainedTime; //已存在时间
-            private float totalTime; //总时间
-            private float level; //等级
+            public float RemainedTime { get; private set; } //已存在时间
+            public float Level { get; private set; } //等级
+            private float totalTime;
+
+            public float TotalTime
+            {
+                get => totalTime;
+                set
+                {
+                    totalTime = value;
+                    RemainedTime = 0f;
+                }
+            } //总时间
 
             /**
              * <summary>
@@ -111,9 +110,9 @@ namespace SubjectModel.Scripts.Subject.Chemistry
              */
             public RemainingBuff(float remain, float level = .0f)
             {
-                this.remainedTime = .0f;
-                this.totalTime = remain;
-                this.level = level;
+                RemainedTime = .0f;
+                totalTime = remain;
+                Level = level;
             }
 
             public virtual void Appear(GameObject host)
@@ -122,7 +121,7 @@ namespace SubjectModel.Scripts.Subject.Chemistry
 
             public virtual void Update(GameObject host)
             {
-                remainedTime += Time.deltaTime;
+                RemainedTime += Time.deltaTime;
             }
 
             public virtual void Destroy(GameObject host)
@@ -131,33 +130,12 @@ namespace SubjectModel.Scripts.Subject.Chemistry
 
             public virtual bool Ended(GameObject host)
             {
-                return totalTime >= 0f && remainedTime >= totalTime;
-            }
-
-            public virtual float GetLevel()
-            {
-                return level;
-            }
-
-            public virtual float GetRemainedTime()
-            {
-                return remainedTime;
-            }
-
-            public virtual float GetTotalTime()
-            {
-                return totalTime;
-            }
-
-            public virtual void Append(float time)
-            {
-                totalTime = time;
-                remainedTime = .0f;
+                return TotalTime >= 0f && RemainedTime >= TotalTime;
             }
 
             public virtual void LevelUp(GameObject gameObject, float newLevel)
             {
-                level = newLevel;
+                Level = newLevel;
             }
         }
 
@@ -180,7 +158,7 @@ namespace SubjectModel.Scripts.Subject.Chemistry
             public override void Update(GameObject host)
             {
                 base.Update(host);
-                Invoke(variable, host, GetLevel());
+                Invoke(variable, host, Level);
             }
 
             private static void Invoke(string variable, GameObject host, float v)
@@ -202,18 +180,18 @@ namespace SubjectModel.Scripts.Subject.Chemistry
             public override void Appear(GameObject host)
             {
                 base.Appear(host);
-                Speed(host, 1.0f / GetLevel());
+                Speed(host, 1.0f / Level);
             }
 
             public override void Destroy(GameObject host)
             {
-                Speed(host, GetLevel());
+                Speed(host, Level);
                 base.Destroy(host);
             }
 
             public override void LevelUp(GameObject host, float newLevel)
             {
-                Speed(host, GetLevel() / newLevel);
+                Speed(host, Level / newLevel);
                 base.LevelUp(host, newLevel);
             }
 
@@ -266,7 +244,7 @@ namespace SubjectModel.Scripts.Subject.Chemistry
                 var variables = host.GetComponent<Variables>();
 
                 var health = variables.declarations.Get<float>("Health"); //得到血量
-                var lost = GetLevel() * Time.deltaTime; //得到当前帧扣精神量
+                var lost = Level * Time.deltaTime; //得到当前帧扣精神量
                 if (reserveHealth >= health) //在效果期间扣血
                 {
                     lost += (reserveHealth - health) * healthLost; //将扣血量换算为精神损失

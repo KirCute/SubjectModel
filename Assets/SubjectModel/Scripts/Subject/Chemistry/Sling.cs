@@ -34,10 +34,7 @@ namespace SubjectModel.Scripts.Subject.Chemistry
      */
     public class Sling : Weapon
     {
-        public override string GetName()
-        {
-            return "弹弓";
-        }
+        public override string Name => "弹弓";
 
         public override void OnMasterUseKeep(GameObject user, Vector2 pos)
         {

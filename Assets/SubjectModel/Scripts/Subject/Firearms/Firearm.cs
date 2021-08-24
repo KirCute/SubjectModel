@@ -69,13 +69,14 @@ namespace SubjectModel.Scripts.Subject.Firearms
         private float weight;
         private float kickingTime;
         private bool kicking;
-        public Func<Firearm, string> Name = FirearmDictionary.DefaultName;
+        public Func<Firearm, string> NameGetter = FirearmDictionary.DefaultName;
         public Action<Firearm, GameObject, Vector2> ShootKeep = FirearmDictionary.NoShoot;
         public Action<Firearm, GameObject, Vector2> ShootOnce = FirearmDictionary.NoShoot;
         public Action<Firearm, GameObject> Reload = FirearmDictionary.NoReload;
         public Action<Firearm, GameObject> ReloadKeep = FirearmDictionary.NoReload;
         public Func<Firearm, Func<IItemStack, bool>> Sub = FirearmDictionary.DefaultSub;
         public Action<Firearm, GameObject> CompleteReload = FirearmDictionary.DefaultCompleteReload;
+        public override string Name => NameGetter(this);
 
         public Firearm(FirearmTemple temple)
         {
@@ -84,11 +85,6 @@ namespace SubjectModel.Scripts.Subject.Firearms
             Deviation = temple.Deviation;
             weight = temple.Weight;
             FirearmDictionary.FirearmBuilder[temple.Type](this);
-        }
-
-        public override string GetName()
-        {
-            return Name(this);
         }
 
         public override void OnMasterUseKeep(GameObject user, Vector2 aim)

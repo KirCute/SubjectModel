@@ -463,7 +463,7 @@ namespace SubjectModel.Scripts.Development
                         {
                             GUILayout.BeginHorizontal();
 
-                            GUILayout.Label($"{i} - {inventory.Contains[i].GetName()}",
+                            GUILayout.Label($"{i} - {inventory.Contains[i].Name}",
                                 GUILayout.ExpandWidth(true));
                             if (inventory.Contains[i] is Weapon &&
                                 GUILayout.Button("·", GUILayout.ExpandWidth(false))) inventory.SwitchTo(i);

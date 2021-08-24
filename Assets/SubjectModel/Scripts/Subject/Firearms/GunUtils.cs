@@ -42,7 +42,7 @@ namespace SubjectModel.Scripts.Subject.Firearms
                     ? $"{fn}({m.Temple.Name})"
                     : bf == null
                         ? $"{fn}({bn} {bc}/{mc}{(l > .0f ? " 装填中" : "")})"
-                        : $"{fn}({bn} {bf.GetFillerName()} {bc}/{mc}{(l > .0f ? " 装填中" : "")})";
+                        : $"{fn}({bn} {bf.FillerName} {bc}/{mc}{(l > .0f ? " 装填中" : "")})";
         };
 
         private static readonly Action<Firearm, GameObject, Vector2> DefaultShoot = (firearm, user, aim) =>
@@ -134,7 +134,7 @@ namespace SubjectModel.Scripts.Subject.Firearms
             {
                 firearm.Magazine = new Magazine(MagazineTemples
                     .Where(item => item.Name == firearm.Temple.Magazine[0]).FirstOrDefault());
-                firearm.Name = gun =>
+                firearm.NameGetter = gun =>
                 {
                     var fn = gun.Temple.Name;
                     var l = gun.Loading;
@@ -147,7 +147,7 @@ namespace SubjectModel.Scripts.Subject.Firearms
                         ? $"{fn}{(l > .0f ? "(装填中)" : "")}"
                         : bf == null
                             ? $"{fn}({bn} {bc}/{mc}{(l > .0f ? " 装填中" : "")})"
-                            : $"{fn}({bn} {bf.GetFillerName()} {bc}/{mc}{(l > .0f ? " 装填中" : "")})";
+                            : $"{fn}({bn} {bf.FillerName} {bc}/{mc}{(l > .0f ? " 装填中" : "")})";
                 };
                 firearm.ShootOnce = DefaultShoot;
                 firearm.Sub = gun => gun.Magazine.AppropriateBullet();
@@ -205,10 +205,10 @@ namespace SubjectModel.Scripts.Subject.Firearms
 
     public interface IFiller
     {
+        public int Count { get; }
+        public string FillerName { get; }
         public void OnBulletHit(GameObject target);
-        public string GetFillerName();
         public bool Equals(IFiller other);
-        public int GetCount();
         public void CountAppend(int count);
     }
 

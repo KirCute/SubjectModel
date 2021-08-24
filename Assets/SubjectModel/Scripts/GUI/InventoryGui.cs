@@ -36,7 +36,7 @@ namespace SubjectModel.Scripts.GUI
         {
             if (inventory == null) return;
             selected.text = inventory.selecting >= 0 && inventory.Contains.Count > inventory.selecting
-                ? inventory.Contains[inventory.selecting].GetName()
+                ? inventory.Contains[inventory.selecting].Name
                 : "";
             sub.text = inventory.SubContains.Count == 0 ? "" : BuildSubString();
         }
@@ -48,7 +48,7 @@ namespace SubjectModel.Scripts.GUI
             {
                 if (i >= Inventory.PlayerMaxSubCount) continue;
                 sb.Append(inventory.subSelecting == i ? "> " : "  ");
-                sb.Append($"{i + 1} - {inventory.SubContains[i].GetName()}");
+                sb.Append($"{i + 1} - {inventory.SubContains[i].Name}");
                 sb.Append("\n");
             }
 

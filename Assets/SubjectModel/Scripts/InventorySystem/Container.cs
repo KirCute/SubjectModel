@@ -75,7 +75,7 @@ namespace SubjectModel.Scripts.InventorySystem
         public void Cleanup(Action<IItemStack> action)
         {
             for (var i = 0; i < Contains.Count; i++)
-                if (Contains[i].GetCount() <= 0)
+                if (Contains[i].Count <= 0)
                 {
                     action(Contains[i]);
                     i--;

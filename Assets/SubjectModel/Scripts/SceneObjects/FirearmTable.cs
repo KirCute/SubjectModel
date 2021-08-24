@@ -32,7 +32,7 @@ namespace SubjectModel.Scripts.SceneObjects
                     GUILayout.BeginHorizontal();
                     if (GUILayout.Button(selecting == magazine ? "." : "o", GUILayout.ExpandWidth(false)))
                         selecting = magazine;
-                    GUILayout.Label(magazine.GetName(), GUILayout.ExpandWidth(true));
+                    GUILayout.Label(magazine.Name, GUILayout.ExpandWidth(true));
                     if (GUILayout.Button("→", GUILayout.ExpandWidth(false))) magazine.Release(inv);
                     GUILayout.EndHorizontal();
                 }
@@ -46,7 +46,7 @@ namespace SubjectModel.Scripts.SceneObjects
                     .Select(i => (Bullet) i))
                 {
                     GUILayout.BeginHorizontal();
-                    GUILayout.Label(bullet.GetName(), GUILayout.ExpandWidth(true));
+                    GUILayout.Label(bullet.Name, GUILayout.ExpandWidth(true));
                     if (selecting != null && GUILayout.Button("←", GUILayout.ExpandWidth(false)))
                         selecting.Load(inv, bullet);
                     GUILayout.EndHorizontal();

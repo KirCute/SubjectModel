@@ -59,17 +59,17 @@ namespace SubjectModel.Scripts.Subject.Chemistry
         {
             foreach (var b in Buffs.Where(b => b.GetType() == buff.GetType())) //寻找所有的同名效果，理论上只会执行1次或0次
             {
-                if (b.GetLevel() > buff.GetLevel()) return; //若新效果等级更低，不做任何操作
+                if (b.Level > buff.Level) return; //若新效果等级更低，不做任何操作
 
-                if (buff.GetLevel() - b.GetLevel() < .0001f) //若新效果与原效果同级
+                if (buff.Level - b.Level < .0001f) //若新效果与原效果同级
                 {
-                    if (b.GetTotalTime() - b.GetRemainedTime() <= buff.GetTotalTime())
-                        b.Append(buff.GetTotalTime()); //若新效果剩余时间更长则延时
+                    if (b.TotalTime - b.RemainedTime <= buff.TotalTime)
+                        b.TotalTime = buff.TotalTime; //若新效果剩余时间更长则延时
                     return;
                 }
 
-                b.LevelUp(gameObject, buff.GetLevel()); //（和下句）若新效果等级更高，直接覆盖原效果
-                b.Append(buff.GetTotalTime());
+                b.LevelUp(gameObject, buff.Level); //（和下句）若新效果等级更高，直接覆盖原效果
+                b.TotalTime = buff.TotalTime;
                 return;
             }
 
