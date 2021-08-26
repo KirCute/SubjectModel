@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SubjectModel.Scripts.Subject.Chemistry;
 using UnityEngine;
 
 namespace SubjectModel.Scripts.Subject.Electronics
@@ -8,65 +9,66 @@ namespace SubjectModel.Scripts.Subject.Electronics
     public class Machine : MonoBehaviour
     {
         private readonly Dictionary<Wire, List<Action<Wire>>> wires = new Dictionary<Wire, List<Action<Wire>>>();
-        private readonly Dictionary<float, float> powerSupply = new Dictionary<float, float>();
-        private readonly List<IBattery> batteries = new List<IBattery>();
-        private readonly List<IMachineComponent> components = new List<IMachineComponent>();
+        private readonly IList<IMachineComponent> componentsWithoutBattery = new List<IMachineComponent>();
+
+        private readonly Dictionary<IBattery, IList<IMachineComponent>> components =
+            new Dictionary<IBattery, IList<IMachineComponent>>();
+
+        private void Start()
+        {
+            if (TryGetComponent<BuffRenderer>(out var br)) br.immune = true; //所有机械均免疫效果
+        }
 
         private void Update()
         {
-            foreach (var component in components)
-            {
-                var bty = batteries.Where(b => Math.Abs(b.Voltage - component.PowerUsing) < .1f && b.Capacity > 0f);
-                var battery = bty.ToList();
-                if (battery.Count == 0) component.OnShortage(gameObject);
-                else
-                {
-                    battery[0].Capacity -= component.Watt * Time.deltaTime;
-                    component.Update(gameObject);
-                }
-            }
+            foreach (var c in components.Values.SelectMany(cl => cl)) c.Update(gameObject);
         }
 
         public void AddComponent(IMachineComponent component)
         {
-            components.Add(component);
+            component.Battery = null;
+            componentsWithoutBattery.Add(component);
             component.OnInstall(this);
-            foreach (var voltage in component.PowerRequirement)
+            foreach (var require in component.PowerRequirement)
             {
-                if (!powerSupply.ContainsKey(voltage)) continue;
-                component.PowerUsing = voltage;
+                var battery = components.Keys.Where(b =>
+                    Math.Abs(b.Voltage - require) < .1f && b.Watt >= components[b].Sum(c => c.Watt)).ToList();
+                if (battery.Count == 0) continue;
+                ChangeBattery(component, battery[0]);
                 break;
             }
         }
 
         public bool RemoveComponent(IMachineComponent component)
         {
-            if (!components.Contains(component)) return false;
-            component.OnUninstall(this);
-            component.PowerUsing = 0f;
-            return components.Remove(component);
-        }
+            foreach (var c in from cl in components.Values from c in cl where c == component select c)
+            {
+                c.OnUninstall(this);
+                ChangeBattery(c, null);
+                componentsWithoutBattery.Remove(c);
+                return true;
+            }
 
-        public bool RemoveBattery(IBattery battery)
-        {
-            if (!batteries.Contains(battery)) return false;
-            powerSupply[battery.Voltage] -= battery.Watt;
-            if (powerSupply[battery.Voltage] <= .1f) powerSupply.Remove(battery.Voltage);
-            return batteries.Remove(battery);
+            return false;
         }
 
         public void AddBattery(IBattery battery)
         {
-            batteries.Add(battery);
-            if (!powerSupply.ContainsKey(battery.Voltage)) powerSupply.Add(battery.Voltage, .0f);
-            powerSupply[battery.Voltage] += battery.Watt;
+            components.Add(battery, new List<IMachineComponent>());
         }
 
-        public Wire WireApply(Action<Wire> merge)
+        public bool RemoveBattery(IBattery battery)
+        {
+            if (!components.ContainsKey(battery)) return false;
+            foreach (var component in components[battery]) ChangeBattery(component, null);
+            return components.Remove(battery);
+        }
+
+        public void WireApply(Action<Wire> merge)
         {
             var ret = new Wire();
             wires.Add(ret, new List<Action<Wire>> {merge});
-            return ret;
+            merge(ret);
         }
 
         public void RemoveWireMerge(Wire wire, Action<Wire> merge)
@@ -90,12 +92,13 @@ namespace SubjectModel.Scripts.Subject.Electronics
             wires.Remove(remove);
         }
 
-        private bool IsPowerShortage()
+        private void ChangeBattery(IMachineComponent component, IBattery target)
         {
-            var requirements = powerSupply.Keys.ToDictionary(k => k, k => 0f);
-            foreach (var component in components.Where(c => c.PowerUsing > .1f))
-                requirements[component.PowerUsing] += component.Watt;
-            return requirements.Any(e => e.Value > powerSupply[e.Key]);
+            if (component.Battery == null) componentsWithoutBattery.Remove(component);
+            else components[component.Battery].Remove(component);
+            if (target == null) componentsWithoutBattery.Add(component);
+            else components[target].Add(component);
+            component.Battery = target;
         }
     }
 }

@@ -12,6 +12,7 @@ namespace SubjectModel.Scripts.AI
         /**
          * <summary>
          * 构建持枪敌人的物品栏
+         * </summary>
          * <param name="self">敌人的GameObject</param>
          * <example>
          * 使用如下代码添加枪械
@@ -21,7 +22,6 @@ namespace SubjectModel.Scripts.AI
          * 使用如下代码添加子弹
          * <code>inventory.Add(new Bullet(FirearmDictionary.BulletTemples[子弹模板序号], 数量));</code>
          * </example>
-         * </summary>
          */
         public static void GenerateShooter(GameObject self)
         {

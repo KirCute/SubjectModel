@@ -13,6 +13,7 @@ namespace SubjectModel.Scripts.AI
         /**
          * <summary>
          * 生成炼金术敌人的物品栏状态
+         * </summary>
          * <param name="self">敌人的GameObject</param>
          * <example>
          * 使用如下代码给敌人的物品栏中添加一个新的玻封药品
@@ -34,7 +35,6 @@ namespace SubjectModel.Scripts.AI
          * ));
          * </code>
          * </example>
-         * </summary>
          */
         public static void GenerateChemist(GameObject self)
         {

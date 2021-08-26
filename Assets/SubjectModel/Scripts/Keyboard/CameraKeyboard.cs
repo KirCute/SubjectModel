@@ -5,6 +5,12 @@ using UnityEngine;
 
 namespace SubjectModel.Scripts.Keyboard
 {
+    /**
+     * <summary>
+     * 控制摄像头瞄准对象的脚本
+     * 控制主体更改时会同步更改瞄准对象
+     * </summary>
+     */
     public class CameraKeyboard : MonoBehaviour
     {
         private static readonly OperationTransferEventListener.EventListenerDelegate Listener = obj =>

@@ -19,8 +19,8 @@ namespace SubjectModel.Scripts.InventorySystem
 
         private readonly Container bag = new Container(); //物品栏的容器
         private readonly Container sub = new Container(); //武器的子物品候选格，是假容器，随时更新
-        public int selecting = -1; //被选定的物品，未选定时为-1
-        public int subSelecting; //被选定的子物品
+        [HideInInspector] public int selecting = -1; //被选定的物品，未选定时为-1
+        [HideInInspector] public int subSelecting; //被选定的子物品
 
         public IList<IItemStack> Contains => bag.Contains;
         public IList<IItemStack> SubContains => sub.Contains;

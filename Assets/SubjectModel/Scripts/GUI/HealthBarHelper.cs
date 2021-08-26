@@ -13,7 +13,7 @@ namespace SubjectModel.Scripts.GUI
     [RequireComponent(typeof(Variables))]
     public class HealthBarHelper : MonoBehaviour
     {
-        private GameObject stateBar;
+        private GameObject stateBar; //状态条GUI物品，在Start时创建
 
         private void Start()
         {
@@ -21,7 +21,7 @@ namespace SubjectModel.Scripts.GUI
                 GameObject.FindWithTag("EnemiesStateBar").transform);
             stateBar.name = name;
             foreach (var bar in stateBar.GetComponentsInChildren<Transform>())
-                switch (bar.name)
+                switch (bar.name)  //通过名称更新stateBar子物品的状态
                 {
                     case "Health Bar":
                         bar.GetComponent<Bar>().sourceVariables = gameObject.GetComponent<Variables>();
@@ -35,7 +35,7 @@ namespace SubjectModel.Scripts.GUI
         private void Update()
         {
             if (Camera.main == null) return;
-            stateBar.transform.position = Camera.main.WorldToScreenPoint(transform.position);
+            stateBar.transform.position = Camera.main.WorldToScreenPoint(transform.position); //使状态条悬浮于作战单位上
         }
 
         private void OnDestroy()

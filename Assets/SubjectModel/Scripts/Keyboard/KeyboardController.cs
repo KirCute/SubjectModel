@@ -1,6 +1,7 @@
 ﻿using Bolt;
-using SubjectModel.Scripts.Event;
 using UnityEngine;
+using SubjectModel.Scripts.Event;
+using SubjectModel.Scripts.System;
 
 namespace SubjectModel.Scripts.Keyboard
 {
@@ -22,20 +23,9 @@ namespace SubjectModel.Scripts.Keyboard
         private void Update()
         {
             var dec = operated.GetComponent<Variables>().declarations;
-            var speed = dec.Get<float>("Speed");
-            if (dec.IsDefined("Running"))
-            {
-                var running = Input.GetKey(KeyCode.LeftShift);
-                dec.Set("Running", running);
-                speed *= running ? dec.Get<float>("RunSpeed") : 1.0f;
-            }
-
-            operated.GetComponent<Rigidbody2D>().velocity = dec.Get<int>("Standonly") > 0
-                ? Vector2.zero
-                : new Vector2(
-                    Input.GetAxisRaw("Horizontal") * speed,
-                    Input.GetAxisRaw("Vertical") * speed
-                );
+            if (dec.IsDefined("Running")) dec.Set("Running", Input.GetKey(KeyCode.LeftShift));
+            operated.GetComponent<Movement>().Motivation =
+                new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         }
 
         private void OnOperationTransfer(GameObject newOperatedObject)

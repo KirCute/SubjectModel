@@ -14,11 +14,11 @@ namespace SubjectModel.Scripts.Subject.Chemistry
     public class BuffInvoker : MonoBehaviour
     {
         //BuffInvoker的半径需在Prefab中修改
+        public const float MaxDistance = 3f; //FlyingDrug的射程
         private const float StartRange = 0.18f; //FlyingDrug初始化时距离发起攻击的作战单位中心的距离，必须大于作战单位碰撞箱半径
         private const float SelfAttackRange = 0.25f; //作战单位在此距离内发起攻击时，视为对自身使用，应大于且尽可能接近StartRange
         private const float StartColorAlpha = 0.5f; //BuffInvoker的初始透明度
         private const float DefaultKeepTime = 0.2f; //BuffInvoker的默认存在时间
-        private const float MaxDistance = 3f; //FlyingDrug的射程
         private static readonly LayerMask DrugMask = 1 << 3 | 1 << 6 | 1 << 8; //可与FlyingDrug发生碰撞的物体所在层
 
         private float aliveTime; //总存在时间

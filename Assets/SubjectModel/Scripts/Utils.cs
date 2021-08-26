@@ -54,7 +54,7 @@ namespace SubjectModel.Scripts
 
         public static Vector2 LengthenVector(Vector2 direction, float magnitude)
         {
-            return direction / direction.magnitude * magnitude;
+            return direction.Equals(Vector2.zero) ? Vector2.zero : direction / direction.magnitude * magnitude;
         }
 
         public static Vector2 LengthenArrow(Vector2 from, Vector2 to, float magnitude)

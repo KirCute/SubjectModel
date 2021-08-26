@@ -1,4 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using Bolt;
+using SubjectModel.Scripts.InventorySystem;
+using SubjectModel.Scripts.Subject.Chemistry;
+using SubjectModel.Scripts.System;
 using UnityEngine;
 
 namespace SubjectModel.Scripts.Subject.Electronics
@@ -12,83 +17,92 @@ namespace SubjectModel.Scripts.Subject.Electronics
             machine.AddBattery(new TestBattery());
             var motor = new TestMotor();
             machine.AddComponent(motor);
-            machine.AddComponent(new TestController(motor));
+            var sensor = new DistanceMagicSensor();
+            machine.AddComponent(sensor);
+            var catapult = new Catapult();
+            machine.AddComponent(catapult);
+            motor.Soul = GameObject.FindWithTag("Player");
+            sensor.Soul = GameObject.FindWithTag("Player");
+            machine.WireMerge(motor.Vec, sensor.Vec);
+            machine.WireMerge(motor.Button, catapult.Button);
+            machine.WireMerge(motor.Select, catapult.Select);
+            machine.WireMerge(catapult.Direction, motor.Vec);
+        }
+
+        private void Start()
+        {
+            GetComponent<Inventory>().Add(new DrugStack
+            (
+                "CoSO4",
+                new List<IonStack>
+                {
+                    new IonStack
+                    {
+                        Element = Elements.Get("Co"), Index = Elements.Get("Co").GetIndex(2),
+                        Amount = 1f, Concentration = 1f
+                    }
+                },
+                Element.Acid,
+                10000
+            ));
         }
     }
 
     public class TestMotor : IMachineComponent
     {
-        public float[] PowerRequirement => new[] {5f, 3f};
+        public IEnumerable<float> PowerRequirement => new[] {5f, 3f};
         public float Watt => 10f;
-        public float PowerUsing { get; set; }
+        public IBattery Battery { get; set; }
+        public GameObject Soul;
+        public Wire Vec;
+        private Action<Wire> vecMerge;
+        public Wire Select;
+        private Action<Wire> selectMerge;
         public Wire Button;
         private Action<Wire> buttonMerge;
 
         public void OnInstall(Machine machine)
         {
+            vecMerge = w => Vec = w;
+            machine.WireApply(vecMerge);
+            selectMerge = w => Select = w;
+            machine.WireApply(selectMerge);
             buttonMerge = w => Button = w;
-            Button = machine.WireApply(buttonMerge);
+            machine.WireApply(buttonMerge);
         }
 
         public void OnUninstall(Machine machine)
         {
+            machine.RemoveWireMerge(Vec, vecMerge);
+            vecMerge = null;
+            machine.RemoveWireMerge(Select, selectMerge);
+            selectMerge = null;
             machine.RemoveWireMerge(Button, buttonMerge);
             buttonMerge = null;
         }
 
         public void Update(GameObject gameObject)
         {
-            gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(Button.Read<float>(SignalType.Stable), 0f);
-        }
-
-        public void OnShortage(GameObject gameObject)
-        {
-            Debug.Log("Shortage!!!");
-            gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(0f, 0f);
+            var dir = Vec.Read<Vector2>(SignalType.OneWire);
+            gameObject.GetComponent<Movement>().Motivation = dir.magnitude > 1.5f ? dir : Vector2.zero;
+            Select.Output(SignalType.OneWire, 0);
+            Button.Output(SignalType.Digital,
+                dir.magnitude <= BuffInvoker.MaxDistance &&
+                Soul.GetComponent<Variables>().declarations.Get<float>("Health") < 70f);
         }
     }
 
     public class TestBattery : IBattery
     {
         public float Voltage => 5f;
-        public float Watt => 20f;
-        public float Capacity { get; set; } = 30f;
-    }
+        public float Watt => 40f;
+        private float capacity = 30000f;
 
-    public class TestController : IMachineComponent
-    {
-        public float[] PowerRequirement => new[] {5f};
-        public float PowerUsing { get; set; }
-        public float Watt => 5f;
-        private readonly TestMotor motor;
-        private Wire entry;
-        private Action<Wire> entryMerge;
-
-        public TestController(TestMotor motor)
+        public bool Cost(float amount)
         {
-            this.motor = motor;
-        }
-
-        public void OnInstall(Machine machine)
-        {
-            entryMerge = w => entry = w;
-            entry = machine.WireApply(entryMerge);
-            machine.WireMerge(motor.Button, entry);
-        }
-
-        public void OnUninstall(Machine machine)
-        {
-            machine.RemoveWireMerge(entry, entryMerge);
-            entryMerge = null;
-        }
-
-        public void Update(GameObject gameObject)
-        {
-            entry.Output(SignalType.Stable, 5f);
-        }
-
-        public void OnShortage(GameObject gameObject)
-        {
+            if (capacity < amount) return false;
+            capacity -= amount;
+            return true;
         }
     }
 }

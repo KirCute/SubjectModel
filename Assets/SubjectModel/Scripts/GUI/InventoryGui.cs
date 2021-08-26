@@ -12,6 +12,7 @@ namespace SubjectModel.Scripts.GUI
      * 屏幕展示物品栏
      * inventory变量有值时，会在屏幕左下角展示选定武器及其子物品
      * 需要挂在画布下的空物体上，该物体有“Selected”和“Sub”两个挂有Text的子物体
+     * 控制主体更改时会同步更改显示的Inventory
      * </summary>
      */
     public class InventoryGui : MonoBehaviour
