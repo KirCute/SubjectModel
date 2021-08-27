@@ -16,6 +16,13 @@ namespace SubjectModel.Scripts.Event.BossFightEvent
             listener.OnEvent -= callback;
         }
 
+        /**
+         * <summary>
+         * Boss战开始时间
+         * 主要由BossAssistance订阅以生成Boss状态信息GUI
+         * </summary>
+         * <param name="boss">Boss的游戏对象</param>
+         */
         public void DispatchEvent(GameObject boss)
         {
             listener.Execute(boss);

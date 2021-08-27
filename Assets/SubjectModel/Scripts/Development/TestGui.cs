@@ -518,7 +518,13 @@ namespace SubjectModel.Scripts.Development
                 }
             }, "测试窗口");
         }
-
+        
+        /**
+         * <summary>
+         * 自动调整的TextField
+         * 若要将string转为float，需在Update中补充TryParse内容
+         * </summary>
+         */
         private static void AutoAdjustString(string text, ref string value)
         {
             GUILayout.BeginHorizontal("Box");
@@ -527,6 +533,12 @@ namespace SubjectModel.Scripts.Development
             GUILayout.EndHorizontal();
         }
 
+        /**
+         * <summary>
+         * 带有“生效”按钮的TestField（内容为float）
+         * 适用于Variables
+         * </summary>
+         */
         private static void ManualAdjustString(string text, ref string value, string targetName,
             VariableDeclarations target)
         {
@@ -535,6 +547,9 @@ namespace SubjectModel.Scripts.Development
             target.Set(targetName, v);
         }
 
+        /**
+         * <summary>带有“生效”按钮的TestField（内容为float）</summary>
+         */
         private static void ManualAdjustString(string text, ref string value, ref float target)
         {
             GUILayout.BeginHorizontal("Box");
@@ -544,6 +559,12 @@ namespace SubjectModel.Scripts.Development
             GUILayout.EndHorizontal();
         }
 
+        /**
+         * <summary>
+         * 带有“生效”和“实时更新”按钮的TestField（内容为int）
+         * 适用于Variables
+         * </summary>
+         */
         private static void ManualAdjustIntUpdating(string text, ref string value, ref bool update, string targetName,
             VariableDeclarations target)
         {
@@ -552,6 +573,9 @@ namespace SubjectModel.Scripts.Development
             target.Set(targetName, v);
         }
 
+        /**
+         * <summary>带有“生效”和"实时更新"按钮的TestField（内容为int）</summary>
+         */
         private static void ManualAdjustIntUpdating(string text, ref string value, ref bool update, ref int target)
         {
             GUILayout.BeginHorizontal("Box");
@@ -563,6 +587,12 @@ namespace SubjectModel.Scripts.Development
             GUILayout.EndHorizontal();
         }
 
+        /**
+         * <summary>
+         * 带有“生效”和“实时更新”按钮的TestField（内容为float）
+         * 适用于Variables
+         * </summary>
+         */
         private static void ManualAdjustFloatUpdating(string text, ref string value, ref bool update, string targetName,
             VariableDeclarations target)
         {
@@ -570,7 +600,10 @@ namespace SubjectModel.Scripts.Development
             ManualAdjustFloatUpdating(text, ref value, ref update, ref v);
             target.Set(targetName, v);
         }
-
+        
+        /**
+         * <summary>带有“生效”和"实时更新"按钮的TestField（内容为float）</summary>
+         */
         private static void ManualAdjustFloatUpdating(string text, ref string value, ref bool update, ref float target)
         {
             GUILayout.BeginHorizontal("Box");
@@ -582,6 +615,13 @@ namespace SubjectModel.Scripts.Development
             GUILayout.EndHorizontal();
         }
 
+        /**
+         * <summary>
+         * 带有“生效”、“实时更新”按钮的Slider
+         * 适用于Variables
+         * </summary>
+         * <param name="maxName">该值最大值在Variables中的变量名</param>
+         */
         private static void ManualAdjustSlider(string text, ref float value, ref bool update, string maxName,
             string targetName, VariableDeclarations target)
         {
@@ -591,6 +631,10 @@ namespace SubjectModel.Scripts.Development
             target.Set(targetName, v);
         }
 
+        /**
+         * <summary>带有“生效”、“实时更新”按钮的Slider</summary>
+         * <param name="max">该值最大值</param>
+         */
         private static void ManualAdjustSlider(string text, ref float value, ref bool update, float max,
             ref float target)
         {
@@ -604,11 +648,20 @@ namespace SubjectModel.Scripts.Development
             GUILayout.EndHorizontal();
         }
 
+        /**
+         * <summary>
+         * 将以逗号为间隔的若干int组成的string拆分为int[]
+         * 被枪械使用的弹匣id指定框调用
+         * </summary>
+         */
         private static IEnumerable<int> SplitTempleString(string temple)
         {
             return temple.Split(',').Select(int.Parse).ToArray();
         }
 
+        /**
+         * <summary>保存枪械模板信息。</summary>
+         */
         private static void SaveFirearmsModel()
         {
             var path = Path.Combine(Application.dataPath, "Firearms.json");

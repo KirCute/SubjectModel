@@ -225,12 +225,15 @@ namespace SubjectModel.Scripts.Development
             */
         }
 
+        /**
+         * <summary>生成箱子内物品的方法</summary>
+         */
         public static void GenerateContainerData()
         {
             foreach (var container in GameObject.FindGameObjectsWithTag("Container"))
             {
                 var chest = container.GetComponent<Chest>();
-                switch (container.name)
+                switch (container.name) //根据箱子的名称生成其内容物
                 {
                     case "PhysicsAntiArmor":
                         chest.Contains.Add(new Firearm(FirearmDictionary.FirearmTemples[0]));

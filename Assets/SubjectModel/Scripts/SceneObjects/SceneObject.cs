@@ -4,9 +4,7 @@ using UnityEngine;
 namespace SubjectModel.Scripts.SceneObjects
 {
     /**
-     * <summary>
-     * 场景中任何可以被玩家右键使用的物品的基类
-     * </summary>
+     * <summary>场景中任何可以被玩家右键使用的物品的基类</summary>
      */
     [RequireComponent(typeof(SpriteRenderer))]
     [RequireComponent(typeof(BoxCollider2D))]
