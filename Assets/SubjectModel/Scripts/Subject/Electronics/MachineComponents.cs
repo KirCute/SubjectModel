@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SubjectModel.Scripts.InventorySystem;
 using SubjectModel.Scripts.Subject.Chemistry;
 using UnityEngine;
@@ -22,19 +21,17 @@ namespace SubjectModel.Scripts.Subject.Electronics
         public float Watt => 1f;
         public IBattery Battery { get; set; }
         public GameObject Soul;
-        public Wire Vec;
-        private Action<Wire> vecMerge;
+        public WireInterface Vec;
 
         public void OnInstall(Machine machine)
         {
-            vecMerge = w => Vec = w;
-            machine.WireApply(vecMerge);
+            Vec = machine.AddWireInterface(this);
         }
 
         public void OnUninstall(Machine machine)
         {
-            machine.RemoveWireMerge(Vec, vecMerge);
-            vecMerge = null;
+            machine.RemoveWireInterface(Vec);
+            Vec = null;
         }
 
         public void Update(GameObject gameObject)
@@ -56,35 +53,29 @@ namespace SubjectModel.Scripts.Subject.Electronics
         public IEnumerable<float> PowerRequirement => new[] {5f};
         public float Watt => 20f;
         public IBattery Battery { get; set; }
-        public Wire Button;
-        private Action<Wire> buttonMerge;
-        public Wire Select;
-        private Action<Wire> selectMerge;
-        public Wire Direction;
-        private Action<Wire> dirMerge;
+        public WireInterface Button;
+        public WireInterface Select;
+        public WireInterface Direction;
         private Inventory inv;
-        private float reserve = 0f;
+        private float reserve;
 
         public void OnInstall(Machine machine)
         {
-            buttonMerge = w => Button = w;
-            machine.WireApply(buttonMerge);
-            selectMerge = w => Select = w;
-            machine.WireApply(selectMerge);
-            dirMerge = w => Direction = w;
-            machine.WireApply(dirMerge);
-            if (!machine.TryGetComponent(out inv)) return;
-            inv.SwitchTo(inv.Contains.IndexOf(inv.Add(new Sling())));
+            Button = machine.AddWireInterface(this);
+            Select = machine.AddWireInterface(this);
+            Direction = machine.AddWireInterface(this);
+            machine.TryGetComponent(out inv);
+            if (inv != null) inv.SwitchTo(inv.Contains.IndexOf(inv.Add(new Sling())));
         }
 
         public void OnUninstall(Machine machine)
         {
-            machine.RemoveWireMerge(Button, buttonMerge);
-            buttonMerge = null;
-            machine.RemoveWireMerge(Select, selectMerge);
-            selectMerge = null;
-            machine.RemoveWireMerge(Direction, dirMerge);
-            dirMerge = null;
+            machine.RemoveWireInterface(Button);
+            Button = null;
+            machine.RemoveWireInterface(Select);
+            Select = null;
+            machine.RemoveWireInterface(Direction);
+            Direction = null;
             inv = null;
         }
 

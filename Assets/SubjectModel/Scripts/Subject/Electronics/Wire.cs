@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace SubjectModel.Scripts.Subject.Electronics
 {
@@ -14,6 +15,13 @@ namespace SubjectModel.Scripts.Subject.Electronics
     {
         private const float MaxVoltage = 5f;
         private const float SignalVoltage = 3.3f;
+        private readonly Queue<Wire> pool;
+        public int Connecting;
+
+        public Wire(Queue<Wire> pool)
+        {
+            this.pool = pool;
+        }
 
         private SignalType Type { get; set; }
         private object Signal { get; set; }
@@ -25,6 +33,7 @@ namespace SubjectModel.Scripts.Subject.Electronics
                 if ((float) value > MaxVoltage) value = MaxVoltage;
                 if ((float) value < 0f) value = 0f;
             }
+
             Type = type;
             Signal = value;
         }
@@ -68,6 +77,67 @@ namespace SubjectModel.Scripts.Subject.Electronics
                 },
                 _ => Signal
             });
+        }
+
+        public void CheckBackToPool()
+        {
+            if (Connecting > 0) return;
+            Type = SignalType.Digital;
+            Signal = false;
+            pool.Enqueue(this);
+        }
+    }
+
+    public class WireInterface
+    {
+        private readonly Queue<WireInterface> pool;
+        private IMachineComponent component;
+        private Wire wire;
+
+        public WireInterface(Queue<WireInterface> pool)
+        {
+            this.pool = pool;
+        }
+        
+        public Wire Wire
+        {
+            get => wire;
+            set
+            {
+                if (wire != null)
+                {
+                    wire.Connecting--;
+                    wire.CheckBackToPool();
+                }
+
+                wire = value;
+                if (wire != null) wire.Connecting++;
+            }
+        }
+
+        public IMachineComponent Component
+        {
+            get => component;
+            set
+            {
+                if (value == null)
+                {
+                    wire = null;
+                    pool.Enqueue(this);
+                }
+
+                component = value;
+            }
+        }
+
+        public void Output(SignalType type, object value)
+        {
+            Wire.Output(type, value);
+        }
+
+        public T Read<T>(SignalType type)
+        {
+            return Wire.Read<T>(type);
         }
     }
 }

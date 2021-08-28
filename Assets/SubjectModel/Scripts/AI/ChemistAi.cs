@@ -40,7 +40,7 @@ namespace SubjectModel.Scripts.AI
         {
             if (!self.TryGetComponent<Inventory>(out var inventory)) return; //获取物品栏inventory
             inventory.Add(new Sling()); //添加弹弓作为武器
-            inventory.Add(new DrugStack
+            inventory.Add(new SealStack(new DrugStack
             (
                 "CuCl2",
                 new List<IonStack>
@@ -56,10 +56,9 @@ namespace SubjectModel.Scripts.AI
                         Amount = 2f, Concentration = 3f
                     }
                 },
-                Element.Acid,
-                10000
-            )); //添加玻封药品CuCl2用于对玩家造成伤害
-            inventory.Add(new DrugStack
+                Element.Acid
+            ), 10000)); //添加玻封药品CuCl2用于对玩家造成伤害
+            inventory.Add(new SealStack(new DrugStack
             (
                 "CoSO4",
                 new List<IonStack>
@@ -70,9 +69,8 @@ namespace SubjectModel.Scripts.AI
                         Amount = 1f, Concentration = 1f
                     }
                 },
-                Element.Acid,
-                10000
-            )); //添加玻封药品CuCl2用于治疗
+                Element.Acid
+            ), 10000)); //添加玻封药品CuCl2用于治疗
             inventory.SwitchTo(0); //装备位于物品栏0号位的弹弓
         }
     }

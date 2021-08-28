@@ -83,7 +83,7 @@ namespace SubjectModel.Scripts.Subject.Chemistry
         {
             if (Utils.GetMagnitudeSquare2D(position, hostPosition) <= SelfAttackRange * SelfAttackRange) //若发生了自投掷
             {
-                Invoke((DrugStack) drug.Fetch(1), position, keepTime); //从作战单位物品栏中直接取出一个玻封药品并发生落地
+                Invoke(drug.Clone(), position, keepTime); //从作战单位物品栏中直接取出一个玻封药品并发生落地
                 return;
             }
 
@@ -102,7 +102,7 @@ namespace SubjectModel.Scripts.Subject.Chemistry
                 (GameObject) Instantiate(
                     Resources.Load("Prefab/FlyingDrug")); //生成FlyingDrug，注意碰撞问题已处理完毕，FlyingDrug主要用于延迟触发沾染和播放动画
             flyingDrug.GetComponent<FlyingDrug>()
-                .Initialize((DrugStack) drug.Fetch(1), origin, position, keepTime); //FlyingDrug的初始化
+                .Initialize(drug.Clone(), origin, position, keepTime); //FlyingDrug的初始化
         }
 
         /**

@@ -1,5 +1,6 @@
 ﻿using System;
 using SubjectModel.Scripts.InventorySystem;
+using UnityEngine;
 
 namespace SubjectModel.Scripts.Subject.Firearms
 {
@@ -62,7 +63,6 @@ namespace SubjectModel.Scripts.Subject.Firearms
         public void Merge(IItemStack item)
         {
             Count += ((Bullet) item).Count;
-            Filler?.CountAppend(((Bullet) item).Filler.Count);
         }
 
         public IItemStack Fetch(int count)
@@ -76,5 +76,12 @@ namespace SubjectModel.Scripts.Subject.Firearms
         {
             return bullet.Temple == Temple && (Filler?.Equals(bullet.Filler) ?? bullet.Filler == null);
         }
+    }
+
+    public interface IFiller
+    {
+        public string FillerName { get; }
+        public void OnBulletHit(GameObject target);
+        public bool Equals(IFiller other);
     }
 }

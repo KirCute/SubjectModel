@@ -254,13 +254,12 @@ namespace SubjectModel.Scripts.Development
                                     Amount = 1f, Concentration = 1.2f
                                 }
                             },
-                            Element.Acid,
-                            20
+                            Element.Acid
                         )));
                         break;
                     case "Poison":
                         chest.Contains.Add(new Sling());
-                        chest.Contains.Add(new DrugStack
+                        chest.Contains.Add(new SealStack(new DrugStack
                         (
                             "CuSO4",
                             new List<IonStack>
@@ -271,10 +270,9 @@ namespace SubjectModel.Scripts.Development
                                     Amount = 1f, Concentration = 1f
                                 }
                             },
-                            Element.Acid,
-                            100
-                        ));
-                        chest.Contains.Add(new DrugStack
+                            Element.Acid
+                        ), 100));
+                        chest.Contains.Add(new SealStack(new DrugStack
                         (
                             "FeCl3",
                             new List<IonStack>
@@ -290,10 +288,9 @@ namespace SubjectModel.Scripts.Development
                                     Amount = 15f, Concentration = 3f
                                 }
                             },
-                            Element.Acid,
-                            50
-                        ));
-                        chest.Contains.Add(new DrugStack
+                            Element.Acid
+                        ), 50));
+                        chest.Contains.Add(new SealStack(new DrugStack
                         (
                             "FeSO4",
                             new List<IonStack>
@@ -304,10 +301,9 @@ namespace SubjectModel.Scripts.Development
                                     Amount = 25f, Concentration = 1f
                                 }
                             },
-                            Element.Acid,
-                            50
-                        ));
-                        chest.Contains.Add(new DrugStack
+                            Element.Acid
+                        ), 50));
+                        chest.Contains.Add(new SealStack(new DrugStack
                         (
                             "CoSO4",
                             new List<IonStack>
@@ -318,13 +314,12 @@ namespace SubjectModel.Scripts.Development
                                     Amount = 1f, Concentration = 1f
                                 }
                             },
-                            Element.Acid,
-                            50
-                        ));
+                            Element.Acid
+                        ), 50));
                         break;
                     case "Reaction":
                         chest.Contains.Add(new Sling());
-                        chest.Contains.Add(new DrugStack
+                        chest.Contains.Add(new SealStack(new DrugStack
                         (
                             "H2O2",
                             new List<IonStack>
@@ -335,10 +330,9 @@ namespace SubjectModel.Scripts.Development
                                     Amount = 1f, Concentration = 1f
                                 }
                             },
-                            Element.Acid,
-                            75
-                        ));
-                        chest.Contains.Add(new DrugStack
+                            Element.Acid
+                        ), 75));
+                        chest.Contains.Add(new SealStack(new DrugStack
                         (
                             "KMnO4",
                             new List<IonStack>
@@ -354,9 +348,8 @@ namespace SubjectModel.Scripts.Development
                                     Amount = 1f, Concentration = 1f
                                 }
                             },
-                            Element.Acid,
-                            75
-                        ));
+                            Element.Acid
+                        ), 75));
                         break;
                     case "Suicide":
                         break;

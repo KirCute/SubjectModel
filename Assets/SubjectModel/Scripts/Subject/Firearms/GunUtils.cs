@@ -203,15 +203,6 @@ namespace SubjectModel.Scripts.Subject.Firearms
         }
     }
 
-    public interface IFiller
-    {
-        public int Count { get; }
-        public string FillerName { get; }
-        public void OnBulletHit(GameObject target);
-        public bool Equals(IFiller other);
-        public void CountAppend(int count);
-    }
-
     [Serializable]
     public class GunData
     {

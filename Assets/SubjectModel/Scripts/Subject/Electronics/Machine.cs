@@ -8,7 +8,8 @@ namespace SubjectModel.Scripts.Subject.Electronics
 {
     public class Machine : MonoBehaviour
     {
-        private readonly Dictionary<Wire, List<Action<Wire>>> wires = new Dictionary<Wire, List<Action<Wire>>>();
+        private readonly WireManager wireManager = new WireManager();
+        private readonly IList<WireInterface> wires = new List<WireInterface>();
         private readonly IList<IMachineComponent> componentsWithoutBattery = new List<IMachineComponent>();
 
         private readonly Dictionary<IBattery, IList<IMachineComponent>> components =
@@ -64,34 +65,6 @@ namespace SubjectModel.Scripts.Subject.Electronics
             return components.Remove(battery);
         }
 
-        public void WireApply(Action<Wire> merge)
-        {
-            var ret = new Wire();
-            wires.Add(ret, new List<Action<Wire>> {merge});
-            merge(ret);
-        }
-
-        public void RemoveWireMerge(Wire wire, Action<Wire> merge)
-        {
-            if (!wires.ContainsKey(wire) || !wires[wire].Contains(merge)) return;
-            merge(null);
-            wires[wire].Remove(merge);
-        }
-
-        public void WireMerge(Wire a, Wire b)
-        {
-            if (!wires.ContainsKey(a) || !wires.ContainsKey(b)) return;
-            var retain = wires[a].Count >= wires[b].Count ? a : b;
-            var remove = wires[a].Count >= wires[b].Count ? b : a;
-            foreach (var merge in wires[remove])
-            {
-                wires[retain].Add(merge);
-                merge(retain);
-            }
-
-            wires.Remove(remove);
-        }
-
         private void ChangeBattery(IMachineComponent component, IBattery target)
         {
             if (component.Battery == null) componentsWithoutBattery.Remove(component);
@@ -99,6 +72,59 @@ namespace SubjectModel.Scripts.Subject.Electronics
             if (target == null) componentsWithoutBattery.Add(component);
             else components[target].Add(component);
             component.Battery = target;
+        }
+
+        public WireInterface AddWireInterface(IMachineComponent component, Wire wire)
+        {
+            var ret = wireManager.GetNewInterface();
+            ret.Component = component;
+            ret.Wire = wire;
+            wires.Add(ret);
+            return ret;
+        }
+
+        public WireInterface AddWireInterface(IMachineComponent component)
+        {
+            return AddWireInterface(component, wireManager.GetNewWire());
+        }
+
+        public void RemoveWireInterface(WireInterface wire)
+        {
+            if (!wires.Contains(wire)) return;
+            wire.Component = null;
+            wires.Remove(wire);
+        }
+
+        public void Connect(Wire retain, Wire remove)
+        {
+            foreach (var wire in wires)
+                if (wire.Wire == remove)
+                    wire.Wire = retain;
+        }
+
+        public void Disconnect(Wire wire, params WireInterface[] outer)
+        {
+            var newWire = wireManager.GetNewWire();
+            foreach (var i in outer)
+                if (i.Wire == wire)
+                    i.Wire = newWire;
+            newWire.CheckBackToPool();
+        }
+        
+        private class WireManager
+        {
+            private readonly Queue<Wire> wirePool = new Queue<Wire>();
+            private readonly Queue<WireInterface> interfacePool = new Queue<WireInterface>();
+
+            public Wire GetNewWire()
+            {
+                return wirePool.Count > 0 ? wirePool.Dequeue() : new Wire(wirePool);
+            }
+
+            public WireInterface GetNewInterface()
+            {
+                return interfacePool.Count > 0 ? interfacePool.Dequeue() : new WireInterface(interfacePool);
+            }
         }
     }
 }

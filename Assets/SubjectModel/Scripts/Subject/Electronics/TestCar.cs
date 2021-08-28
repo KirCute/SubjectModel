@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Bolt;
 using SubjectModel.Scripts.InventorySystem;
 using SubjectModel.Scripts.Subject.Chemistry;
@@ -23,15 +22,15 @@ namespace SubjectModel.Scripts.Subject.Electronics
             machine.AddComponent(catapult);
             motor.Soul = GameObject.FindWithTag("Player");
             sensor.Soul = GameObject.FindWithTag("Player");
-            machine.WireMerge(motor.Vec, sensor.Vec);
-            machine.WireMerge(motor.Button, catapult.Button);
-            machine.WireMerge(motor.Select, catapult.Select);
-            machine.WireMerge(catapult.Direction, motor.Vec);
+            machine.Connect(motor.Vec.Wire, sensor.Vec.Wire);
+            machine.Connect(motor.Button.Wire, catapult.Button.Wire);
+            machine.Connect(motor.Select.Wire, catapult.Select.Wire);
+            machine.Connect(catapult.Direction.Wire, motor.Vec.Wire);
         }
 
         private void Start()
         {
-            GetComponent<Inventory>().Add(new DrugStack
+            GetComponent<Inventory>().Add(new SealStack(new DrugStack
             (
                 "CoSO4",
                 new List<IonStack>
@@ -42,9 +41,8 @@ namespace SubjectModel.Scripts.Subject.Electronics
                         Amount = 1f, Concentration = 1f
                     }
                 },
-                Element.Acid,
-                10000
-            ));
+                Element.Acid
+            ), 10000));
         }
     }
 
@@ -54,31 +52,25 @@ namespace SubjectModel.Scripts.Subject.Electronics
         public float Watt => 10f;
         public IBattery Battery { get; set; }
         public GameObject Soul;
-        public Wire Vec;
-        private Action<Wire> vecMerge;
-        public Wire Select;
-        private Action<Wire> selectMerge;
-        public Wire Button;
-        private Action<Wire> buttonMerge;
+        public WireInterface Vec;
+        public WireInterface Select;
+        public WireInterface Button;
 
         public void OnInstall(Machine machine)
         {
-            vecMerge = w => Vec = w;
-            machine.WireApply(vecMerge);
-            selectMerge = w => Select = w;
-            machine.WireApply(selectMerge);
-            buttonMerge = w => Button = w;
-            machine.WireApply(buttonMerge);
+            Vec = machine.AddWireInterface(this);
+            Select = machine.AddWireInterface(this);
+            Button = machine.AddWireInterface(this);
         }
 
         public void OnUninstall(Machine machine)
         {
-            machine.RemoveWireMerge(Vec, vecMerge);
-            vecMerge = null;
-            machine.RemoveWireMerge(Select, selectMerge);
-            selectMerge = null;
-            machine.RemoveWireMerge(Button, buttonMerge);
-            buttonMerge = null;
+            machine.RemoveWireInterface(Vec);
+            Vec = null;
+            machine.RemoveWireInterface(Select);
+            Select = null;
+            machine.RemoveWireInterface(Button);
+            Button = null;
         }
 
         public void Update(GameObject gameObject)

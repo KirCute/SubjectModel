@@ -200,7 +200,8 @@ namespace SubjectModel.Scripts.Development
                         drugCount = GUILayout.TextField(drugCount, GUILayout.ExpandWidth(true));
                         if (GUILayout.Button("+", GUILayout.ExpandWidth(false)) && ions.Count != 0)
                         {
-                            inventory.Add(new DrugStack(drugTag, ions, int.Parse(properties), int.Parse(drugCount)));
+                            inventory.Add(new SealStack(new DrugStack(drugTag, ions, int.Parse(properties)),
+                                int.Parse(drugCount)));
                             ions = new List<IonStack>();
                         }
 
@@ -212,7 +213,7 @@ namespace SubjectModel.Scripts.Development
                         {
                             inventory.Add(new Bullet(FirearmDictionary.BulletTemples[int.Parse(chemicalBullet)],
                                 int.Parse(drugCount),
-                                new DrugStack(drugTag, ions, int.Parse(properties), int.Parse(drugCount))));
+                                new DrugStack(drugTag, ions, int.Parse(properties))));
                             ions = new List<IonStack>();
                         }
 
@@ -518,7 +519,7 @@ namespace SubjectModel.Scripts.Development
                 }
             }, "测试窗口");
         }
-        
+
         /**
          * <summary>
          * 自动调整的TextField
@@ -600,7 +601,7 @@ namespace SubjectModel.Scripts.Development
             ManualAdjustFloatUpdating(text, ref value, ref update, ref v);
             target.Set(targetName, v);
         }
-        
+
         /**
          * <summary>带有“生效”和"实时更新"按钮的TestField（内容为float）</summary>
          */

@@ -62,77 +62,99 @@ namespace SubjectModel.Scripts.Subject.Chemistry
     }
 
     /**
-     * <summary>试剂堆，用于描述玻封药品，子弹或其它炼金术容器内的全部内容物</summary>
+     * <summary>试剂堆，用于描述玻封药品、试管、子弹或其它炼金术容器内的全部内容物</summary>
      */
-    public class DrugStack : IThrowable, IFiller
+    public class DrugStack : IFiller
     {
         public readonly string Tag;
         public readonly IList<IonStack> Ions;
         public readonly int Properties;
-        public string Name => $"{Tag}({Count})";
         public string FillerName => Tag;
-        public int Count { get; private set; }
 
-        public DrugStack(string tag, IList<IonStack> ions, int properties, int count)
+        public DrugStack(string tag, IList<IonStack> ions, int properties)
         {
             Tag = tag;
             Ions = ions;
             Properties = properties;
-            Count = count;
-        }
-
-        public void Merge(IItemStack item)
-        {
-            Count += ((DrugStack) item).Count;
-        }
-
-        public IItemStack Fetch(int c)
-        {
-            if (c > Count) c = Count;
-            var ions = Ions.Select(ion => new IonStack
-                    {Element = ion.Element, Index = ion.Index, Amount = ion.Amount, Concentration = ion.Concentration})
-                .ToList();
-            Count -= c;
-            return new DrugStack(Tag, ions, Properties, c);
-        }
-
-        public void CountAppend(int c)
-        {
-            Count += c;
-        }
-
-        public bool CanMerge(IItemStack item)
-        {
-            if (!(item is DrugStack)) return false;
-            var drug = (DrugStack) item;
-            if (drug.Ions.Count != Ions.Count || drug.Tag != Tag || drug.Properties != Properties) return false;
-            return Ions.All(ion => drug.Ions.Any(i =>
-                ion.Element == i.Element && ion.Index == i.Index && Math.Abs(ion.Amount - i.Amount) < 0.000001f &&
-                Math.Abs(ion.Concentration - i.Concentration) < 0.000001f));
-        }
-
-        public void OnMasterThrow(GameObject user, Vector2 pos)
-        {
-            if (Camera.main == null) return;
-            BuffInvoker.InvokeByThrower(this, pos, user.GetComponent<Rigidbody2D>().position);
-        }
-
-        public void OnSlaveThrow(GameObject user)
-        {
-            if (Camera.main == null) return;
-            BuffInvoker.InvokeByThrower(this, user.GetComponent<Rigidbody2D>().position,
-                user.GetComponent<Rigidbody2D>().position);
         }
 
         public void OnBulletHit(GameObject target)
         {
             if (!target.TryGetComponent<BuffRenderer>(out var br)) return;
-            br.Register((DrugStack) Fetch(1));
+            br.Register(Clone());
         }
 
         public bool Equals(IFiller other)
         {
-            return other is DrugStack o && CanMerge(o);
+            return other is DrugStack o && Equals(o);
+        }
+
+        public bool Equals(DrugStack other)
+        {
+            if (other.Ions.Count != Ions.Count || other.Tag != Tag || other.Properties != Properties) return false;
+            return Ions.All(ion => other.Ions.Any(i =>
+                ion.Element == i.Element && ion.Index == i.Index && Math.Abs(ion.Amount - i.Amount) < 0.001f &&
+                Math.Abs(ion.Concentration - i.Concentration) < 0.001f));
+        }
+
+        public DrugStack Clone()
+        {
+            return new DrugStack(Tag, Ions.Select(ion => new IonStack
+                    {Element = ion.Element, Index = ion.Index, Amount = ion.Amount, Concentration = ion.Concentration})
+                .ToList(), Properties);
+        }
+    }
+
+    /**
+     * <summary>玻封药品</summary>
+     */
+    public class SealStack : IThrowable
+    {
+        public string Name => $"{drug.Tag} ({Count})";
+        public int Count { get; private set; }
+        private readonly DrugStack drug;
+
+        public SealStack(DrugStack drug, int count)
+        {
+            this.drug = drug;
+            Count = count;
+        }
+
+        public bool CanMerge(IItemStack item)
+        {
+            return item is SealStack stack && drug.Equals(stack.drug);
+        }
+
+        public void Merge(IItemStack item)
+        {
+            Count += ((SealStack) item).Count;
+        }
+
+        public IItemStack Fetch(int c)
+        {
+            if (c > Count) c = Count;
+            Count -= c;
+            return new SealStack(drug.Clone(), c);
+        }
+
+        public void OnMasterThrow(GameObject user, Vector2 pos)
+        {
+            if (Camera.main == null) return;
+            BuffInvoker.InvokeByThrower(drug, pos, user.GetComponent<Rigidbody2D>().position);
+            Count--;
+        }
+
+        public void OnSlaveThrow(GameObject user)
+        {
+            if (Camera.main == null) return;
+            BuffInvoker.InvokeByThrower(drug, user.GetComponent<Rigidbody2D>().position,
+                user.GetComponent<Rigidbody2D>().position);
+            Count--;
+        }
+
+        public void CountAppend(int c)
+        {
+            Count += c;
         }
     }
 }
