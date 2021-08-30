@@ -3,6 +3,12 @@ using UnityEngine;
 
 namespace SubjectModel.Scripts.Task
 {
+    /**
+     * <summary>
+     * 任务触发器
+     * 在玩家进入一触发器后触发遭遇事件。
+     * </summary>
+     */
     [RequireComponent(typeof(Collider2D))]
     public class MissionTrigger : MonoBehaviour
     {

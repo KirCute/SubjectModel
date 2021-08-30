@@ -136,30 +136,30 @@ namespace SubjectModel.Scripts.Subject.Firearms
 
         public static readonly Action<Firearm>[] FirearmBuilder =
         {
-            firearm => { },
-            firearm =>
+            firearm => { }, //Unknown
+            firearm => //AR
             {
                 firearm.ShootKeep = DefaultShoot;
                 firearm.Reload = DefaultReload;
             },
-            firearm =>
+            firearm => //RF
             {
                 firearm.Magazine = new Magazine(MagazineTemples
-                    .Where(item => item.Name == firearm.Temple.Magazine[0]).FirstOrDefault());
+                    .Where(item => item.Name == firearm.Temple.Magazine[0]).FirstOrDefault()); //自动获得桥架
                 firearm.NameGetter = gun =>
                 {
                     var fn = gun.Temple.Name;
-                    var l = gun.Loading;
+                    var l = gun.Loading > .0f;
                     var b = gun.Magazine.Containing;
                     var bn = b?.Temple.Name;
                     var bf = b?.Filler;
                     var bc = b?.Count;
                     var mc = gun.Magazine.Temple.BulletContains;
                     return b == null
-                        ? $"{fn}{(l > .0f ? "(装填中)" : "")}"
+                        ? $"{fn}{(l ? "(装填中)" : "")}"
                         : bf == null
-                            ? $"{fn}({bn} {bc}/{mc}{(l > .0f ? " 装填中" : "")})"
-                            : $"{fn}({bn} {bf.FillerName} {bc}/{mc}{(l > .0f ? " 装填中" : "")})";
+                            ? $"{fn}({bn} {bc}/{mc}{(l ? " 装填中" : "")})"
+                            : $"{fn}({bn} {bf.FillerName} {bc}/{mc}{(l ? " 装填中" : "")})";
                 };
                 firearm.ShootOnce = DefaultShoot;
                 firearm.Sub = gun => gun.Magazine.AppropriateBullet();
@@ -179,8 +179,8 @@ namespace SubjectModel.Scripts.Subject.Firearms
                 {
                     if (gun.SwitchingMagazine || !user.GetComponent<Inventory>().TryGetSubItem(out var ready)) return;
                     var bullet = (Bullet) ready;
-                    if (gun.Magazine.Containing != null && (!gun.Magazine.Containing.Is(bullet) ||
-                                                            gun.Magazine.Containing.Count >=
+                    if (gun.Magazine.Containing != null && (!gun.Magazine.Containing.Is(bullet) || 
+                                                            gun.Magazine.Containing.Count >= 
                                                             gun.Magazine.Temple.BulletContains)) return;
                     gun.Ready = bullet;
                     gun.SwitchingMagazine = true;

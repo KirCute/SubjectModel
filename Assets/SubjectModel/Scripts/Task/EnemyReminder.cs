@@ -5,15 +5,24 @@ using UnityEngine;
 
 namespace SubjectModel.Scripts.Task
 {
+    /**
+     * <summary>
+     * 怪物生成器
+     * 订阅遭遇事件使怪物显性。
+     * 在遭遇且有Boss时触发BossFight事件。
+     * 在怪物全部被击杀时触发成功事件。
+     * 注意：只有挂载了StateMachine的物体会被识别为怪物。
+     * </summary>
+     */
     public class EnemyReminder : MissionObject
     {
-        public GameObject boss;
-        public bool cameraLock;
+        public GameObject boss; //若为子物体之一，指定其为Boss，否则认为此次遭遇无Boss
+        public bool cameraLock; //是否锁定相机
         
         private void Update()
         {
             if (GetComponentsInChildren<StateMachine>().Length > 0) return;
-            EventDispatchers.EeDispatcher.DispatchEvent(completeIndex);
+            EventDispatchers.EeDispatcher.DispatchEvent(completeIndex); //触发成功事件
         }
 
         protected override void Encounter()

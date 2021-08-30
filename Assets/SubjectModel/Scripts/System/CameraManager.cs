@@ -4,6 +4,13 @@ using UnityEngine;
 
 namespace SubjectModel.Scripts.System
 {
+    /**
+     * <summary>
+     * 相机管理脚本
+     * 订阅CameraTransfer事件以持续追踪目标物体
+     * 需要挂载在CinemachineVirtualCamera上
+     * </summary>
+     */
     [RequireComponent(typeof(CinemachineVirtualCamera))]
     public class CameraManager : MonoBehaviour
     {
@@ -19,6 +26,11 @@ namespace SubjectModel.Scripts.System
             EventDispatchers.CteDispatcher.AddEventListener(OnCameraTransfer);
         }
 
+        /**
+         * <summary>
+         * 得到从第index层开始的追踪物体（无参时即为实际追踪物体）
+         * </summary>
+         */
         private Transform GetTarget(int index = 0)
         {
             while (layerTarget[index] == null && index < layerTarget.Length - 1) index++;
