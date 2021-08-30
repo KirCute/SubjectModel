@@ -467,14 +467,14 @@ namespace SubjectModel.Scripts.Development
                             GUILayout.Label($"{i} - {inventory.Contains[i].Name}",
                                 GUILayout.ExpandWidth(true));
                             if (inventory.Contains[i] is Weapon &&
-                                GUILayout.Button("·", GUILayout.ExpandWidth(false))) inventory.SwitchTo(i);
+                                GUILayout.Button("·", GUILayout.ExpandWidth(false))) inventory.Selecting = i;
 
                             if (i != 0 && GUILayout.Button("↑", GUILayout.ExpandWidth(false)))
                             {
                                 var front = inventory.Contains[i - 1];
                                 var behind = inventory.Contains[i];
-                                if (inventory.selecting == i) inventory.selecting--;
-                                else if (inventory.selecting == i - 1) inventory.selecting++;
+                                if (inventory.Selecting == i) inventory.selecting--;
+                                else if (inventory.Selecting == i - 1) inventory.selecting++;
                                 inventory.Contains[i - 1] = behind;
                                 inventory.Contains[i] = front;
                             }
@@ -484,8 +484,8 @@ namespace SubjectModel.Scripts.Development
                             {
                                 var front = inventory.Contains[i];
                                 var behind = inventory.Contains[i + 1];
-                                if (inventory.selecting == i + 1) inventory.selecting--;
-                                else if (inventory.selecting == i) inventory.selecting++;
+                                if (inventory.Selecting == i + 1) inventory.selecting--;
+                                else if (inventory.Selecting == i) inventory.selecting++;
                                 inventory.Contains[i] = behind;
                                 inventory.Contains[i + 1] = front;
                             }

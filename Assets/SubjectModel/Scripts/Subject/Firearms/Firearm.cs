@@ -86,7 +86,7 @@ namespace SubjectModel.Scripts.Subject.Firearms
             weight = temple.Weight;
             FirearmDictionary.FirearmBuilder[temple.Type](this);
         }
-
+        
         public override void OnMasterUseKeep(GameObject user, Vector2 aim)
         {
             ShootKeep(this, user, aim);

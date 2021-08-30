@@ -20,8 +20,8 @@ namespace SubjectModel.Scripts.GUI
         private void Start()
         {
             var children = GetComponentsInChildren<Text>();
-            oxidizer = children.Where(text => text.name == "Oxidizer").FirstOrDefault();
-            reducer = children.Where(text => text.name == "Reducer").FirstOrDefault();
+            oxidizer = children.Where(text => text.name == "Oxidizer").FirstOrDefault(); //Oxidizer子物体理论上只有一个
+            reducer = children.Where(text => text.name == "Reducer").FirstOrDefault(); //Reducer子物体理论上只有一个
         }
 
         private void Update()

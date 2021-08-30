@@ -28,7 +28,7 @@ namespace SubjectModel.Scripts.AI
             if (!self.TryGetComponent<Inventory>(out var inventory)) return; //获取物品栏inventory
             inventory.Add(new Firearm(FirearmDictionary.FirearmTemples[2])); //添加模板0枪支
             inventory.Add(new Bullet(FirearmDictionary.BulletTemples[4], 1000000)); //添加子弹
-            inventory.SwitchTo(0); //装备位于物品栏0号位的枪支
+            inventory.Selecting = 0; //装备位于物品栏0号位的枪支
         }
     }
 }

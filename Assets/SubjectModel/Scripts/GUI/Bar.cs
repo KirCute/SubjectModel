@@ -19,7 +19,7 @@ namespace SubjectModel.Scripts.GUI
         {
             if (sourceVariables == null) return;
             var dec = sourceVariables.declarations;
-            GetComponent<RectTransform>().sizeDelta =
+            GetComponent<RectTransform>().sizeDelta = //修改GUI条长度
                 new Vector2(Utils.Map(.0f, dec.Get<float>(sourceEnd), .0f, targetEnd, dec.Get<float>(source)), y);
         }
 

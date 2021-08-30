@@ -71,7 +71,7 @@ namespace SubjectModel.Scripts.AI
                 },
                 Element.Acid
             ), 10000)); //添加玻封药品CuCl2用于治疗
-            inventory.SwitchTo(0); //装备位于物品栏0号位的弹弓
+            inventory.Selecting = 0; //装备位于物品栏0号位的弹弓
         }
     }
 }

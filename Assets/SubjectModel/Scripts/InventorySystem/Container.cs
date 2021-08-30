@@ -12,7 +12,14 @@ namespace SubjectModel.Scripts.InventorySystem
      */
     public class Container
     {
-        public readonly IList<IItemStack> Contains;
+        public readonly IList<IItemStack> Contains; //箱子的内容物
+        public IItemStack this[int index] //用于美化代码
+        {
+            get => Contains[index];
+            set => Contains[index] = value;
+        }
+
+        public int Count => Contains.Count; //用于美化代码
 
         public Container(IList<IItemStack> contains)
         {

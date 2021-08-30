@@ -65,7 +65,7 @@ namespace SubjectModel.Scripts.Subject.Electronics
             Select = machine.AddWireInterface(this);
             Direction = machine.AddWireInterface(this);
             machine.TryGetComponent(out inv);
-            if (inv != null) inv.SwitchTo(inv.Contains.IndexOf(inv.Add(new Sling())));
+            if (inv != null) inv.Selecting = inv.Contains.IndexOf(inv.Add(new Sling()));
         }
 
         public void OnUninstall(Machine machine)
@@ -85,7 +85,7 @@ namespace SubjectModel.Scripts.Subject.Electronics
             if (reserve < 0f) reserve = 0f;
             if (inv == null || !Button.Read<bool>(SignalType.Digital) || reserve > 0f) return;
             reserve = 5f;
-            inv.subSelecting = Select.Read<int>(SignalType.OneWire);
+            inv.SubSelecting = Select.Read<int>(SignalType.OneWire);
             var dir = Direction.Read<Vector2>(SignalType.OneWire);
             inv.MasterUse(dir + (gameObject.TryGetComponent<Rigidbody2D>(out var rbody)
                 ? rbody.position

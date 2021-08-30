@@ -23,11 +23,11 @@ namespace SubjectModel.Scripts.GUI
         private void OnBossFightStart(GameObject entity)
         {
             boss = entity;
-            EventDispatchers.EdeDispatcher.AddEventListener(OnBossFightEnd, boss);
+            EventDispatchers.EdeDispatcher.AddEventListener(OnBossFightEnd, boss); //同时订阅boss和玩家死亡事件用于判定胜负
             EventDispatchers.EdeDispatcher.AddEventListener(OnBossFightEnd, GameObject.FindWithTag("Player"));
             boss.GetComponent<HealthBarHelper>().enabled = false; //关闭Boss的一般敌人状态条
-            foreach (var bar in GetComponentsInChildren<Transform>())
-                switch (bar.name) //通过名称更新BossAssistance子物品的状态
+            foreach (var bar in GetComponentsInChildren<Transform>()) //通过名称更新BossAssistance子物品的状态
+                switch (bar.name) //当添加新的Boss GUI时在此处做初始化工作
                 {
                     case "Health Bar": //血条
                         bar.GetComponent<Bar>().sourceVariables = boss.GetComponent<Variables>();
@@ -48,8 +48,8 @@ namespace SubjectModel.Scripts.GUI
         {
             EventDispatchers.EdeDispatcher.RemoveEventListener(OnBossFightEnd, boss);
             EventDispatchers.EdeDispatcher.RemoveEventListener(OnBossFightEnd, GameObject.FindWithTag("Player"));
-            foreach (var bar in GetComponentsInChildren<Transform>())
-                switch (bar.name) //还原BossAssistance子物品的状态
+            foreach (var bar in GetComponentsInChildren<Transform>()) //还原BossAssistance子物品的状态
+                switch (bar.name) //当添加新的Boss GUI时在此处做销毁工作
                 {
                     case "Health Bar":
                         bar.GetComponent<Bar>().sourceVariables = null;

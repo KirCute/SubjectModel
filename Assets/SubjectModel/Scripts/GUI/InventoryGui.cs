@@ -29,26 +29,26 @@ namespace SubjectModel.Scripts.GUI
         private void Start()
         {
             var children = GetComponentsInChildren<Text>();
-            selected = children.Where(text => text.name == "Selected").FirstOrDefault();
-            sub = children.Where(text => text.name == "Sub").FirstOrDefault();
+            selected = children.Where(text => text.name == "Selected").FirstOrDefault(); //Selected子物体理论上只有一个
+            sub = children.Where(text => text.name == "Sub").FirstOrDefault(); //Sub子物体理论上只有一个
         }
 
         private void Update()
         {
             if (inventory == null) return;
-            selected.text = inventory.selecting >= 0 && inventory.Contains.Count > inventory.selecting
-                ? inventory.Contains[inventory.selecting].Name
+            selected.text = inventory.Selecting >= 0 && inventory.Contains.Count > inventory.Selecting
+                ? inventory.Contains[inventory.Selecting].Name
                 : "";
-            sub.text = inventory.SubContains.Count == 0 ? "" : BuildSubString();
+            sub.text = BuildSubString();
         }
 
         private string BuildSubString()
         {
-            var sb = new StringBuilder();
+            var sb = new StringBuilder("");
             for (var i = inventory.SubContains.Count - 1; i >= 0; i--)
             {
                 if (i >= Inventory.PlayerMaxSubCount) continue;
-                sb.Append(inventory.subSelecting == i ? "> " : "  ");
+                sb.Append(inventory.SubSelecting == i ? "> " : "  ");
                 sb.Append($"{i + 1} - {inventory.SubContains[i].Name}");
                 sb.Append("\n");
             }

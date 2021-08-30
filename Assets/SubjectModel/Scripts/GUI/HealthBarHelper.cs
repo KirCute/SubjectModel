@@ -20,8 +20,8 @@ namespace SubjectModel.Scripts.GUI
             stateBar = (GameObject) Instantiate(Resources.Load("Prefab/Enemy State Bar"),
                 GameObject.FindWithTag("EnemiesStateBar").transform);
             stateBar.name = name;
-            foreach (var bar in stateBar.GetComponentsInChildren<Transform>())
-                switch (bar.name)  //通过名称更新stateBar子物品的状态
+            foreach (var bar in stateBar.GetComponentsInChildren<Transform>()) //通过名称更新stateBar子物品的状态
+                switch (bar.name) //当一般敌人状态条有新的内容时，在此处做初始化工作
                 {
                     case "Health Bar":
                         bar.GetComponent<Bar>().sourceVariables = gameObject.GetComponent<Variables>();
