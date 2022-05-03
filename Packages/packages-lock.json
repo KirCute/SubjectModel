@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.unity.2d.animation": {
-      "version": "5.0.6",
+      "version": "5.0.7",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -24,7 +24,7 @@
       "url": "https://packages-v2.unity.cn"
     },
     "com.unity.2d.path": {
-      "version": "4.0.1",
+      "version": "4.0.2",
       "depth": 1,
       "source": "registry",
       "dependencies": {},
@@ -55,13 +55,13 @@
       "dependencies": {}
     },
     "com.unity.2d.spriteshape": {
-      "version": "5.1.3",
+      "version": "5.1.4",
       "depth": 0,
       "source": "registry",
       "dependencies": {
         "com.unity.mathematics": "1.1.0",
         "com.unity.2d.common": "4.0.3",
-        "com.unity.2d.path": "4.0.1",
+        "com.unity.2d.path": "4.0.2",
         "com.unity.modules.physics2d": "1.0.0"
       },
       "url": "https://packages-v2.unity.cn"
@@ -73,7 +73,7 @@
       "dependencies": {}
     },
     "com.unity.cinemachine": {
-      "version": "2.6.5",
+      "version": "2.6.10",
       "depth": 0,
       "source": "registry",
       "dependencies": {},
@@ -114,7 +114,7 @@
       "url": "https://packages-v2.unity.cn"
     },
     "com.unity.ide.vscode": {
-      "version": "1.2.3",
+      "version": "1.2.4",
       "depth": 0,
       "source": "registry",
       "dependencies": {},
@@ -134,8 +134,34 @@
       "dependencies": {},
       "url": "https://packages-v2.unity.cn"
     },
+    "com.unity.render-pipelines.core": {
+      "version": "10.5.1",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.ugui": "1.0.0"
+      },
+      "url": "https://packages-v2.unity.cn"
+    },
+    "com.unity.searcher": {
+      "version": "4.3.2",
+      "depth": 2,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages-v2.unity.cn"
+    },
+    "com.unity.shadergraph": {
+      "version": "10.5.1",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.render-pipelines.core": "10.5.1",
+        "com.unity.searcher": "4.3.2"
+      },
+      "url": "https://packages-v2.unity.cn"
+    },
     "com.unity.test-framework": {
-      "version": "1.1.27",
+      "version": "1.1.29",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -174,6 +200,16 @@
         "com.unity.modules.ui": "1.0.0",
         "com.unity.modules.imgui": "1.0.0"
       }
+    },
+    "com.unity.visualeffectgraph": {
+      "version": "10.5.1",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.shadergraph": "10.5.1",
+        "com.unity.render-pipelines.core": "10.5.1"
+      },
+      "url": "https://packages-v2.unity.cn"
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",
